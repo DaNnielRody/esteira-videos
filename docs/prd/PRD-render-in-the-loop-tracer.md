@@ -70,13 +70,26 @@ result is accepted only through the same render and validation gates.
 {
   "schema_version": "1.0",
   "scene_name": "AcceptanceScene",
-  "description": "Mostre um círculo no centro. Depois transforme-o em um quadrado e mova-o para a direita."
+  "description": "Mostre um círculo no centro. Depois transforme-o em um quadrado e mova-o para a direita.",
+  "topics": ["linear_algebra"],
+  "reference_examples": 2,
+  "expect": {
+    "max_shapes": 1,
+    "beats": [{"shape": "circle", "region": "center"}],
+    "latex": [],
+    "text": []
+  }
 }
 ```
 
 - Unknown keys are rejected.
 - `scene_name` matches `^[A-Z][A-Za-z0-9_]*$`.
 - `description` is non-blank.
+- `topics` selects only the closed AI/mathematics reference vocabulary and has
+  no duplicates; `reference_examples` is between zero and three.
+- `expect` is opt-in. Frame and fixed-text sensors return evidence or an
+  explicit sensor failure; semantic matchers never interpret sensor failure as
+  a wrong scene.
 
 ### Provider
 
@@ -87,6 +100,8 @@ result is accepted only through the same render and validation gates.
 - The correction request includes the original spec, exact previous code,
   executed argv, exit/timeout facts, stdout, stderr, and validator reasons.
 - Ollama defaults to `qwen2.5-coder:7b`, but model and base URL are configurable.
+- Sampling `temperature` and `seed` are explicit, preserved request fields and
+  are sent inside Ollama's `options`; defaults are `0.0` and `42`.
 - Ollama generation is non-streaming and uses `keep_alive: 0`; unload is also
   an explicit empty generation request with `keep_alive: 0`.
 
@@ -105,7 +120,7 @@ result is accepted only through the same render and validation gates.
 - Run directories use a collision-resistant ID; attempts are `attempt-01`,
   `attempt-02`, and so on and are never overwritten.
 - `run.json` is the read-only progress source and records one of:
-  `attempting`, `correcting`, `success`, `provider_error`, or
+  `attempting`, `correcting`, `success`, `provider_error`, `sensor_error`, or
   `attempts_exhausted`.
 - JSON and text artifacts are UTF-8 and contain no model assertion that can
   override renderer/validator facts.

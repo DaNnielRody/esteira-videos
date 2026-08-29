@@ -17,8 +17,10 @@ Shape measurement uses OpenCV contours, and every descriptor comes from the
 axis-aligned bounding box is not rotation invariant and previously reported a
 square rotated by ten degrees as a polygon.
 
-The vocabulary is deliberately narrow: circle, square, polygon. It does not
-recognise text, colour, or arbitrary geometry.
+The vocabulary is deliberately narrow: circle, square, polygon, a fixed colour
+palette, coarse regions and centroid motion. It does not recognise text or
+arbitrary geometry; deterministic ``MathTex`` checks live in the separate
+LaTeX validator.
 """
 
 from __future__ import annotations
@@ -32,6 +34,8 @@ from typing import Protocol
 import cv2
 import numpy as np
 import numpy.typing as npt
+
+from video_pipeline.sensors import SensorFailure, SensorFailureCode, SensorResult
 
 # Manim renders on a black background; anything brighter is drawn content.
 _FOREGROUND_LUMINANCE = 40
@@ -110,6 +114,45 @@ class FrameObservation:
     shapes: list[ObservedShape]
 
 
+@dataclass(frozen=True, slots=True, init=False)
+class ObservationResult(SensorResult[list[FrameObservation]]):
+    """Uniform frame-sensor result containing evidence or an explicit failure."""
+
+    def __init__(
+        self,
+        *,
+        frames: list[FrameObservation] | None = None,
+        failure: SensorFailure | None = None,
+    ) -> None:
+        SensorResult.__init__(self, evidence=frames, failure=failure)
+
+    @property
+    def frames(self) -> list[FrameObservation]:
+        """Compatibility name for successful frame evidence."""
+
+        return self.evidence if self.evidence is not None else []
+
+    @classmethod
+    def success(cls, evidence: list[FrameObservation]) -> ObservationResult:
+        """Build successful frame evidence through the shared sensor contract."""
+
+        return cls(frames=evidence)
+
+    @classmethod
+    def failed(
+        cls,
+        failure: SensorFailure | SensorFailureCode,
+        detail: str | None = None,
+    ) -> ObservationResult:
+        """Build a failed result without pretending an empty storyboard was seen."""
+
+        if isinstance(failure, SensorFailure):
+            return cls(failure=failure)
+        if detail is None:
+            raise ValueError("sensor failure detail is required")
+        return cls(failure=SensorFailure(code=failure, detail=detail))
+
+
 class SceneObserver:
     """Sample frames from a rendered MP4 and describe what each one shows."""
 
@@ -128,7 +171,7 @@ class SceneObserver:
         self.timeout = float(timeout)
         self._ffmpeg_run = ffmpeg_run or _run_ffmpeg
 
-    def observe(self, mp4_path: str | Path, frames_dir: str | Path) -> list[FrameObservation]:
+    def observe(self, mp4_path: str | Path, frames_dir: str | Path) -> ObservationResult:
         """Extract sampled frames into ``frames_dir`` and analyze each one.
 
         The sampled frames stay on disk twice: as PNGs a reader can open, and
@@ -141,7 +184,10 @@ class SceneObserver:
         target.mkdir(parents=True, exist_ok=True)
         duration = _duration_seconds(source)
         if duration is None or duration <= 0:
-            return []
+            return ObservationResult.failed(
+                SensorFailureCode.DURATION_UNAVAILABLE,
+                f"could not read a positive duration from {source}",
+            )
 
         # Sample on a fixed grid so the storyboard is reproducible for one video.
         rate = max(self.samples / duration, 1.0 / duration)
@@ -158,21 +204,39 @@ class SceneObserver:
             str(target / "frame-%03d.png"),
         ]
         try:
-            self._ffmpeg_run(
+            extraction = self._ffmpeg_run(
                 argv,
                 capture_output=True,
                 text=True,
                 check=False,
                 timeout=self.timeout,
             )
-        except (OSError, subprocess.SubprocessError):
-            return []
+        except subprocess.TimeoutExpired as exc:
+            return ObservationResult.failed(
+                SensorFailureCode.FRAME_EXTRACTION_TIMEOUT,
+                f"ffmpeg frame extraction timed out after {exc.timeout} seconds",
+            )
+        except (OSError, subprocess.SubprocessError) as exc:
+            return ObservationResult.failed(
+                SensorFailureCode.FRAME_EXTRACTION_FAILED,
+                f"ffmpeg frame extraction failed: {exc}",
+            )
+        returncode = getattr(extraction, "returncode", 0)
+        if returncode != 0:
+            detail = str(getattr(extraction, "stderr", "") or "").strip()
+            return ObservationResult.failed(
+                SensorFailureCode.FRAME_EXTRACTION_FAILED,
+                f"ffmpeg frame extraction exited {returncode}: {detail}",
+            )
 
         frames = _read_png_stack(sorted(target.glob("frame-*.png")))
         if frames.size == 0:
-            return []
+            return ObservationResult.failed(
+                SensorFailureCode.NO_FRAMES_EXTRACTED,
+                f"ffmpeg produced no readable frames from {source}",
+            )
         np.savez_compressed(target / "frames.npz", frame_data=frames)
-        return analyze_frames(frames)
+        return ObservationResult(frames=analyze_frames(frames))
 
 
 def analyze_frames(frames: npt.NDArray[np.uint8]) -> list[FrameObservation]:
@@ -402,8 +466,11 @@ def _run_ffmpeg(
 
 __all__ = [
     "FrameObservation",
+    "ObservationResult",
     "ObservedShape",
     "SceneObserver",
+    "SensorFailure",
+    "SensorFailureCode",
     "analyze_frame",
     "analyze_frames",
 ]

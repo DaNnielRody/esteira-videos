@@ -15,7 +15,6 @@ from video_pipeline.provider import (
     UnloadResult,
 )
 from video_pipeline.rendering import RenderResult
-from video_pipeline.spec import SceneSpec
 from video_pipeline.validation import ValidationResult
 
 try:
@@ -176,7 +175,14 @@ def test_video_pipeline_render_success_reports_terminal_state_and_paths(
 
     exit_code = _invoke(
         main,
-        ["render", str(scene_path)],
+        [
+            "render",
+            str(scene_path),
+            "--temperature",
+            "0.35",
+            "--seed",
+            "23",
+        ],
         provider=provider,
         runner=runner,
         validator=validator,
@@ -192,6 +198,8 @@ def test_video_pipeline_render_success_reports_terminal_state_and_paths(
     assert str(run_directory) in captured.out
     assert mp4_paths
     assert str(mp4_paths[0]) in captured.out
+    assert provider.requests[0].temperature == 0.35
+    assert provider.requests[0].seed == 23
     assert json.loads((run_directory / "run.json").read_text(encoding="utf-8"))["state"] == (
         "success"
     )
@@ -273,6 +281,113 @@ def test_video_pipeline_render_provider_error_is_nonzero_and_observable(
     )
 
 
+def test_video_pipeline_calibrate_writes_axis_error_rates(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """The labeled sensor report is a repeatable CLI gate."""
+
+    main = _require_cli()
+    output = tmp_path / "sensor-calibration.json"
+    golden = Path(__file__).parent / "golden"
+
+    exit_code = main(  # type: ignore[operator, no-any-return]
+        ["calibrate", "--golden-root", str(golden), "--output", str(output)]
+    )
+
+    assert exit_code == 0
+    assert str(output.resolve()) in capsys.readouterr().out
+    document = json.loads(output.read_text(encoding="utf-8"))
+    assert document["scenes"] == 15
+    assert document["axes"]["latex"]["true_positives"] == 1
+    assert document["axes"]["latex"]["true_negatives"] == 1
+    assert document["axes"]["text"]["true_positives"] == 2
+    assert document["axes"]["text"]["true_negatives"] == 4
+    assert document["axes"]["shape_count"]["false_positive_rate"] == 0.0
+    assert set(document["axes"]) == {
+        "shape_count",
+        "shape",
+        "color",
+        "region",
+        "motion",
+        "latex",
+        "text",
+    }
+    assert all(axis["false_positives"] == 0 for axis in document["axes"].values())
+    assert all(axis["false_negatives"] == 0 for axis in document["axes"].values())
+
+
+def test_prepare_study_materializes_ten_paired_control_and_treatment_specs(
+    tmp_path: Path,
+) -> None:
+    """The few-shot experiment changes only the number of reference examples."""
+
+    main = _require_cli()
+    manifest = tmp_path / "study.json"
+    cases = [
+        {
+            "schema_version": "1.0",
+            "scene_name": f"StudyScene{index}",
+            "description": f"Cena matemática controlada {index}",
+            "topics": ["linear_algebra"],
+        }
+        for index in range(1, 11)
+    ]
+    manifest.write_text(
+        json.dumps({"schema_version": "1.0", "name": "ai-math", "cases": cases}),
+        encoding="utf-8",
+    )
+    output = tmp_path / "prepared"
+
+    exit_code = main(  # type: ignore[operator, no-any-return]
+        ["prepare-study", str(manifest), "--output-root", str(output)]
+    )
+
+    assert exit_code == 0
+    controls = sorted((output / "control").glob("*.json"))
+    treatments = sorted((output / "treatment").glob("*.json"))
+    assert len(controls) == len(treatments) == 10
+    for control_path, treatment_path in zip(controls, treatments, strict=True):
+        control = json.loads(control_path.read_text(encoding="utf-8"))
+        treatment = json.loads(treatment_path.read_text(encoding="utf-8"))
+        assert control.pop("reference_examples") == 0
+        assert treatment.pop("reference_examples") == 2
+        assert control == treatment
+
+
+def test_prepare_study_rejects_a_nonempty_destination(tmp_path: Path) -> None:
+    """A rerun cannot silently mix stale samples into a paired experiment."""
+
+    main = _require_cli()
+    manifest = tmp_path / "study.json"
+    cases = [
+        {
+            "schema_version": "1.0",
+            "scene_name": f"StudyScene{index}",
+            "description": f"Cena matemática controlada {index}",
+            "topics": ["linear_algebra"],
+        }
+        for index in range(1, 11)
+    ]
+    manifest.write_text(
+        json.dumps({"schema_version": "1.0", "name": "ai-math", "cases": cases}),
+        encoding="utf-8",
+    )
+    output = tmp_path / "prepared"
+    assert main(  # type: ignore[operator, no-any-return]
+        ["prepare-study", str(manifest), "--output-root", str(output)]
+    ) == 0
+    stale = output / "control" / "stale.json"
+    stale.write_text("{}", encoding="utf-8")
+
+    second_exit = main(  # type: ignore[operator, no-any-return]
+        ["prepare-study", str(manifest), "--output-root", str(output)]
+    )
+
+    assert second_exit == 1
+    assert stale.is_file()
+
+
 def test_cli_audit_contract() -> None:
     """Inventory the CLI contract tests without production imports."""
 
@@ -280,6 +395,8 @@ def test_cli_audit_contract() -> None:
         "test_video_pipeline_render_success_reports_terminal_state_and_paths",
         "test_video_pipeline_render_exhaustion_is_nonzero_and_preserves_run_path",
         "test_video_pipeline_render_provider_error_is_nonzero_and_observable",
+        "test_video_pipeline_calibrate_writes_axis_error_rates",
+        "test_prepare_study_materializes_ten_paired_control_and_treatment_specs",
     )
 
     assert all(callable(globals().get(name)) for name in behavioral_tests)

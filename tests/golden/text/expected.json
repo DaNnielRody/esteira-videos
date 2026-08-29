@@ -1,0 +1,88 @@
+{
+  "cases": [
+    {
+      "name": "exact-text",
+      "renderer": "text",
+      "expected_content": "Gradient descent",
+      "candidate_content": "Gradient descent",
+      "font": "DejaVu Sans",
+      "expected_font_size": 42,
+      "candidate_font_size": 42,
+      "expected_color": "yellow",
+      "candidate_color": "yellow",
+      "expected_x": 0.0,
+      "candidate_x": 0.0,
+      "should_match": true
+    },
+    {
+      "name": "different-text",
+      "renderer": "text",
+      "expected_content": "Gradient descent",
+      "candidate_content": "Gradient ascent",
+      "font": "DejaVu Sans",
+      "expected_font_size": 42,
+      "candidate_font_size": 42,
+      "expected_color": "yellow",
+      "candidate_color": "yellow",
+      "expected_x": 0.0,
+      "candidate_x": 0.0,
+      "should_match": false
+    },
+    {
+      "name": "displaced-text",
+      "renderer": "text",
+      "expected_content": "Gradient descent",
+      "candidate_content": "Gradient descent",
+      "font": "DejaVu Sans",
+      "expected_font_size": 42,
+      "candidate_font_size": 42,
+      "expected_color": "yellow",
+      "candidate_color": "yellow",
+      "expected_x": 0.0,
+      "candidate_x": 1.0,
+      "should_match": false
+    },
+    {
+      "name": "wrong-size-text",
+      "renderer": "text",
+      "expected_content": "Gradient descent",
+      "candidate_content": "Gradient descent",
+      "font": "DejaVu Sans",
+      "expected_font_size": 42,
+      "candidate_font_size": 56,
+      "expected_color": "yellow",
+      "candidate_color": "yellow",
+      "expected_x": 0.0,
+      "candidate_x": 0.0,
+      "should_match": false
+    },
+    {
+      "name": "wrong-color-text",
+      "renderer": "text",
+      "expected_content": "Gradient descent",
+      "candidate_content": "Gradient descent",
+      "font": "DejaVu Sans",
+      "expected_font_size": 42,
+      "candidate_font_size": 42,
+      "expected_color": "yellow",
+      "candidate_color": "blue",
+      "expected_x": 0.0,
+      "candidate_x": 0.0,
+      "should_match": false
+    },
+    {
+      "name": "exact-tex",
+      "renderer": "tex",
+      "expected_content": "Linear transformation",
+      "candidate_content": "Linear transformation",
+      "font": null,
+      "expected_font_size": 42,
+      "candidate_font_size": 42,
+      "expected_color": "yellow",
+      "candidate_color": "yellow",
+      "expected_x": 0.0,
+      "candidate_x": 0.0,
+      "should_match": true
+    }
+  ]
+}

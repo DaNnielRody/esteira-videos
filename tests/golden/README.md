@@ -36,6 +36,11 @@ Tolerâncias de comparação exata, quando aplicável, são as do Manim
 cena é o rótulo: `geometry/Circle.npz` é um círculo, `transform/Transform.npz`
 é uma transformação real capturada em 7 frames.
 
+`latex/expected.json` e `text/expected.json` declaram pares positivos e
+negativos que o harness renderiza em Manim Community durante a calibração.
+Eles cobrem conteúdo, posição, tamanho e cor fixos para `MathTex`, `Tex` e
+`Text`; não usam OCR nem imagens autorrotuladas pelo próprio sensor.
+
 ## Limite deliberado
 
 Comparação exata de frame **não** serve para julgar cena gerada por LLM. Dois

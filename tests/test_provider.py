@@ -163,6 +163,19 @@ def test_ollama_generate_posts_non_streaming_json_and_extracts_fenced_code() -> 
     assert "Draw a circle" in body["prompt"]
 
 
+def test_ollama_generate_sends_reproducible_sampling_options() -> None:
+    """Temperature and seed are explicit experimental inputs, not hidden defaults."""
+
+    _require_contract()
+    opener = RecordingOpener([{"response": "print('scene')"}])
+    provider = OllamaProvider(base_url="http://ollama.test", opener=opener)
+
+    provider.generate(_request(temperature=0.2, seed=17))
+
+    body = _request_body(opener.requests[0][0])
+    assert body["options"] == {"temperature": 0.2, "seed": 17}
+
+
 def test_ollama_generate_accepts_plain_code_and_correction_context() -> None:
     _require_contract()
     opener = RecordingOpener([{"response": "print('corrected')"}])

@@ -9,6 +9,7 @@ the geometry the vendored golden set does not contain — chiefly rotation, whic
 from __future__ import annotations
 
 import math
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -18,12 +19,14 @@ try:
     from video_pipeline.observation import (
         FrameObservation,
         ObservedShape,
+        SceneObserver,
         analyze_frames,
     )
 except (ImportError, ModuleNotFoundError):
     analyze_frames = None  # type: ignore[assignment]
     FrameObservation = None  # type: ignore[assignment,misc]
     ObservedShape = None  # type: ignore[assignment,misc]
+    SceneObserver = None  # type: ignore[assignment,misc]
 
 
 WIDTH = 428
@@ -330,3 +333,16 @@ def test_observation_audit_contract() -> None:
 
     assert callable(globals().get("test_a_square_is_a_square_at_any_rotation"))
     assert callable(globals().get("test_two_touching_squares_are_not_read_as_one_square"))
+
+
+def test_unreadable_media_returns_a_structured_sensor_failure(tmp_path: Path) -> None:
+    """No duration is infrastructure failure, not an empty semantic observation."""
+
+    _require_contract()
+    assert SceneObserver is not None
+    result = SceneObserver().observe(tmp_path / "missing.mp4", tmp_path / "frames")
+
+    assert result.frames == []
+    assert result.failure is not None
+    assert result.failure.code == "duration_unavailable"
+    assert "missing.mp4" in result.failure.detail

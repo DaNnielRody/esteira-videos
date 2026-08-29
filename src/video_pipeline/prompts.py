@@ -7,8 +7,11 @@ so the stored artifact reproduces the request byte for byte.
 
 from __future__ import annotations
 
+import json
 from collections.abc import Mapping
 from typing import TYPE_CHECKING
+
+from video_pipeline.reference_catalog import select_reference_examples
 
 if TYPE_CHECKING:  # pragma: no cover - import cycle guard, not runtime behavior
     from video_pipeline.provider import ProviderRequest
@@ -53,6 +56,49 @@ def build_prompt(request: ProviderRequest) -> str:
         f"scene_name: {request.scene_name}",
         f"description: {request.description}",
     ]
+    if request.topics:
+        lines.append(f"topics: {', '.join(request.topics)}")
+    if request.expectations:
+        lines.extend(
+            [
+                "Machine-verifiable expectations (implement all exact values):",
+                json.dumps(request.expectations, ensure_ascii=False, sort_keys=True),
+            ]
+        )
+        latex = request.expectations.get("latex")
+        if isinstance(latex, list) and latex:
+            lines.append(
+                "For every latex item, use MathTex(tex, font_size=font_size, color=COLOR) "
+                ".move_to([x, y, 0]) and leave it fully visible in at least one frame."
+            )
+        text = request.expectations.get("text")
+        if isinstance(text, list) and text:
+            lines.append(
+                "For every text item, use exactly its renderer (Text or Tex), content, "
+                "font when present, font_size, color and .move_to([x, y, 0]); leave it "
+                "fully visible in at least one frame."
+            )
+    examples = select_reference_examples(
+        request.topics,
+        limit=request.reference_examples,
+    )
+    if examples:
+        lines.extend(
+            [
+                "Authorized 3b1b-derived Manim Community reference patterns follow.",
+                "Adapt their technique; keep the requested scene class name and specification.",
+            ]
+        )
+        for example in examples:
+            lines.extend(
+                [
+                    f"Reference {example.identifier}: {example.title}",
+                    f"Provenance: {example.source_url}::{example.source_scene}",
+                    "```python",
+                    example.code.rstrip(),
+                    "```",
+                ]
+            )
     if request.diagnostics is None:
         lines.append("Return the complete Python source without commentary.")
         return "\n".join(lines)

@@ -18,6 +18,11 @@ class ProviderRequest:
     schema_version: str
     scene_name: str
     description: str
+    topics: tuple[str, ...] = ()
+    reference_examples: int = 2
+    expectations: Mapping[str, object] | None = None
+    temperature: float = 0.0
+    seed: int = 42
     previous_code: str | None = None
     diagnostics: Mapping[str, object] | None = None
 
@@ -105,7 +110,10 @@ class OllamaProvider:
         """Generate candidate Python and retain the complete raw response."""
 
         prompt = build_prompt(request)
-        raw_response = self._post(prompt)
+        raw_response = self._post(
+            prompt,
+            options={"temperature": request.temperature, "seed": request.seed},
+        )
         response_text = raw_response.get("response")
         if not isinstance(response_text, str):
             raise ProviderError("Ollama response must contain a string response")
@@ -124,13 +132,20 @@ class OllamaProvider:
             raise ProviderError("Ollama unload response must contain a string response")
         return UnloadResult(ok=True, raw_response=raw_response)
 
-    def _post(self, prompt: str) -> dict[str, object]:
+    def _post(
+        self,
+        prompt: str,
+        *,
+        options: Mapping[str, object] | None = None,
+    ) -> dict[str, object]:
         body = {
             "model": self.model,
             "prompt": prompt,
             "stream": False,
             "keep_alive": 0,
         }
+        if options is not None:
+            body["options"] = dict(options)
         payload = json.dumps(body, ensure_ascii=False).encode("utf-8")
         request = urllib.request.Request(
             f"{self.base_url}/api/generate",

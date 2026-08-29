@@ -11,7 +11,17 @@ from enum import StrEnum
 from pathlib import Path
 
 from video_pipeline.expectations import SceneExpectations, check_expectations
-from video_pipeline.observation import FrameObservation, SceneObserver
+from video_pipeline.latex_validation import (
+    LatexValidationResult,
+    LatexValidator,
+    check_latex_matches,
+)
+from video_pipeline.observation import (
+    FrameObservation,
+    ObservationResult,
+    SceneObserver,
+    SensorFailureCode,
+)
 from video_pipeline.prompts import build_prompt
 from video_pipeline.provider import (
     LLMProvider,
@@ -35,6 +45,7 @@ class PipelineState(StrEnum):
     CORRECTING = "correcting"
     SUCCESS = "success"
     PROVIDER_ERROR = "provider_error"
+    SENSOR_ERROR = "sensor_error"
     ATTEMPTS_EXHAUSTED = "attempts_exhausted"
 
 
@@ -76,16 +87,26 @@ class RenderPipeline:
         runner: ManimRunner | None = None,
         validator: RenderValidator | None = None,
         observer: SceneObserver | None = None,
+        latex_validator: LatexValidator | None = None,
         output_root: str | Path = Path("artifacts/runs"),
         id_factory: Callable[[], str] | None = None,
+        temperature: float = 0.0,
+        seed: int = 42,
     ) -> None:
+        if not 0.0 <= temperature <= 2.0:
+            raise ValueError("temperature must be between 0.0 and 2.0")
+        if seed < 0:
+            raise ValueError("seed must be non-negative")
         self.provider = provider if provider is not None else OllamaProvider()
         self.runner = runner if runner is not None else ManimRunner()
         self.validator = validator if validator is not None else RenderValidator()
         self.observer = observer if observer is not None else SceneObserver()
+        self.latex_validator = latex_validator if latex_validator is not None else LatexValidator()
         # Resolve once so CLI output is an absolute, copy/pasteable run path.
         self.output_root = Path(output_root).resolve()
         self.id_factory = id_factory
+        self.temperature = float(temperature)
+        self.seed = seed
 
     def render(self, spec: SceneSpec, max_attempts: int = 3) -> PipelineResult:
         """Generate, render, validate, and correct up to ``max_attempts`` times."""
@@ -106,6 +127,13 @@ class RenderPipeline:
                 schema_version=spec.schema_version,
                 scene_name=spec.scene_name,
                 description=spec.description,
+                topics=tuple(spec.topics),
+                reference_examples=spec.reference_examples,
+                expectations=(
+                    _expectations_document(spec.expect) if spec.expect is not None else None
+                ),
+                temperature=self.temperature,
+                seed=self.seed,
                 previous_code=previous_code,
                 diagnostics=diagnostics,
             )
@@ -210,6 +238,29 @@ class RenderPipeline:
             )
             diagnostics = _diagnostics(render_result, validation)
             _write_json(attempt.path / "diagnostics.json", diagnostics)
+
+            if validation.sensor_failure_code is not None:
+                error = validation.sensor_failure_detail or validation.sensor_failure_code
+                self._finish_attempt(
+                    attempt.path,
+                    attempt_record,
+                    state=PipelineState.SENSOR_ERROR,
+                    terminal_state=PipelineState.SENSOR_ERROR,
+                    extra={
+                        "error": error,
+                        "render": _render_document(render_result),
+                        "validation": _validation_document(validation),
+                        "diagnostics": diagnostics,
+                    },
+                )
+                _set_run_state(run_document, PipelineState.SENSOR_ERROR)
+                _write_json(run.path / "run.json", run_document)
+                return PipelineResult(
+                    state=PipelineState.SENSOR_ERROR,
+                    run_path=run.path,
+                    error=error,
+                    attempts=attempt_number,
+                )
 
             # Keep this exact gate visible: process exit alone never accepts a run.
             if render_result.exit_code == 0 and validation.valid:
@@ -378,18 +429,63 @@ class RenderPipeline:
 
         if expectations is None or candidate is None or not validation.valid:
             return validation
-        frames, error = self._observe(candidate, attempt_path / "observation")
+        observation = self._observe(candidate, attempt_path / "observation")
+        frames = observation.frames
+        failure = observation.failure
         _write_json(
             attempt_path / "observation.json",
             {
                 "expectations": _expectations_document(expectations),
-                "error": error,
+                "error": failure.detail if failure is not None else None,
+                "sensor": {
+                    "name": "frame_observer",
+                    "status": "failure" if failure is not None else "success",
+                    "failure": (
+                        {"code": failure.code.value, "detail": failure.detail}
+                        if failure is not None
+                        else None
+                    ),
+                },
                 "frames": [_frame_document(frame) for frame in frames],
             },
         )
-        if error is not None:
-            return _rejected(validation, [f"scene observation failed:\n{error}"])
+        if failure is not None:
+            return _sensor_failed(
+                validation,
+                code=failure.code.value,
+                detail=failure.detail,
+            )
         reasons = check_expectations(frames, expectations)
+        try:
+            latex_observation = self.latex_validator.observe(
+                [*expectations.latex, *expectations.text],
+                attempt_path / "observation",
+                attempt_path / "latex-validation",
+            )
+        except Exception:
+            return _sensor_failed(
+                validation,
+                code=SensorFailureCode.LATEX_VALIDATOR_EXCEPTION.value,
+                detail=traceback.format_exc(),
+            )
+        if latex_observation.failure is not None:
+            latex = LatexValidationResult(
+                matches=[], reasons=[], failure=latex_observation.failure
+            )
+            _write_json(attempt_path / "latex-validation.json", latex.to_document())
+            return _sensor_failed(
+                validation,
+                code=latex_observation.failure.code.value,
+                detail=latex_observation.failure.detail,
+            )
+        matches = (
+            latex_observation.evidence
+            if latex_observation.evidence is not None
+            else []
+        )
+        latex = LatexValidationResult(matches=matches, reasons=check_latex_matches(matches))
+        _write_json(attempt_path / "latex-validation.json", latex.to_document())
+        reasons.extend(latex.reasons)
         if not reasons:
             return validation
         return _rejected(validation, reasons)
@@ -398,11 +494,14 @@ class RenderPipeline:
         self,
         candidate: Path,
         frames_dir: Path,
-    ) -> tuple[list[FrameObservation], str | None]:
+    ) -> ObservationResult:
         try:
-            return self.observer.observe(candidate, frames_dir), None
+            return self.observer.observe(candidate, frames_dir)
         except Exception:
-            return [], traceback.format_exc()
+            return ObservationResult.failed(
+                SensorFailureCode.OBSERVER_EXCEPTION,
+                traceback.format_exc(),
+            )
 
     def _finish_attempt(
         self,
@@ -493,6 +592,29 @@ def _rejected(validation: ValidationResult, reasons: list[str]) -> ValidationRes
         height=validation.height,
         duration_seconds=validation.duration_seconds,
         size_bytes=validation.size_bytes,
+        sensor_failure_code=validation.sensor_failure_code,
+        sensor_failure_detail=validation.sensor_failure_detail,
+    )
+
+
+def _sensor_failed(
+    validation: ValidationResult,
+    *,
+    code: str,
+    detail: str,
+) -> ValidationResult:
+    """Mark infrastructure observation failure separately from semantic rejection."""
+
+    return ValidationResult(
+        path=validation.path,
+        valid=False,
+        reasons=list(validation.reasons),
+        width=validation.width,
+        height=validation.height,
+        duration_seconds=validation.duration_seconds,
+        size_bytes=validation.size_bytes,
+        sensor_failure_code=code,
+        sensor_failure_detail=detail,
     )
 
 
@@ -507,6 +629,30 @@ def _expectations_document(expectations: SceneExpectations) -> dict[str, object]
                 "moved": beat.moved,
             }
             for beat in expectations.beats
+        ],
+        "latex": [
+            {
+                "tex": item.tex,
+                "font_size": item.font_size,
+                "color": item.color,
+                "x": item.x,
+                "y": item.y,
+                "min_iou": item.min_iou,
+            }
+            for item in expectations.latex
+        ],
+        "text": [
+            {
+                "renderer": item.renderer,
+                "content": item.content,
+                "font": item.font,
+                "font_size": item.font_size,
+                "color": item.color,
+                "x": item.x,
+                "y": item.y,
+                "min_iou": item.min_iou,
+            }
+            for item in expectations.text
         ],
     }
 
@@ -678,6 +824,8 @@ def _new_run_document(
             "schema_version": spec.schema_version,
             "scene_name": spec.scene_name,
             "description": spec.description,
+            "topics": list(spec.topics),
+            "reference_examples": spec.reference_examples,
         },
         "attempts": [],
     }
@@ -714,6 +862,11 @@ def _request_document(request: ProviderRequest) -> dict[str, object]:
         "schema_version": request.schema_version,
         "scene_name": request.scene_name,
         "description": request.description,
+        "topics": list(request.topics),
+        "reference_examples": request.reference_examples,
+        "expectations": _json_value(request.expectations),
+        "temperature": request.temperature,
+        "seed": request.seed,
         "previous_code": request.previous_code,
         "diagnostics": _json_value(request.diagnostics),
     }
@@ -742,6 +895,14 @@ def _validation_document(result: ValidationResult) -> dict[str, object]:
         "height": result.height,
         "duration_seconds": result.duration_seconds,
         "size_bytes": result.size_bytes,
+        "sensor_failure": (
+            {
+                "code": result.sensor_failure_code,
+                "detail": result.sensor_failure_detail,
+            }
+            if result.sensor_failure_code is not None
+            else None
+        ),
     }
 
 

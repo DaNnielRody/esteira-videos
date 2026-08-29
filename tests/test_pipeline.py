@@ -180,6 +180,8 @@ def _make_pipeline(
     validator: RecordingValidator,
     output_root: Path,
     run_id: str,
+    temperature: float = 0.0,
+    seed: int = 42,
 ) -> object:
     return pipeline_type(
         provider=provider,
@@ -187,6 +189,8 @@ def _make_pipeline(
         validator=validator,
         output_root=output_root,
         id_factory=lambda: run_id,
+        temperature=temperature,
+        seed=seed,
     )
 
 
@@ -272,6 +276,8 @@ def test_render_pipeline_happy_path_writes_one_success_attempt(tmp_path: Path) -
         validator=validator,
         output_root=output_root,
         run_id="happy-run",
+        temperature=0.2,
+        seed=17,
     )
 
     result = pipeline.render(_scene(), max_attempts=3)  # type: ignore[attr-defined]
@@ -281,6 +287,8 @@ def test_render_pipeline_happy_path_writes_one_success_attempt(tmp_path: Path) -
     assert provider.requests[0].schema_version == "1.0"
     assert provider.requests[0].scene_name == "AcceptanceScene"
     assert provider.requests[0].description == VALID_DESCRIPTION
+    assert provider.requests[0].temperature == 0.2
+    assert provider.requests[0].seed == 17
     assert provider.responses == [
         _response("VALID_CODE_SENTINEL", "RAW_SUCCESS_RESPONSE_SENTINEL")
     ]
@@ -306,6 +314,11 @@ def test_render_pipeline_happy_path_writes_one_success_attempt(tmp_path: Path) -
     run_directory = _run_directory(output_root)
     attempts = _attempt_directories(run_directory)
     assert [attempt.name for attempt in attempts] == ["attempt-01"]
+    request_document = json.loads(
+        (attempts[0] / "request.json").read_text(encoding="utf-8")
+    )
+    assert request_document["temperature"] == 0.2
+    assert request_document["seed"] == 17
     run_document = json.loads((run_directory / "run.json").read_text(encoding="utf-8"))
     assert run_document["state"] == "success"
     run_text = json.dumps(run_document)

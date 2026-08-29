@@ -9,6 +9,7 @@ from __future__ import annotations
 import pytest
 
 from video_pipeline.provider import ProviderRequest
+from video_pipeline.reference_catalog import SOURCE_COMMIT
 
 try:
     from video_pipeline.prompts import build_prompt
@@ -119,6 +120,45 @@ def test_a_first_attempt_carries_no_failure_language() -> None:
 
     assert "FAILED" not in prompt
     assert "rejected" not in prompt.lower()
+
+
+def test_topic_reference_carries_immutable_provenance_and_community_code() -> None:
+    """A selected adaptation must remain traceable to one upstream revision."""
+
+    _require_contract()
+    prompt = build_prompt(
+        ProviderRequest(
+            schema_version="1.0",
+            scene_name="LinearAlgebraScene",
+            description="Transforme os vetores da base com uma matriz.",
+            topics=("linear_algebra",),
+            reference_examples=1,
+        )
+    )
+
+    assert SOURCE_COMMIT in prompt
+    assert "_2016/eola/chapter3.py::FollowIHatJHat" in prompt
+    assert "from manim import" in prompt
+    assert "manim_imports_ext" not in prompt
+
+
+def test_reference_limit_is_filled_with_complementary_examples_for_one_topic() -> None:
+    """Requesting two algebra examples should not silently return only one."""
+
+    _require_contract()
+    prompt = build_prompt(
+        ProviderRequest(
+            schema_version="1.0",
+            scene_name="LinearAlgebraScene",
+            description="Mostre uma transformação e uma rede como matrizes.",
+            topics=("linear_algebra",),
+            reference_examples=2,
+        )
+    )
+
+    assert prompt.count("Provenance: https://github.com/3b1b/videos/blob/") == 2
+    assert "Reference linear-map-basis" in prompt
+    assert "Reference neural-network-layers" in prompt
 
 
 def test_the_closing_line_carries_every_semantic_reason() -> None:

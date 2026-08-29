@@ -19,8 +19,8 @@ limitada, valida o MP4 com `ffprobe`, confere a semântica de cena do código
 gerado e, quando necessário, envia o código e o diagnóstico completo para uma
 nova tentativa. Cada execução fica em
 `artifacts/runs/<run-id>/`, com `run.json` e diretórios `attempt-01`,
-`attempt-02`, etc. O terminal imprime `SUCCESS`, `ATTEMPTS_EXHAUSTED` ou
-`PROVIDER_ERROR`, além do caminho do run e do MP4 aceito.
+`attempt-02`, etc. O terminal imprime `SUCCESS`, `ATTEMPTS_EXHAUSTED`,
+`PROVIDER_ERROR` ou `SENSOR_ERROR`, além do caminho do run e do MP4 aceito.
 
 Opções operacionais:
 
@@ -31,8 +31,19 @@ video-pipeline render scene.json \
   --provider-timeout 120 \
   --render-timeout 120 \
   --max-attempts 3 \
+  --temperature 0.0 \
+  --seed 42 \
   --output-root artifacts/runs
 ```
+
+`temperature` e `seed` são enviados explicitamente nas `options` do Ollama e
+preservados em cada `request.json`. Isso permite comparar corpus e temperatura
+sem depender de defaults ocultos do modelo.
+
+Para cenas de IA/matemática, `topics` seleciona um conjunto pequeno de padrões
+adaptados do código autorizado do 3Blue1Brown e já validado em Manim Community.
+`reference_examples: 0` desliga o few-shot; o padrão é 2. Consulte
+`docs/reference-corpus.md` para o catálogo, o estudo pareado e a proveniência.
 
 ## O que decide uma tentativa
 
@@ -54,9 +65,10 @@ As duas checagens são independentes de propósito. A condição 4 lê o código
 condição 3 lê os pixels do vídeo que de fato saiu, então também pega erros que
 nenhuma análise estática enxergaria.
 
-Toda condição violada vira diagnóstico estruturado, volta para o provider junto
+Toda rejeição da cena vira diagnóstico estruturado, volta para o provider junto
 com o código anterior e a linha exata apontada pelo traceback do Manim, e a
-próxima tentativa corrige. Nada disso depende do modelo acertar de primeira.
+próxima tentativa corrige. Uma falha do próprio sensor termina separadamente e
+não culpa o código nem gasta outra chamada ao modelo.
 
 ## Verificação semântica (`expect`)
 
@@ -93,6 +105,29 @@ ele o vídeo é lido de volta frame a frame e conferido:
 - `moved` — direção do deslocamento **relativa ao beat anterior**
   (`left`/`right`/`up`/`down`), útil porque a descrição pede uma direção, não
   uma posição final.
+- `latex` — fórmula `MathTex` com `tex`, `font_size`, `color`, `x`, `y` e
+  `min_iou` fixados. O pipeline renderiza uma referência e compara máscara e
+  cor com o vídeo real; sem tipografia fixada não há aceitação automática de
+  conteúdo textual.
+- `text` — conteúdo exato renderizado com `Text` ou `Tex`. Ambos exigem
+  `renderer`, `content`, `font_size`, `color`, `x`, `y` e `min_iou`; `Text`
+  exige ainda uma `font` Pango explícita. Conteúdo multilinha é aceito. Presença
+  e posição são verificadas pelo mesmo match visual fixado.
+
+Exemplo de texto determinístico:
+
+```json
+{
+  "renderer": "text",
+  "content": "Camada de entrada\nCamada de saída",
+  "font": "DejaVu Sans",
+  "font_size": 36,
+  "color": "white",
+  "x": 0.0,
+  "y": -2.5,
+  "min_iou": 0.95
+}
+```
 
 Os frames amostrados e o veredito ficam em
 `artifacts/runs/<run>/attempt-NN/observation/` e `observation.json`, de modo que
@@ -103,6 +138,13 @@ Os frames trafegam e são gravados no **formato de control data do Manim** —
 de modo que o `frames.npz` de cada tentativa é legível pelas ferramentas do
 próprio Manim. O leitor é validado contra o control data oficial do Manim,
 vendorizado em `tests/golden/` (ver o README de lá).
+
+`video-pipeline calibrate` transforma esse golden set em um relatório de
+TP/FP/FN/TN por eixo. O observador de frames e o sensor de texto retornam o
+mesmo contrato `SensorResult`: evidência ou falha explícita, nunca ambos. O
+matcher semântico só recebe evidência bem-sucedida. Falha de extração ou de
+referência textual termina como `SENSOR_ERROR`, separada de uma rejeição
+semântica e sem gastar outra chamada ao Qwen.
 
 Medição por contornos do OpenCV: todo descritor vem de `cv2.minAreaRect`, a
 caixa mínima **rotacionada**, então um quadrado é um quadrado em qualquer
@@ -117,12 +159,15 @@ a mistura. Os limites de matiz ficam nos pontos médios entre as constantes
 medidas da paleta do Manim, e `tests/test_observation.py` verifica a paleta
 inteira, em traço e em preenchimento.
 
-**Limites, por decisão:** o vocabulário é `circle`, `square`, `polygon` mais as
-onze cores acima. Não reconhece texto nem geometria arbitrária, e duas formas exatamente
+**Limites, por decisão:** o vocabulário de formas é `circle`, `square`,
+`polygon` mais as onze cores acima. Não usa OCR nem reconhece texto de
+tipografia livre; `MathTex`, `Tex` e `Text` só são verificados quando conteúdo,
+tipografia, cor e posição estão fixados na spec. Duas formas exatamente
 sobrepostas leem como uma — por isso a checagem estática do código continua
-como segunda camada. Comparação exata de frame não julga cena gerada: dois
-renders ambos corretos da mesma spec divergem em 2,72% dos pixels, 2.719x acima
-da tolerância do Manim. Ver `docs/adr/0002-frame-observation-dependencies.md`.
+como segunda camada.
+Comparação exata de frame não julga cena gerada: dois renders ambos corretos da
+mesma spec divergem em 2,72% dos pixels, 2.719x acima da tolerância do Manim.
+Ver `docs/adr/0002-frame-observation-dependencies.md`.
 
 O exemplo de aceitação contém a descrição em português: “Mostre um círculo no centro. Depois transforme-o em um quadrado e mova-o para a direita.”
 

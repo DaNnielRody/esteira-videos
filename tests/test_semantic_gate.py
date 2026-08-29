@@ -13,7 +13,7 @@ from video_pipeline.validation import ValidationResult
 
 try:
     from video_pipeline.expectations import SceneBeat, SceneExpectations
-    from video_pipeline.observation import FrameObservation, ObservedShape
+    from video_pipeline.observation import FrameObservation, ObservationResult, ObservedShape
     from video_pipeline.pipeline import RenderPipeline
     from video_pipeline.spec import SceneSpec, load_scene_spec
 except (ImportError, ModuleNotFoundError):  # pragma: no cover - contract guard
@@ -21,6 +21,7 @@ except (ImportError, ModuleNotFoundError):  # pragma: no cover - contract guard
     SceneExpectations = None  # type: ignore[assignment,misc]
     FrameObservation = None  # type: ignore[assignment,misc]
     ObservedShape = None  # type: ignore[assignment,misc]
+    ObservationResult = None  # type: ignore[assignment,misc]
     RenderPipeline = None  # type: ignore[assignment,misc]
     SceneSpec = None  # type: ignore[assignment,misc]
     load_scene_spec = None  # type: ignore[assignment]
@@ -125,7 +126,7 @@ class ScriptedObserver:
     def __init__(self) -> None:
         self.calls: list[Path] = []
 
-    def observe(self, mp4_path: Path, frames_dir: Path) -> list[FrameObservation]:
+    def observe(self, mp4_path: Path, frames_dir: Path) -> ObservationResult:
         self.calls.append(Path(frames_dir))
         Path(frames_dir).mkdir(parents=True, exist_ok=True)
         good = Path(mp4_path).parent.parent / "scene.py"
@@ -143,7 +144,23 @@ class ScriptedObserver:
                 [_shape("square", 0.50)],
                 [_shape("square", 0.50), _shape("square", 0.64)],
             ]
-        return [FrameObservation(index=i, shapes=row) for i, row in enumerate(rows)]
+        return ObservationResult(
+            frames=[FrameObservation(index=i, shapes=row) for i, row in enumerate(rows)]
+        )
+
+
+class CrashingObserver:
+    """Represent an unavailable frame sensor, not a semantically wrong scene."""
+
+    def observe(self, mp4_path: Path, frames_dir: Path) -> list[FrameObservation]:
+        raise RuntimeError("FRAME_SENSOR_CRASH_SENTINEL")
+
+
+class CrashingLatexValidator:
+    """Represent an unexpected failure inside the LaTeX sensor boundary."""
+
+    def observe(self, expectations: object, frames_dir: Path, evidence_dir: Path) -> object:
+        raise RuntimeError("LATEX_SENSOR_CRASH_SENTINEL")
 
 
 def _pipeline(provider: ScriptedProvider, output_root: Path) -> RenderPipeline:
@@ -243,6 +260,58 @@ def test_a_spec_without_expectations_skips_the_semantic_gate(tmp_path: Path) -> 
     result = pipeline.render(spec, max_attempts=1)
 
     assert str(getattr(result.state, "value", result.state)).upper() == "SUCCESS"
+
+
+def test_sensor_failure_is_terminal_and_never_sent_to_qwen(tmp_path: Path) -> None:
+    """Infrastructure failure must not consume retries by blaming correct code."""
+
+    _require_contract()
+    provider = ScriptedProvider([GOOD_CODE])
+    pipeline = RenderPipeline(
+        provider=provider,
+        runner=RecordingRunner(),
+        validator=AcceptingValidator(),
+        observer=CrashingObserver(),
+        output_root=tmp_path / "runs",
+        id_factory=lambda: "sensor-error-run",
+    )
+
+    result = pipeline.render(_spec(), max_attempts=3)
+
+    assert str(getattr(result.state, "value", result.state)).upper() == "SENSOR_ERROR"
+    assert len(provider.requests) == 1
+    observation = json.loads(
+        (result.run_path / "attempt-01" / "observation.json").read_text(encoding="utf-8")
+    )
+    assert observation["sensor"]["status"] == "failure"
+    assert observation["sensor"]["failure"]["code"] == "observer_exception"
+    assert "FRAME_SENSOR_CRASH_SENTINEL" in observation["sensor"]["failure"]["detail"]
+
+
+def test_latex_sensor_exception_is_terminal_and_never_sent_to_qwen(tmp_path: Path) -> None:
+    """Unexpected LaTeX verifier crashes still close the run as sensor failure."""
+
+    _require_contract()
+    provider = ScriptedProvider([GOOD_CODE])
+    pipeline = RenderPipeline(
+        provider=provider,
+        runner=RecordingRunner(),
+        validator=AcceptingValidator(),
+        observer=ScriptedObserver(),
+        latex_validator=CrashingLatexValidator(),
+        output_root=tmp_path / "runs",
+        id_factory=lambda: "latex-sensor-error-run",
+    )
+
+    result = pipeline.render(_spec(), max_attempts=3)
+
+    assert result.state.value == "sensor_error"
+    assert len(provider.requests) == 1
+    validation = json.loads(
+        (result.run_path / "attempt-01" / "validation.json").read_text(encoding="utf-8")
+    )
+    assert validation["sensor_failure"]["code"] == "latex_validator_exception"
+    assert "LATEX_SENSOR_CRASH_SENTINEL" in validation["sensor_failure"]["detail"]
 
 
 def test_scene_spec_loads_declared_expectations(tmp_path: Path) -> None:

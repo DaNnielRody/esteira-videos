@@ -44,6 +44,8 @@ class ValidationResult:
     height: int | None = None
     duration_seconds: float | None = None
     size_bytes: int | None = None
+    sensor_failure_code: str | None = None
+    sensor_failure_detail: str | None = None
 
 
 class RenderValidator:

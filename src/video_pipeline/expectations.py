@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from video_pipeline.observation import FrameObservation, ObservedShape
 
@@ -50,6 +50,56 @@ class SceneBeat(BaseModel):
         return " ".join(parts)
 
 
+class LatexExpectation(BaseModel):
+    """One formula whose typography is fixed enough for deterministic sensing."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
+
+    tex: str
+    font_size: int = Field(ge=12, le=144)
+    color: Colour
+    x: float = Field(ge=-7.0, le=7.0)
+    y: float = Field(ge=-4.0, le=4.0)
+    min_iou: float = Field(default=0.95, ge=0.5, le=1.0)
+
+    @field_validator("tex")
+    @classmethod
+    def _tex_must_not_be_blank(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("latex tex must not be blank")
+        return value
+
+
+class TextExpectation(BaseModel):
+    """Fixed Pango Text or LaTeX Tex content for deterministic sensing."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
+
+    renderer: Literal["text", "tex"]
+    content: str
+    font: str | None = None
+    font_size: int = Field(ge=12, le=144)
+    color: Colour
+    x: float = Field(ge=-7.0, le=7.0)
+    y: float = Field(ge=-4.0, le=4.0)
+    min_iou: float = Field(default=0.95, ge=0.5, le=1.0)
+
+    @field_validator("content")
+    @classmethod
+    def _content_must_not_be_blank(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("text content must not be blank")
+        return value
+
+    @model_validator(mode="after")
+    def _renderer_has_fixed_font_contract(self) -> TextExpectation:
+        if self.renderer == "text" and (self.font is None or not self.font.strip()):
+            raise ValueError("text renderer requires an explicit font")
+        if self.renderer == "tex" and self.font is not None:
+            raise ValueError("tex renderer does not accept a Pango font")
+        return self
+
+
 class SceneExpectations(BaseModel):
     """The complete semantic contract for one rendered scene."""
 
@@ -57,6 +107,8 @@ class SceneExpectations(BaseModel):
 
     max_shapes: int = Field(default=1, ge=1)
     beats: list[SceneBeat] = Field(default_factory=list)
+    latex: list[LatexExpectation] = Field(default_factory=list)
+    text: list[TextExpectation] = Field(default_factory=list)
 
 
 def check_expectations(
@@ -192,4 +244,10 @@ def _summarize(frames: list[FrameObservation]) -> str:
     return ", ".join(seen) if seen else "an empty frame"
 
 
-__all__ = ["SceneBeat", "SceneExpectations", "check_expectations"]
+__all__ = [
+    "LatexExpectation",
+    "SceneBeat",
+    "SceneExpectations",
+    "TextExpectation",
+    "check_expectations",
+]
