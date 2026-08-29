@@ -41,17 +41,64 @@ Uma tentativa só é aceita quando **todas** as condições valem:
 1. o Manim sai com código zero;
 2. o `ffprobe` observa um MP4 não vazio, com stream de vídeo, dimensões e
    duração positivas;
-3. o `scene.py` gerado não anima um mobject que nunca entrou em cena.
+3. os frames do vídeo renderizado satisfazem os `expect` da especificação;
+4. o `scene.py` gerado não anima um mobject que nunca entrou em cena.
 
-A terceira condição existe porque o Manim sai com zero e grava um MP4 válido
-para uma cena que anima um objeto invisível — o caso clássico é continuar
-animando `b` depois de `self.play(Transform(a, b))`, quando quem está em cena
-é `a`. Sem essa checagem o pipeline entregaria, em silêncio, um vídeo que não
-corresponde à especificação.
+As condições 3 e 4 existem porque **o Manim sai com zero e grava um MP4 válido
+para uma cena errada**. O caso clássico é continuar animando `b` depois de
+`self.play(Transform(a, b))`, quando quem está em cena é `a`: o resultado é um
+vídeo perfeitamente decodificável mostrando dois objetos onde a especificação
+pede um. Sem 3 e 4, o pipeline entregaria isso em silêncio.
+
+As duas checagens são independentes de propósito. A condição 4 lê o código; a
+condição 3 lê os pixels do vídeo que de fato saiu, então também pega erros que
+nenhuma análise estática enxergaria.
 
 Toda condição violada vira diagnóstico estruturado, volta para o provider junto
 com o código anterior e a linha exata apontada pelo traceback do Manim, e a
 próxima tentativa corrige. Nada disso depende do modelo acertar de primeira.
+
+## Verificação semântica (`expect`)
+
+O bloco `expect` é opcional. Sem ele o contrato é só de renderabilidade; com
+ele o vídeo é lido de volta frame a frame e conferido:
+
+```json
+{
+  "schema_version": "1.0",
+  "scene_name": "AcceptanceScene",
+  "description": "Mostre um círculo no centro. Depois transforme-o em um quadrado e mova-o para a direita.",
+  "expect": {
+    "max_shapes": 1,
+    "beats": [
+      {"shape": "circle", "region": "center"},
+      {"shape": "square", "region": "center"},
+      {"shape": "square", "moved": "right"}
+    ]
+  }
+}
+```
+
+- `max_shapes` — quantas formas podem estar visíveis ao mesmo tempo. É o que
+  pega o objeto duplicado.
+- `beats` — o que precisa aparecer, **na ordem escrita**. Cada beat casa como
+  subsequência dos frames amostrados, então restringe o quê e em que ordem,
+  não o instante exato.
+- `shape` — `circle`, `square`, `polygon` ou `any`.
+- `region` — posição absoluta em terços do frame: `left`/`center`/`right`,
+  `top`/`middle`/`bottom`.
+- `moved` — direção do deslocamento **relativa ao beat anterior**
+  (`left`/`right`/`up`/`down`), útil porque a descrição pede uma direção, não
+  uma posição final.
+
+Os frames amostrados e o veredito ficam em
+`artifacts/runs/<run>/attempt-NN/observation/` e `observation.json`, de modo que
+dá para olhar exatamente o que o verificador olhou.
+
+**Limites, por decisão:** o classificador separa círculo de quadrado alinhado
+aos eixos e conta formas visíveis. Não reconhece texto, cor ou geometria
+arbitrária, e formas intermediárias durante um `Transform` são reportadas como
+`polygon`/`other`. Ver `docs/adr/0002-frame-observation-dependencies.md`.
 
 O exemplo de aceitação contém a descrição em português: “Mostre um círculo no centro. Depois transforme-o em um quadrado e mova-o para a direita.”
 
@@ -71,3 +118,4 @@ untrusted remote prompts without OS/container isolation.
 - Pydantic 2.12.4
 - Ollama (modelo padrão `qwen2.5-coder:7b`)
 - FFmpeg/`ffprobe`
+- NumPy, Pillow e SciPy (leitura dos frames renderizados)

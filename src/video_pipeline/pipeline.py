@@ -10,6 +10,8 @@ from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
 
+from video_pipeline.expectations import SceneExpectations, check_expectations
+from video_pipeline.observation import FrameObservation, SceneObserver
 from video_pipeline.prompts import build_prompt
 from video_pipeline.provider import (
     LLMProvider,
@@ -73,12 +75,14 @@ class RenderPipeline:
         provider: LLMProvider | None = None,
         runner: ManimRunner | None = None,
         validator: RenderValidator | None = None,
+        observer: SceneObserver | None = None,
         output_root: str | Path = Path("artifacts/runs"),
         id_factory: Callable[[], str] | None = None,
     ) -> None:
         self.provider = provider if provider is not None else OllamaProvider()
         self.runner = runner if runner is not None else ManimRunner()
         self.validator = validator if validator is not None else RenderValidator()
+        self.observer = observer if observer is not None else SceneObserver()
         # Resolve once so CLI output is an absolute, copy/pasteable run path.
         self.output_root = Path(output_root).resolve()
         self.id_factory = id_factory
@@ -194,6 +198,12 @@ class RenderPipeline:
             _write_json(attempt.path / "render.json", render_document)
             candidate = _first_candidate(render_result)
             validation = self._validate(candidate, attempt.path)
+            # Observe the finished video first, then lint the source. A failing
+            # attempt should carry both what the frames showed and why the code
+            # produced it, so one correction can address the whole failure.
+            validation = self._with_observed_scene(
+                validation, candidate, attempt.path, spec.expect
+            )
             validation = _with_scene_semantics(validation, response.code)
             _write_json(
                 attempt.path / "validation.json", _validation_document(validation)
@@ -353,6 +363,47 @@ class RenderPipeline:
             )
         return result
 
+    def _with_observed_scene(
+        self,
+        validation: ValidationResult,
+        candidate: Path | None,
+        attempt_path: Path,
+        expectations: SceneExpectations | None,
+    ) -> ValidationResult:
+        """Reject a valid MP4 whose frames contradict the scene specification.
+
+        Only a run that already produced a probeable video can be observed, so
+        an attempt that failed earlier keeps its original, more precise reason.
+        """
+
+        if expectations is None or candidate is None or not validation.valid:
+            return validation
+        frames, error = self._observe(candidate, attempt_path / "observation")
+        _write_json(
+            attempt_path / "observation.json",
+            {
+                "expectations": _expectations_document(expectations),
+                "error": error,
+                "frames": [_frame_document(frame) for frame in frames],
+            },
+        )
+        if error is not None:
+            return _rejected(validation, [f"scene observation failed:\n{error}"])
+        reasons = check_expectations(frames, expectations)
+        if not reasons:
+            return validation
+        return _rejected(validation, reasons)
+
+    def _observe(
+        self,
+        candidate: Path,
+        frames_dir: Path,
+    ) -> tuple[list[FrameObservation], str | None]:
+        try:
+            return self.observer.observe(candidate, frames_dir), None
+        except Exception:
+            return [], traceback.format_exc()
+
     def _finish_attempt(
         self,
         attempt_path: Path,
@@ -429,6 +480,46 @@ _INTRODUCING_ANIMATIONS = frozenset(
 )
 # ``Transform(a, b)`` leaves ``a`` on screen and consumes ``b``.
 _CONSUMING_TRANSFORMS = frozenset({"Transform", "TransformFromCopy"})
+
+
+def _rejected(validation: ValidationResult, reasons: list[str]) -> ValidationResult:
+    """Carry an existing validation forward as invalid, adding new reasons."""
+
+    return ValidationResult(
+        path=validation.path,
+        valid=False,
+        reasons=[*validation.reasons, *reasons],
+        width=validation.width,
+        height=validation.height,
+        duration_seconds=validation.duration_seconds,
+        size_bytes=validation.size_bytes,
+    )
+
+
+def _expectations_document(expectations: SceneExpectations) -> dict[str, object]:
+    return {
+        "max_shapes": expectations.max_shapes,
+        "beats": [
+            {"shape": beat.shape, "region": beat.region, "moved": beat.moved}
+            for beat in expectations.beats
+        ],
+    }
+
+
+def _frame_document(frame: FrameObservation) -> dict[str, object]:
+    return {
+        "index": frame.index,
+        "shapes": [
+            {
+                "kind": shape.kind,
+                "center_x": round(shape.center_x, 4),
+                "center_y": round(shape.center_y, 4),
+                "area_fraction": round(shape.area_fraction, 5),
+                "extent": round(shape.extent, 4),
+            }
+            for shape in frame.shapes
+        ],
+    }
 
 
 def _with_scene_semantics(

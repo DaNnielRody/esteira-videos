@@ -7,6 +7,8 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from video_pipeline.expectations import SceneExpectations
+
 
 class SceneSpec(BaseModel):
     """The v1 input accepted by the pipeline for one scene."""
@@ -16,6 +18,8 @@ class SceneSpec(BaseModel):
     schema_version: Literal["1.0"]
     scene_name: str = Field(pattern=r"^[A-Z][A-Za-z0-9_]*$")
     description: str
+    # Optional: without it the pipeline keeps the renderability-only contract.
+    expect: SceneExpectations | None = None
 
     @field_validator("description")
     @classmethod

@@ -23,20 +23,28 @@ _Avoid_: code generation, which omits execution and correction.
   is reference-only and generated scenes target the Community API.
 - A render is successful only when Manim exits zero, independent MP4
   validation observes a non-empty video stream with positive dimensions and
-  duration, and the generated scene code animates no mobject that never
-  entered the scene.
+  duration, the rendered frames satisfy the Scene Spec `expect` block, and the
+  generated scene code animates no mobject that never entered the scene.
 - Renderer exit status and container validity do not decide scene semantics.
   A scene that keeps animating `b` after `self.play(Transform(a, b))` exits
-  zero and writes a probeable MP4 showing two shapes instead of one, so that
-  class is checked in the pipeline and fed back as a correction diagnostic.
+  zero and writes a probeable MP4 showing two shapes instead of one.
+- Semantic fidelity is decided by reading the rendered video back, not by
+  trusting the source: `observation.py` samples frames and reports the shapes
+  visible in each, and `expectations.py` matches them against the declared
+  beats. Static source analysis is the second layer, because two shapes that
+  overlap exactly still read as one region.
+- Semantic verification is opt-in per Scene Spec. Only what `expect` declares
+  is verified; colour, text, timing and geometry outside circle/square are
+  not.
 - Script/content generation, montage, audio, subtitles, and multi-scene editing
   are outside the first milestone.
 
 ## Relationships
 
-- `cli` -> `spec` -> `pipeline`; `pipeline` -> `prompts` -> `provider`
-  (generation and unload), `rendering` (bounded Manim subprocess), `validation`
-  (ffprobe), `workspace` (per-run and per-attempt directories).
+- `cli` -> `spec` -> `pipeline`; `spec` -> `expectations`; `pipeline` ->
+  `prompts` -> `provider` (generation and unload), `rendering` (bounded Manim
+  subprocess), `validation` (ffprobe), `observation` -> `expectations` (frame
+  storyboard and semantic verdict), `workspace` (per-run/per-attempt dirs).
 
 ## Operational surface
 
@@ -58,6 +66,10 @@ _Avoid_: code generation, which omits execution and correction.
 - `src/video_pipeline/prompts.py` — one prompt builder serves both the provider
   request and the preserved `prompt.txt`, so the stored artifact reproduces
   what was sent.
+- `src/video_pipeline/observation.py` — the classifier is narrow on purpose and
+  was corrected by measurement: two touching shapes merge into one connected
+  region, so a near-1:1 bounding box is required before naming a circle or a
+  square.
 - `src/video_pipeline/prompts.py` — a correction prompt converges a 7B local
   model only when it leads with the failing generated source line and the root
   error and closes with the corrective instruction. A `repr()` dump of the full
@@ -65,8 +77,8 @@ _Avoid_: code generation, which omits execution and correction.
 
 ## Flagged ambiguities
 
-- The first tracer bullet is delivered and accepted. The open gap is semantic
-  fidelity: nothing verifies that the rendered video shows what the description
-  asks. The pipeline only rejects one mechanical class (animating a mobject
-  never added to the scene); a scene that renders the wrong content correctly
-  still passes.
+- Semantic verification covers what a Scene Spec declares in `expect`. Nothing
+  infers expectations from the prose description, so a scene can still be wrong
+  in a way no beat describes. Deriving beats from free text needs a model, and a
+  probabilistic judge contradicts the rule that deterministic observation of the
+  real artifact decides.

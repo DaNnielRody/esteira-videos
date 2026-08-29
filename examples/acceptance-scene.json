@@ -1,5 +1,13 @@
 {
   "schema_version": "1.0",
   "scene_name": "AcceptanceScene",
-  "description": "Mostre um círculo no centro. Depois transforme-o em um quadrado e mova-o para a direita."
+  "description": "Mostre um círculo no centro. Depois transforme-o em um quadrado e mova-o para a direita.",
+  "expect": {
+    "max_shapes": 1,
+    "beats": [
+      {"shape": "circle", "region": "center"},
+      {"shape": "square", "region": "center"},
+      {"shape": "square", "moved": "right"}
+    ]
+  }
 }
