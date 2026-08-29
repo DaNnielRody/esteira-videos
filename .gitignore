@@ -1,0 +1,17 @@
+.claude/tmp/
+.claude/memory.db
+.claude/hooks/memory-reconcile.sh
+.codegraph/
+.venv/
+.env
+.env.*
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+artifacts/runs/
+artifacts/runs/**
