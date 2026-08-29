@@ -1,0 +1,72 @@
+{
+  "source": {
+    "repository": "https://github.com/ManimCommunity/manim",
+    "path": "tests/test_graphical_units/control_data",
+    "commit": "cafc63919eb0",
+    "fetched": "2026-08-29",
+    "license": "MIT"
+  },
+  "notes": [
+    "Ground truth declarada a partir do que a cena é, conferida visualmente e por",
+    "medição de centroide — nunca a partir da saída do observador.",
+    "O índice do frame em que uma transformação vira a outra é detalhe de",
+    "implementação do Manim, por isso só se afirma o primeiro e o último frame."
+  ],
+  "scenes": [
+    {
+      "file": "geometry/Circle.npz",
+      "why": "Cena Circle do Manim: um círculo único, centralizado.",
+      "shapes_per_frame": 1,
+      "every_frame": "circle",
+      "region": {"x": "center", "y": "middle"}
+    },
+    {
+      "file": "geometry/Rectangle.npz",
+      "why": "Retângulo ~2:1. Não é quadrado; a proporção tem de impedir isso.",
+      "shapes_per_frame": 1,
+      "every_frame": "polygon",
+      "never": ["square", "circle"]
+    },
+    {
+      "file": "geometry/Polygon.npz",
+      "why": "Quadrilátero irregular e fino, fora do centro. Nem círculo nem quadrado.",
+      "shapes_per_frame": 1,
+      "every_frame": "polygon",
+      "never": ["square", "circle"]
+    },
+    {
+      "file": "movements/Shift.npz",
+      "why": "Quadrado deslocado para cima; x permanece constante.",
+      "shapes_per_frame": 1,
+      "every_frame": "square",
+      "moved": ["up"],
+      "not_moved": ["left", "right"],
+      "min_motion": 0.1
+    },
+    {
+      "file": "movements/MoveTo.npz",
+      "why": "Quadrado movido na diagonal: sobe e vai para a direita.",
+      "shapes_per_frame": 1,
+      "every_frame": "square",
+      "moved": ["up", "right"],
+      "min_motion": 0.05
+    },
+    {
+      "file": "transform/MoveToTarget.npz",
+      "why": "MoveToTarget real do Manim: quadrado sobe bastante, x constante.",
+      "shapes_per_frame": 1,
+      "every_frame": "square",
+      "moved": ["up"],
+      "not_moved": ["left", "right"],
+      "min_motion": 0.3
+    },
+    {
+      "file": "transform/Transform.npz",
+      "why": "Transform real capturado em 7 frames: quadrado vira círculo, parado no centro. É exatamente a semântica onde o pipeline erra.",
+      "shapes_per_frame": 1,
+      "first_frame": "square",
+      "last_frame": "circle",
+      "not_moved": ["left", "right", "up", "down"]
+    }
+  ]
+}

@@ -14,7 +14,7 @@ fi
 .venv/bin/ruff check src/
 # mypy is scoped, not full: pyproject sets `disallow_any_expr`, which the
 # json/argparse/subprocess boundaries in cli.py, provider.py, rendering.py and
-# validation.py do not satisfy, nor does observation.py, whose NumPy and SciPy
+# validation.py do not satisfy, nor does observation.py, whose OpenCV and NumPy
 # public types carry Any. tests/ do not satisfy it either.
 # Widening this line is tracked in .claude/tmp/doubts-render-in-the-loop-tracer.md.
 .venv/bin/mypy \

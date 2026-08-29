@@ -95,10 +95,22 @@ Os frames amostrados e o veredito ficam em
 `artifacts/runs/<run>/attempt-NN/observation/` e `observation.json`, de modo que
 dá para olhar exatamente o que o verificador olhou.
 
-**Limites, por decisão:** o classificador separa círculo de quadrado alinhado
-aos eixos e conta formas visíveis. Não reconhece texto, cor ou geometria
-arbitrária, e formas intermediárias durante um `Transform` são reportadas como
-`polygon`/`other`. Ver `docs/adr/0002-frame-observation-dependencies.md`.
+Os frames trafegam e são gravados no **formato de control data do Manim** —
+`(n_frames, height, width, 4)` uint8 RGBA sob a chave `frame_data` num `.npz` —
+de modo que o `frames.npz` de cada tentativa é legível pelas ferramentas do
+próprio Manim. O leitor é validado contra o control data oficial do Manim,
+vendorizado em `tests/golden/` (ver o README de lá).
+
+Medição por contornos do OpenCV: todo descritor vem de `cv2.minAreaRect`, a
+caixa mínima **rotacionada**, então um quadrado é um quadrado em qualquer
+ângulo.
+
+**Limites, por decisão:** o vocabulário é `circle`, `square`, `polygon`. Não
+reconhece texto, cor nem geometria arbitrária, e duas formas exatamente
+sobrepostas leem como uma — por isso a checagem estática do código continua
+como segunda camada. Comparação exata de frame não julga cena gerada: dois
+renders ambos corretos da mesma spec divergem em 2,72% dos pixels, 2.719x acima
+da tolerância do Manim. Ver `docs/adr/0002-frame-observation-dependencies.md`.
 
 O exemplo de aceitação contém a descrição em português: “Mostre um círculo no centro. Depois transforme-o em um quadrado e mova-o para a direita.”
 
@@ -118,4 +130,4 @@ untrusted remote prompts without OS/container isolation.
 - Pydantic 2.12.4
 - Ollama (modelo padrão `qwen2.5-coder:7b`)
 - FFmpeg/`ffprobe`
-- NumPy, Pillow e SciPy (leitura dos frames renderizados)
+- OpenCV (headless), NumPy e Pillow (leitura dos frames renderizados)

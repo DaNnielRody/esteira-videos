@@ -39,6 +39,9 @@ _STREAM_KEYS = ("stdout", "stderr")
 # Rich marks the failing frame line with this glyph.
 _TRACEBACK_MARKER = "\u2771"
 
+# A reason mentioning the scene source tells the model what to edit.
+_NAMES_A_CODE_CHANGE = "scene animates"
+
 
 def build_prompt(request: ProviderRequest) -> str:
     """Build the generation or correction prompt for one provider request."""
@@ -62,9 +65,15 @@ def build_prompt(request: ProviderRequest) -> str:
     )
     lines.extend(_diagnostic_lines(request.diagnostics, failing))
     if request.previous_code is not None:
+        rejected = _rendered_successfully(request.diagnostics)
+        headline = (
+            "This is the code that produced the rejected video."
+            if rejected
+            else "This is the code that failed."
+        )
         lines.extend(
             [
-                "This is the code that failed. Rewrite it; never return it unchanged:",
+                f"{headline} Rewrite it; never return it unchanged:",
                 "```python",
                 request.previous_code,
                 "```",
@@ -94,9 +103,7 @@ def _diagnostic_lines(
 ) -> list[str]:
     """Render every diagnostic fact with the decisive failure first."""
 
-    lines = [
-        "The previous render FAILED. Diagnose the exact cause below and fix it.",
-    ]
+    lines = [_headline(diagnostics)]
     if failing:
         lines.append("Manim failed on these lines of the code you generated:")
         lines.extend(failing)
@@ -130,16 +137,56 @@ def _corrective_instruction(
     """Close the prompt with the single action the model must take."""
 
     error = _root_error(diagnostics.get("stderr"))
-    parts = ["Fix"]
-    parts.append("that exact line" if failing else "the failure above")
+    tail = "Then return the complete corrected Python source without commentary."
     if error:
-        parts.append(f"so Manim no longer raises `{error}`.")
-    else:
-        parts.append("so Manim renders the scene.")
-    parts.append(
-        "Then return the complete corrected Python source without commentary."
+        target = "that exact line" if failing else "the failure above"
+        return f"Fix {target} so Manim no longer raises `{error}`. {tail}"
+
+    # The render succeeded and the video was still rejected. Saying "make it
+    # render" here contradicts the diagnosis and the model repeats itself.
+    reasons = _reasons(diagnostics)
+    if reasons:
+        joined = "; ".join(reasons)
+        return (
+            "The code already renders. Change what the animation draws so every "
+            f"one of these stops being true: {joined}. {tail}"
+        )
+    return f"Fix the rejection above. {tail}"
+
+
+def _headline(diagnostics: Mapping[str, object]) -> str:
+    """Open the diagnosis with what actually happened."""
+
+    if _rendered_successfully(diagnostics):
+        return (
+            "The previous attempt RENDERED SUCCESSFULLY but the resulting video "
+            "was REJECTED: it does not show what the scene specification asks "
+            "for. The code runs; the picture is wrong."
+        )
+    return "The previous render FAILED. Diagnose the exact cause below and fix it."
+
+
+def _rendered_successfully(diagnostics: Mapping[str, object]) -> bool:
+    return diagnostics.get("exit_code") == 0 and not _root_error(
+        diagnostics.get("stderr")
     )
-    return " ".join(parts)
+
+
+def _reasons(diagnostics: Mapping[str, object]) -> list[str]:
+    """Return every recorded validator reason, most prescriptive first.
+
+    One reason describes the picture, another names the code change that
+    produced it.  The model needs both, and the one naming a code change is
+    the one it can act on directly.
+    """
+
+    raw = diagnostics.get("validator_reasons")
+    if not isinstance(raw, (list, tuple)):
+        return []
+    texts = [str(reason).strip() for reason in raw if str(reason).strip()]
+    prescriptive = [text for text in texts if _NAMES_A_CODE_CHANGE in text]
+    descriptive = [text for text in texts if _NAMES_A_CODE_CHANGE not in text]
+    return [*prescriptive, *descriptive]
 
 
 def _failing_source_lines(stderr: object, previous_code: object) -> list[str]:

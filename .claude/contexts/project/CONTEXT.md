@@ -28,6 +28,9 @@ _Avoid_: code generation, which omits execution and correction.
 - Renderer exit status and container validity do not decide scene semantics.
   A scene that keeps animating `b` after `self.play(Transform(a, b))` exits
   zero and writes a probeable MP4 showing two shapes instead of one.
+- Exact frame comparison cannot judge a generated scene: two renders both
+  correct for one specification were measured 2,719x above Manim's own
+  mismatch tolerance. It applies only where the render is deterministic.
 - Semantic fidelity is decided by reading the rendered video back, not by
   trusting the source: `observation.py` samples frames and reports the shapes
   visible in each, and `expectations.py` matches them against the declared
@@ -66,10 +69,13 @@ _Avoid_: code generation, which omits execution and correction.
 - `src/video_pipeline/prompts.py` — one prompt builder serves both the provider
   request and the preserved `prompt.txt`, so the stored artifact reproduces
   what was sent.
-- `src/video_pipeline/observation.py` — the classifier is narrow on purpose and
-  was corrected by measurement: two touching shapes merge into one connected
-  region, so a near-1:1 bounding box is required before naming a circle or a
-  square.
+- `src/video_pipeline/observation.py` — frames travel and are persisted in
+  Manim's control-data format: `(n, h, w, 4)` uint8 RGBA under `frame_data`.
+  Shape descriptors come from `cv2.minAreaRect`, the rotated minimum-area box,
+  so they hold at any angle; an axis-aligned box is not rotation invariant.
+- `tests/golden/` — Manim's own control data is the ground truth for the frame
+  reader. The scene name is the label, and the format is left unchanged so both
+  projects can read the same files.
 - `src/video_pipeline/prompts.py` — a correction prompt converges a 7B local
   model only when it leads with the failing generated source line and the root
   error and closes with the corrective instruction. A `repr()` dump of the full
