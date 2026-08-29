@@ -1,0 +1,148 @@
+{
+  "schema_version": "1.0",
+  "name": "ai-math-reference-corpus",
+  "sources": [
+    {
+      "scene_name": "LinearTransformationStudy",
+      "source_repo": "https://github.com/3b1b/videos",
+      "source_commit": "674b966fbb6cf0307590d27744d186165e8b6a76",
+      "source_path": "_2016/eola/chapter3.py",
+      "source_scene": "FollowIHatJHat"
+    },
+    {
+      "scene_name": "DeterminantAreaStudy",
+      "source_repo": "https://github.com/3b1b/videos",
+      "source_commit": "674b966fbb6cf0307590d27744d186165e8b6a76",
+      "source_path": "_2016/eola/chapter5.py",
+      "source_scene": "NameDeterminant"
+    },
+    {
+      "scene_name": "EigenvectorStudy",
+      "source_repo": "https://github.com/3b1b/videos",
+      "source_commit": "674b966fbb6cf0307590d27744d186165e8b6a76",
+      "source_path": "_2016/eola/chapter10.py",
+      "source_scene": "ShowEigenVectorAfterComputing"
+    },
+    {
+      "scene_name": "NeuralLayersStudy",
+      "source_repo": "https://github.com/3b1b/videos",
+      "source_commit": "674b966fbb6cf0307590d27744d186165e8b6a76",
+      "source_path": "_2017/nn/part1.py",
+      "source_scene": "IntroduceEachLayer"
+    },
+    {
+      "scene_name": "GradientDescentStudy",
+      "source_repo": "https://github.com/3b1b/videos",
+      "source_commit": "674b966fbb6cf0307590d27744d186165e8b6a76",
+      "source_path": "_2017/nn/part2.py",
+      "source_scene": "GradientDescentAlgorithm"
+    },
+    {
+      "scene_name": "LinearRegressionStudy",
+      "source_repo": "https://github.com/3b1b/videos",
+      "source_commit": "674b966fbb6cf0307590d27744d186165e8b6a76",
+      "source_path": "_2024/transformers/ml_basics.py",
+      "source_scene": "LinearRegression"
+    },
+    {
+      "scene_name": "DiscreteConvolutionStudy",
+      "source_repo": "https://github.com/3b1b/videos",
+      "source_commit": "674b966fbb6cf0307590d27744d186165e8b6a76",
+      "source_path": "_2022/convolutions/discrete.py",
+      "source_scene": "MovingAverageExample"
+    },
+    {
+      "scene_name": "AttentionWeightsStudy",
+      "source_repo": "https://github.com/3b1b/videos",
+      "source_commit": "674b966fbb6cf0307590d27744d186165e8b6a76",
+      "source_path": "_2024/transformers/attention.py",
+      "source_scene": "AttentionPatterns"
+    },
+    {
+      "scene_name": "BayesianUpdateStudy",
+      "source_repo": "https://github.com/3b1b/videos",
+      "source_commit": "674b966fbb6cf0307590d27744d186165e8b6a76",
+      "source_path": "_2020/beta/beta3.py",
+      "source_scene": "ShowBayesianUpdating"
+    },
+    {
+      "scene_name": "FourierFeaturesStudy",
+      "source_repo": "https://github.com/3b1b/videos",
+      "source_commit": "674b966fbb6cf0307590d27744d186165e8b6a76",
+      "source_path": "_2019/diffyq/part2/fourier_series.py",
+      "source_scene": "FourierSeriesIntroBackground4"
+    }
+  ],
+  "cases": [
+    {
+      "schema_version": "1.0",
+      "scene_name": "LinearTransformationStudy",
+      "description": "Mostre um plano cartesiano e os vetores da base. Aplique uma transformação linear de cisalhamento mantendo a continuidade dos mesmos vetores. Exiba a fórmula indicada na posição exata.",
+      "topics": ["linear_algebra"],
+      "expect": {"max_shapes": 200, "latex": [{"tex": "A\\mathbf{x}", "font_size": 48, "color": "yellow", "x": 0.0, "y": -2.8, "min_iou": 0.95}]}
+    },
+    {
+      "schema_version": "1.0",
+      "scene_name": "DeterminantAreaStudy",
+      "description": "Mostre um quadrado unitário sendo transformado por uma matriz e destaque como sua área muda pelo determinante. Exiba a fórmula indicada na posição exata.",
+      "topics": ["linear_algebra"],
+      "expect": {"max_shapes": 200, "latex": [{"tex": "\\mathrm{area}=|\\det(A)|", "font_size": 48, "color": "yellow", "x": 0.0, "y": -2.8, "min_iou": 0.95}]}
+    },
+    {
+      "schema_version": "1.0",
+      "scene_name": "EigenvectorStudy",
+      "description": "Mostre vários vetores sob uma transformação e destaque um autovetor que preserva sua direção enquanto muda de escala. Exiba a fórmula indicada na posição exata.",
+      "topics": ["linear_algebra"],
+      "expect": {"max_shapes": 200, "latex": [{"tex": "A\\mathbf{v}=\\lambda\\mathbf{v}", "font_size": 48, "color": "yellow", "x": 0.0, "y": -2.8, "min_iou": 0.95}]}
+    },
+    {
+      "schema_version": "1.0",
+      "scene_name": "NeuralLayersStudy",
+      "description": "Construa uma rede neural em camadas, revele conexões atrás dos neurônios e destaque a propagação de ativações da entrada à saída. Exiba a fórmula indicada na posição exata.",
+      "topics": ["neural_networks", "linear_algebra"],
+      "expect": {"max_shapes": 300, "latex": [{"tex": "\\mathbf{a}^{(l)}=\\sigma(W\\mathbf{a}^{(l-1)}+\\mathbf{b})", "font_size": 40, "color": "yellow", "x": 0.0, "y": -3.0, "min_iou": 0.95}]}
+    },
+    {
+      "schema_version": "1.0",
+      "scene_name": "GradientDescentStudy",
+      "description": "Mostre um ponto descendo uma curva de custo em passos sucessivos orientados pelo gradiente. Exiba a fórmula indicada na posição exata.",
+      "topics": ["machine_learning", "calculus"],
+      "expect": {"max_shapes": 200, "latex": [{"tex": "\\theta\\leftarrow\\theta-\\eta\\nabla L(\\theta)", "font_size": 44, "color": "yellow", "x": 0.0, "y": -2.8, "min_iou": 0.95}]}
+    },
+    {
+      "schema_version": "1.0",
+      "scene_name": "LinearRegressionStudy",
+      "description": "Mostre pontos de dados, ajuste uma reta e revele os resíduos verticais entre as amostras e o modelo. Exiba a fórmula indicada na posição exata.",
+      "topics": ["machine_learning", "linear_algebra"],
+      "expect": {"max_shapes": 200, "latex": [{"tex": "\\hat{y}=w x+b", "font_size": 48, "color": "yellow", "x": 0.0, "y": -2.8, "min_iou": 0.95}]}
+    },
+    {
+      "schema_version": "1.0",
+      "scene_name": "DiscreteConvolutionStudy",
+      "description": "Mostre uma janela de kernel deslizando por uma sequência discreta e produzindo cada valor da convolução por soma ponderada local. Exiba a fórmula indicada na posição exata.",
+      "topics": ["convolution", "machine_learning"],
+      "expect": {"max_shapes": 300, "latex": [{"tex": "(f*g)[n]=\\sum_k f[k]g[n-k]", "font_size": 42, "color": "yellow", "x": 0.0, "y": -2.8, "min_iou": 0.95}]}
+    },
+    {
+      "schema_version": "1.0",
+      "scene_name": "AttentionWeightsStudy",
+      "description": "Mostre tokens, matrizes de consulta e chave e uma matriz de atenção cuja opacidade representa os pesos entre tokens. Exiba a fórmula indicada na posição exata.",
+      "topics": ["transformers", "machine_learning", "linear_algebra"],
+      "expect": {"max_shapes": 400, "latex": [{"tex": "\\mathrm{softmax}(QK^T/\\sqrt{d})V", "font_size": 42, "color": "yellow", "x": 0.0, "y": -2.8, "min_iou": 0.95}]}
+    },
+    {
+      "schema_version": "1.0",
+      "scene_name": "BayesianUpdateStudy",
+      "description": "Mostre uma distribuição a priori sendo atualizada por evidência até se tornar a posterior, mantendo rótulos consistentes. Exiba a fórmula indicada na posição exata.",
+      "topics": ["probability", "machine_learning"],
+      "expect": {"max_shapes": 300, "latex": [{"tex": "P(H|E)=\\frac{P(E|H)P(H)}{P(E)}", "font_size": 42, "color": "yellow", "x": 0.0, "y": -2.8, "min_iou": 0.95}]}
+    },
+    {
+      "schema_version": "1.0",
+      "scene_name": "FourierFeaturesStudy",
+      "description": "Mostre uma função sendo aproximada por somas parciais de senos e destaque o refinamento a cada novo termo. Exiba a fórmula indicada na posição exata.",
+      "topics": ["fourier", "machine_learning"],
+      "expect": {"max_shapes": 300, "latex": [{"tex": "f(x)\\approx\\sum_{k=1}^{N}a_k\\sin(kx)", "font_size": 42, "color": "yellow", "x": 0.0, "y": -2.8, "min_iou": 0.95}]}
+    }
+  ]
+}
