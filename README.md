@@ -85,6 +85,9 @@ ele o vídeo é lido de volta frame a frame e conferido:
   subsequência dos frames amostrados, então restringe o quê e em que ordem,
   não o instante exato.
 - `shape` — `circle`, `square`, `polygon` ou `any`.
+- `color` — cor observada da forma: `red`, `orange`, `yellow`, `green`, `teal`,
+  `blue`, `purple`, `pink`, `white`, `grey`, `black`. Opcional por beat; sem
+  ele qualquer cor serve. Uma mudança de cor se escreve como dois beats.
 - `region` — posição absoluta em terços do frame: `left`/`center`/`right`,
   `top`/`middle`/`bottom`.
 - `moved` — direção do deslocamento **relativa ao beat anterior**
@@ -105,14 +108,28 @@ Medição por contornos do OpenCV: todo descritor vem de `cv2.minAreaRect`, a
 caixa mínima **rotacionada**, então um quadrado é um quadrado em qualquer
 ângulo.
 
-**Limites, por decisão:** o vocabulário é `circle`, `square`, `polygon`. Não
-reconhece texto, cor nem geometria arbitrária, e duas formas exatamente
+A cor é nomeada em HSV sobre os pixels efetivamente desenhados da forma —
+traço mais preenchimento, excluindo o fundo que ela cerca. O antisserrilhamento
+mistura o traço com o fundo e derruba a mediana (um traço branco do Manim lê
+mediana 0,60 de valor, que nomearia cinza), então a decisão usa o **percentil
+90** de saturação e de valor: os pixels mais fortes são o traço, os fracos são
+a mistura. Os limites de matiz ficam nos pontos médios entre as constantes
+medidas da paleta do Manim, e `tests/test_observation.py` verifica a paleta
+inteira, em traço e em preenchimento.
+
+**Limites, por decisão:** o vocabulário é `circle`, `square`, `polygon` mais as
+onze cores acima. Não reconhece texto nem geometria arbitrária, e duas formas exatamente
 sobrepostas leem como uma — por isso a checagem estática do código continua
 como segunda camada. Comparação exata de frame não julga cena gerada: dois
 renders ambos corretos da mesma spec divergem em 2,72% dos pixels, 2.719x acima
 da tolerância do Manim. Ver `docs/adr/0002-frame-observation-dependencies.md`.
 
 O exemplo de aceitação contém a descrição em português: “Mostre um círculo no centro. Depois transforme-o em um quadrado e mova-o para a direita.”
+
+`examples/colored-scene.json` exercita o vocabulário de cor: círculo azul no
+centro, vira quadrado vermelho, move para a direita. Rodada real com
+`qwen2.5-coder:7b`, convergiu na tentativa 3 — as duas primeiras foram
+rejeitadas por “frame 10 mostra 2 formas (red square, red square)”.
 
 ## Aviso de confiança
 

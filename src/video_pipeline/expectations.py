@@ -16,6 +16,10 @@ from video_pipeline.observation import FrameObservation, ObservedShape
 Shape = Literal["circle", "square", "polygon", "any"]
 Region = Literal["left", "center", "right", "top", "middle", "bottom"]
 Direction = Literal["left", "right", "up", "down"]
+Colour = Literal[
+    "red", "orange", "yellow", "green", "teal", "blue", "purple", "pink",
+    "white", "grey", "black",
+]
 
 # A frame is split into thirds; the middle third is "center"/"middle".
 _LOW = 1.0 / 3.0
@@ -30,13 +34,15 @@ class SceneBeat(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
     shape: Shape = "any"
+    color: Colour | None = None
     region: Region | None = None
     moved: Direction | None = None
 
     def describe(self) -> str:
         """Name this beat the way a diagnostic should read."""
 
-        parts = [f"a {self.shape}" if self.shape != "any" else "a shape"]
+        noun = self.shape if self.shape != "any" else "shape"
+        parts = [f"a {self.color} {noun}" if self.color else f"a {noun}"]
         if self.region is not None:
             parts.append(f"in the {self.region} of the frame")
         if self.moved is not None:
@@ -77,7 +83,7 @@ def _budget_reasons(frames: list[FrameObservation], max_shapes: int) -> list[str
     worst = max(frames, key=_shape_count)
     if len(worst.shapes) <= max_shapes:
         return []
-    kinds = ", ".join(shape.kind for shape in worst.shapes)
+    kinds = ", ".join(f"{shape.color} {shape.kind}" for shape in worst.shapes)
     return [
         f"frame {worst.index} shows {len(worst.shapes)} shapes ({kinds}) but the scene "
         f"declares at most {max_shapes}; a duplicate usually means a mobject was "
@@ -127,6 +133,8 @@ def _matches(
 ) -> bool:
     if beat.shape != "any" and shape.kind != beat.shape:
         return False
+    if beat.color is not None and shape.color != beat.color:
+        return False
     if beat.region is not None and not _in_region(shape, beat.region):
         return False
     if beat.moved is not None and not _has_moved(shape, previous, beat.moved):
@@ -175,7 +183,10 @@ def _summarize(frames: list[FrameObservation]) -> str:
     seen: list[str] = []
     for frame in frames:
         for shape in frame.shapes:
-            entry = f"{shape.kind} at x={shape.center_x:.2f},y={shape.center_y:.2f}"
+            entry = (
+                f"{shape.color} {shape.kind} at "
+                f"x={shape.center_x:.2f},y={shape.center_y:.2f}"
+            )
             if entry not in seen:
                 seen.append(entry)
     return ", ".join(seen) if seen else "an empty frame"

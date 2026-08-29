@@ -104,6 +104,20 @@ def test_reader_matches_manim_control_data(scene: dict[str, object]) -> None:
     if isinstance(last, str):
         assert last in kinds[-1], f"{why} read {kinds}"
 
+    colours = [[shape.color for shape in o.shapes] for o in observations]
+
+    every_colour = scene.get("every_frame_color")
+    if isinstance(every_colour, str):
+        assert all(every_colour in row for row in colours), f"{why} read {colours}"
+
+    first_colour = scene.get("first_frame_color")
+    if isinstance(first_colour, str):
+        assert first_colour in colours[0], f"{why} read {colours}"
+
+    last_colour = scene.get("last_frame_color")
+    if isinstance(last_colour, str):
+        assert last_colour in colours[-1], f"{why} read {colours}"
+
     never = scene.get("never")
     if isinstance(never, list):
         flat = {kind for row in kinds for kind in row}

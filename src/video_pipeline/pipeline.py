@@ -500,7 +500,12 @@ def _expectations_document(expectations: SceneExpectations) -> dict[str, object]
     return {
         "max_shapes": expectations.max_shapes,
         "beats": [
-            {"shape": beat.shape, "region": beat.region, "moved": beat.moved}
+            {
+                "shape": beat.shape,
+                "color": beat.color,
+                "region": beat.region,
+                "moved": beat.moved,
+            }
             for beat in expectations.beats
         ],
     }
@@ -512,6 +517,7 @@ def _frame_document(frame: FrameObservation) -> dict[str, object]:
         "shapes": [
             {
                 "kind": shape.kind,
+                "color": shape.color,
                 "center_x": round(shape.center_x, 4),
                 "center_y": round(shape.center_y, 4),
                 "area_fraction": round(shape.area_fraction, 5),

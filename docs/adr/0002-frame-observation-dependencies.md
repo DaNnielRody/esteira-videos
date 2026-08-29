@@ -103,8 +103,14 @@ decodificado pelo `ffmpeg` de linha de comando, não pelo `VideoCapture`.
   golden set valida o **observador**; a fidelidade de uma cena nova é decidida
   por `expectations.py`. Comparação exata continua aplicável onde o render é
   determinístico, como o teste de integração com provider fixo.
-- O vocabulário é estreito por decisão: `circle`, `square`, `polygon`. Não
-  reconhece texto, cor nem geometria arbitrária.
+- O vocabulário é estreito por decisão: `circle`, `square`, `polygon` mais as
+  onze cores nomeadas em HSV. Não reconhece texto nem geometria arbitrária.
+- **A cor é decidida por percentil 90, não por mediana.** Medido em
+  `tests/golden/movements/Shift.npz`: um traço branco do Manim tem mediana de
+  valor 0,60 — que nomearia cinza — enquanto o percentil 90 é 1,00. O
+  antisserrilhamento mistura o traço com o fundo, então a estatística central
+  descreve a mistura, não a tinta. Os limites de matiz ficam nos pontos médios
+  entre as constantes medidas da paleta do Manim, e não em valores chutados.
 - Duas formas que se sobreponham **exatamente** ainda leem como uma região. A
   análise estática do `scene.py` continua como segunda camada por isso.
 - `observation.py` não satisfaz `disallow_any_expr` do mypy, porque os tipos

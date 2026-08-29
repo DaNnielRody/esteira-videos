@@ -49,6 +49,31 @@ _CIRCLE_EXTENT_RANGE = (0.62, _SQUARE_MIN_EXTENT)
 # Douglas-Peucker keeps four corners for a quadrilateral, many for a circle.
 _CIRCLE_MIN_VERTICES = 6
 
+# Colour naming. Hue bins sit at the midpoints between Manim's own palette
+# constants, measured rather than guessed:
+#   RED 4.7  MAROON 348.2  ORANGE 25.1  GOLD 31.9  YELLOW 46.8  GREEN 101.3
+#   TEAL 165.0  BLUE 191.3  DARK_BLUE 199.6  PURPLE 281.4  PINK 308.7
+_HUE_BINS: tuple[tuple[float, float, str], ...] = (
+    (0.0, 15.0, "red"),
+    (15.0, 39.0, "orange"),
+    (39.0, 70.0, "yellow"),
+    (70.0, 140.0, "green"),
+    (140.0, 178.0, "teal"),
+    (178.0, 240.0, "blue"),
+    (240.0, 295.0, "purple"),
+    (295.0, 335.0, "pink"),
+    (335.0, 360.0, "red"),
+)
+# Antialiasing and h264 chroma subsampling dilute saturation, so a shape counts
+# as coloured on its strongest pixels, not its median ones.
+_SATURATION_PERCENTILE = 90
+_MIN_SATURATION = 0.20
+# The same blend drags value down: a white stroke reads median 0.60 and 90th
+# percentile 1.00. The brightest drawn pixels are the stroke.
+_VALUE_PERCENTILE = 90
+_WHITE_MIN_VALUE = 0.75
+_GREY_MIN_VALUE = 0.25
+
 
 class _FfmpegRun(Protocol):
     """Injectable ffmpeg boundary used by the deterministic tests."""
@@ -70,6 +95,7 @@ class ObservedShape:
     """One connected shape read out of one frame."""
 
     kind: str
+    color: str
     center_x: float
     center_y: float
     area_fraction: float
@@ -169,13 +195,16 @@ def analyze_frame(frame: npt.NDArray[np.uint8], *, index: int) -> FrameObservati
     # External contours only: a stroked outline yields one boundary, so a
     # hollow shape measures as the solid region a viewer perceives.
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    colour = _rgb_channels(frame)
 
     shapes: list[ObservedShape] = []
     for contour in contours:
         area = float(cv2.contourArea(contour))
         if area / frame_area < _MIN_AREA_FRACTION:
             continue
-        described = _describe(contour, area=area, width=width, height=height)
+        described = _describe(
+            contour, area=area, width=width, height=height, mask=mask, colour=colour
+        )
         if described is not None:
             shapes.append(described)
 
@@ -202,6 +231,8 @@ def _describe(
     area: float,
     width: int,
     height: int,
+    mask: npt.NDArray[np.uint8],
+    colour: npt.NDArray[np.uint8],
 ) -> ObservedShape | None:
     (center_x, center_y), (box_width, box_height), _ = cv2.minAreaRect(contour)
     if box_width <= 0 or box_height <= 0:
@@ -215,11 +246,73 @@ def _describe(
 
     return ObservedShape(
         kind=_classify(aspect=aspect, extent=extent, vertices=vertices),
+        color=_name_colour(_drawn_pixels(contour, mask=mask, colour=colour)),
         center_x=float(center_x) / width,
         center_y=float(center_y) / height,
         area_fraction=area / float(width * height),
         extent=extent,
     )
+
+
+def _rgb_channels(frame: npt.NDArray[np.uint8]) -> npt.NDArray[np.uint8]:
+    """Return the frame's colour channels, dropping any alpha."""
+
+    array = np.asarray(frame)
+    if array.ndim == 2:
+        return np.ascontiguousarray(cv2.cvtColor(array, cv2.COLOR_GRAY2RGB), dtype=np.uint8)
+    return np.ascontiguousarray(array[..., :3], dtype=np.uint8)
+
+
+def _drawn_pixels(
+    contour: npt.NDArray[np.int32],
+    *,
+    mask: npt.NDArray[np.uint8],
+    colour: npt.NDArray[np.uint8],
+) -> npt.NDArray[np.uint8]:
+    """Return only the pixels this shape actually paints.
+
+    Filling the contour would include the background a hollow shape encloses,
+    so the filled region is intersected with the foreground mask: what remains
+    is stroke plus fill, which is what a viewer sees.
+    """
+
+    region = np.zeros(mask.shape, dtype=np.uint8)
+    cv2.drawContours(region, [contour], -1, 255, thickness=cv2.FILLED)
+    drawn = (region > 0) & (mask > 0)
+    return np.ascontiguousarray(colour[drawn], dtype=np.uint8)
+
+
+def _name_colour(pixels: npt.NDArray[np.uint8]) -> str:
+    """Name the colour a viewer would give this shape."""
+
+    if pixels.size == 0:
+        return "unknown"
+    hsv = cv2.cvtColor(pixels.reshape(-1, 1, 3), cv2.COLOR_RGB2HSV).reshape(-1, 3)
+    # OpenCV packs hue into 0..179 to fit a byte; degrees are twice that.
+    hue = hsv[:, 0].astype(np.float64) * 2.0
+    saturation = hsv[:, 1].astype(np.float64) / 255.0
+    value = hsv[:, 2].astype(np.float64) / 255.0
+
+    if float(np.percentile(saturation, _SATURATION_PERCENTILE)) >= _MIN_SATURATION:
+        coloured = saturation >= _MIN_SATURATION
+        return _hue_name(float(np.median(hue[coloured])))
+
+    brightest = float(np.percentile(value, _VALUE_PERCENTILE))
+    if brightest >= _WHITE_MIN_VALUE:
+        return "white"
+    if brightest >= _GREY_MIN_VALUE:
+        return "grey"
+    return "black"
+
+
+def _hue_name(degrees: float) -> str:
+    """Map one hue angle to its Manim-palette colour name."""
+
+    angle = degrees % 360.0
+    for low, high, name in _HUE_BINS:
+        if low <= angle < high:
+            return name
+    return "red"
 
 
 def _classify(*, aspect: float, extent: float, vertices: int) -> str:

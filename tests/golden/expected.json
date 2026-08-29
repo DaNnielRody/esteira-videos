@@ -10,63 +10,99 @@
     "Ground truth declarada a partir do que a cena é, conferida visualmente e por",
     "medição de centroide — nunca a partir da saída do observador.",
     "O índice do frame em que uma transformação vira a outra é detalhe de",
-    "implementação do Manim, por isso só se afirma o primeiro e o último frame."
+    "implementação do Manim, por isso só se afirma o primeiro e o último frame.",
+    "Cores medidas por matiz HSV e conferidas contra as constantes da paleta do Manim."
   ],
   "scenes": [
     {
       "file": "geometry/Circle.npz",
-      "why": "Cena Circle do Manim: um círculo único, centralizado.",
+      "why": "Cena Circle do Manim: um círculo único, centralizado. Cor: Manim RED #FC6255, matiz 4.7 graus.",
       "shapes_per_frame": 1,
       "every_frame": "circle",
-      "region": {"x": "center", "y": "middle"}
+      "region": {
+        "x": "center",
+        "y": "middle"
+      },
+      "every_frame_color": "red"
     },
     {
       "file": "geometry/Rectangle.npz",
-      "why": "Retângulo ~2:1. Não é quadrado; a proporção tem de impedir isso.",
+      "why": "Retângulo ~2:1. Não é quadrado; a proporção tem de impedir isso. Cor: traco branco, sem saturacao.",
       "shapes_per_frame": 1,
       "every_frame": "polygon",
-      "never": ["square", "circle"]
+      "never": [
+        "square",
+        "circle"
+      ],
+      "every_frame_color": "white"
     },
     {
       "file": "geometry/Polygon.npz",
-      "why": "Quadrilátero irregular e fino, fora do centro. Nem círculo nem quadrado.",
+      "why": "Quadrilátero irregular e fino, fora do centro. Nem círculo nem quadrado. Cor: Manim BLUE #58C4DD, matiz 191.3 graus.",
       "shapes_per_frame": 1,
       "every_frame": "polygon",
-      "never": ["square", "circle"]
+      "never": [
+        "square",
+        "circle"
+      ],
+      "every_frame_color": "blue"
     },
     {
       "file": "movements/Shift.npz",
-      "why": "Quadrado deslocado para cima; x permanece constante.",
+      "why": "Quadrado deslocado para cima; x permanece constante. Cor: traco branco antisserrilhado: mediana 0.60, p90 1.00.",
       "shapes_per_frame": 1,
       "every_frame": "square",
-      "moved": ["up"],
-      "not_moved": ["left", "right"],
-      "min_motion": 0.1
+      "moved": [
+        "up"
+      ],
+      "not_moved": [
+        "left",
+        "right"
+      ],
+      "min_motion": 0.1,
+      "every_frame_color": "white"
     },
     {
       "file": "movements/MoveTo.npz",
-      "why": "Quadrado movido na diagonal: sobe e vai para a direita.",
+      "why": "Quadrado movido na diagonal: sobe e vai para a direita. Cor: traco branco antisserrilhado.",
       "shapes_per_frame": 1,
       "every_frame": "square",
-      "moved": ["up", "right"],
-      "min_motion": 0.05
+      "moved": [
+        "up",
+        "right"
+      ],
+      "min_motion": 0.05,
+      "every_frame_color": "white"
     },
     {
       "file": "transform/MoveToTarget.npz",
-      "why": "MoveToTarget real do Manim: quadrado sobe bastante, x constante.",
+      "why": "MoveToTarget real do Manim: quadrado sobe bastante, x constante. Cor: traco branco antisserrilhado.",
       "shapes_per_frame": 1,
       "every_frame": "square",
-      "moved": ["up"],
-      "not_moved": ["left", "right"],
-      "min_motion": 0.3
+      "moved": [
+        "up"
+      ],
+      "not_moved": [
+        "left",
+        "right"
+      ],
+      "min_motion": 0.3,
+      "every_frame_color": "white"
     },
     {
       "file": "transform/Transform.npz",
-      "why": "Transform real capturado em 7 frames: quadrado vira círculo, parado no centro. É exatamente a semântica onde o pipeline erra.",
+      "why": "Transform real capturado em 7 frames: quadrado vira círculo, parado no centro. É exatamente a semântica onde o pipeline erra. Cor: quadrado branco vira circulo RED (matiz 4).",
       "shapes_per_frame": 1,
       "first_frame": "square",
       "last_frame": "circle",
-      "not_moved": ["left", "right", "up", "down"]
+      "not_moved": [
+        "left",
+        "right",
+        "up",
+        "down"
+      ],
+      "first_frame_color": "white",
+      "last_frame_color": "red"
     }
   ]
 }

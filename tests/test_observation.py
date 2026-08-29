@@ -241,6 +241,90 @@ def test_a_frame_stack_is_read_in_order() -> None:
     assert [shape.kind for shape in observations[2].shapes] == ["square"]
 
 
+PALETTE = {
+    "RED": "red",
+    "MAROON": "red",
+    "ORANGE": "orange",
+    "GOLD": "orange",
+    "YELLOW": "yellow",
+    "GREEN": "green",
+    "TEAL": "teal",
+    "BLUE": "blue",
+    "DARK_BLUE": "blue",
+    "PURPLE": "purple",
+    "PINK": "pink",
+    "WHITE": "white",
+    "GREY": "grey",
+}
+
+
+def _rgb(constant: str) -> tuple[int, int, int]:
+    """Resolve one Manim palette constant to 8-bit RGB."""
+
+    import manim
+
+    channels = getattr(manim, constant).to_rgb()
+    return tuple(int(round(float(c) * 255)) for c in channels)  # type: ignore[return-value]
+
+
+@pytest.mark.parametrize("constant", sorted(PALETTE))
+def test_every_palette_colour_is_read_back_from_an_outline(constant: str) -> None:
+    """A stroked shape carries its colour in the stroke alone."""
+
+    _require_contract()
+    image = _blank()
+    red, green, blue = _rgb(constant)
+    ImageDraw.Draw(image).line(
+        _square_points(0), fill=(red, green, blue, 255), width=STROKE
+    )
+
+    assert [shape.color for shape in _one(image)] == [PALETTE[constant]]
+
+
+@pytest.mark.parametrize("constant", ["RED", "BLUE", "GREEN", "YELLOW", "PURPLE"])
+def test_a_fill_decides_the_colour_over_a_white_stroke(constant: str) -> None:
+    """Manim strokes a filled shape in white; the fill is what a viewer names."""
+
+    _require_contract()
+    image = _blank()
+    draw = ImageDraw.Draw(image)
+    box = [WIDTH // 2 - 55, HEIGHT // 2 - 55, WIDTH // 2 + 55, HEIGHT // 2 + 55]
+    draw.rectangle(box, fill=(*_rgb(constant), 255), outline=(255, 255, 255, 255), width=STROKE)
+
+    assert [shape.color for shape in _one(image)] == [PALETTE[constant]]
+
+
+def test_an_antialiased_white_stroke_is_white_not_grey() -> None:
+    """Antialiasing blends a stroke toward the background and drags the median.
+
+    Measured on `tests/golden/movements/Shift.npz`: a white square reads
+    median value 0.60, which names grey, while its 90th percentile is 1.00.
+    The brightest drawn pixels are the stroke; the dim ones are the blend.
+    """
+
+    _require_contract()
+    small = Image.new("RGBA", (214, 120), (0, 0, 0, 255))
+    ImageDraw.Draw(small).line(
+        [(70, 30), (150, 30), (150, 90), (70, 90), (70, 30)],
+        fill=(255, 255, 255, 255),
+        width=1,
+    )
+
+    assert [shape.color for shape in _one(small)] == ["white"]
+
+
+def test_colour_is_read_per_shape() -> None:
+    """Two shapes in one frame keep their own colours."""
+
+    _require_contract()
+    image = _blank()
+    draw = ImageDraw.Draw(image)
+    draw.rectangle([100, 90, 160, 150], fill=(*_rgb("BLUE"), 255))
+    draw.rectangle([280, 90, 340, 150], fill=(*_rgb("RED"), 255))
+
+    assert [shape.color for shape in _one(image)] == ["blue", "red"]
+
+
 def test_observation_audit_contract() -> None:
     """Inventory the observation evidence contract without production imports."""
 

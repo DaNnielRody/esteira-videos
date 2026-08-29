@@ -37,8 +37,7 @@ _Avoid_: code generation, which omits execution and correction.
   beats. Static source analysis is the second layer, because two shapes that
   overlap exactly still read as one region.
 - Semantic verification is opt-in per Scene Spec. Only what `expect` declares
-  is verified; colour, text, timing and geometry outside circle/square are
-  not.
+  is verified; text, timing and geometry outside circle/square/polygon are not.
 - Script/content generation, montage, audio, subtitles, and multi-scene editing
   are outside the first milestone.
 
@@ -73,6 +72,11 @@ _Avoid_: code generation, which omits execution and correction.
   Manim's control-data format: `(n, h, w, 4)` uint8 RGBA under `frame_data`.
   Shape descriptors come from `cv2.minAreaRect`, the rotated minimum-area box,
   so they hold at any angle; an axis-aligned box is not rotation invariant.
+  Colour is named in HSV over the drawn pixels using the 90th percentile of
+  saturation and value, never the median: antialiasing blends the stroke into
+  the background and drags the median of a white Manim stroke to 0.60, which
+  would name grey. Hue cuts sit at the midpoints between measured Manim palette
+  constants.
 - `tests/golden/` — Manim's own control data is the ground truth for the frame
   reader. The scene name is the label, and the format is left unchanged so both
   projects can read the same files.

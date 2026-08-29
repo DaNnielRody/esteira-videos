@@ -24,9 +24,15 @@ def _require_contract() -> None:
         pytest.fail("SCENE_EXPECTATIONS_CONTRACT_MISSING")
 
 
-def _shape(kind: str, center_x: float, center_y: float = 0.5) -> ObservedShape:
+def _shape(
+    kind: str,
+    center_x: float,
+    center_y: float = 0.5,
+    color: str = "white",
+) -> ObservedShape:
     return ObservedShape(
         kind=kind,
+        color=color,
         center_x=center_x,
         center_y=center_y,
         area_fraction=0.05,
@@ -144,6 +150,54 @@ def test_an_empty_storyboard_is_reported() -> None:
 
     _require_contract()
     assert check_expectations([], _acceptance())
+
+
+def test_a_declared_colour_must_be_observed() -> None:
+    """A beat naming a colour is not satisfied by the right shape in another."""
+
+    _require_contract()
+    expectations = SceneExpectations(
+        max_shapes=1,
+        beats=[SceneBeat(shape="circle", color="blue")],
+    )
+    blue = _frames([_shape("circle", 0.5, color="blue")])
+    red = _frames([_shape("circle", 0.5, color="red")])
+
+    assert check_expectations(blue, expectations) == []
+    assert check_expectations(red, expectations)
+
+
+def test_a_beat_without_a_colour_accepts_any_colour() -> None:
+    """Colour is opt-in per beat, like every other constraint."""
+
+    _require_contract()
+    expectations = SceneExpectations(max_shapes=1, beats=[SceneBeat(shape="circle")])
+
+    assert check_expectations(_frames([_shape("circle", 0.5, color="pink")]), expectations) == []
+
+
+def test_a_colour_change_is_expressible_as_two_beats() -> None:
+    """A blue circle becoming a red square is two beats, in order."""
+
+    _require_contract()
+    expectations = SceneExpectations(
+        max_shapes=1,
+        beats=[
+            SceneBeat(shape="circle", color="blue"),
+            SceneBeat(shape="square", color="red"),
+        ],
+    )
+    good = _frames(
+        [_shape("circle", 0.5, color="blue")],
+        [_shape("square", 0.5, color="red")],
+    )
+    reversed_order = _frames(
+        [_shape("square", 0.5, color="red")],
+        [_shape("circle", 0.5, color="blue")],
+    )
+
+    assert check_expectations(good, expectations) == []
+    assert check_expectations(reversed_order, expectations)
 
 
 def test_expectations_audit_contract() -> None:

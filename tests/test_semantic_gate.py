@@ -37,9 +37,10 @@ def _require_contract() -> None:
         pytest.fail("SEMANTIC_GATE_CONTRACT_MISSING")
 
 
-def _shape(kind: str, center_x: float) -> ObservedShape:
+def _shape(kind: str, center_x: float, color: str = "white") -> ObservedShape:
     return ObservedShape(
         kind=kind,
+        color=color,
         center_x=center_x,
         center_y=0.5,
         area_fraction=0.05,
