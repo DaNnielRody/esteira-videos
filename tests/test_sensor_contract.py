@@ -51,7 +51,7 @@ def test_sensor_result_contains_evidence_or_failure_never_both() -> None:
     assert failed.evidence is None
     assert failed.failure is failure
     frame_success = ObservationResult.success([])
-    assert frame_success.frames == []
+    assert frame_success.evidence == []
     assert frame_success.failure is None
     frame_failure = ObservationResult.failed(failure)
     assert frame_failure.failure is failure

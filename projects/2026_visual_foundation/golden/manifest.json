@@ -1,0 +1,74 @@
+{
+  "schema_version": "golden.manifest/1",
+  "version": 1,
+  "profile": "visual",
+  "status": "accepted",
+  "project_id": "2026_visual_foundation",
+  "title": "Visual foundation",
+  "capabilities": ["basic_geometry", "equations", "typography"],
+  "theme": "theme.json",
+  "tolerances": {
+    "bbox": 0.03,
+    "duration_seconds": 0.1,
+    "colour_ratio": 0.05
+  },
+  "code_hash": "9c4634d517f8c7ceb4ceca53a23a6c0e3bab2d29523a8b5d8b2b02acc0ec534a",
+  "plan_hash": "6af60c2e6dcfb45e344cc48fb7481b7358a03673953546311b88b7c71aef5a9d",
+  "scenes": [
+    {
+      "id": "geometry",
+      "plan": "scenes/01_geometry/plan.json",
+      "code": "scenes/01_geometry/scene.py",
+      "expectations": "scenes/01_geometry/expectations.json",
+      "capabilities": ["basic_geometry"],
+      "expected_facts": {
+        "initial_state": [],
+        "final_state": ["vector"],
+        "checkpoints": ["introduce", "transform"],
+        "animations": ["Create", "Transform"]
+      },
+      "semantic_expectations": {
+        "required_objects": ["vector"],
+        "required_regions": {"vector": "left"},
+        "required_color_roles": {"vector": "primary"}
+      },
+      "expected_findings": [],
+      "keyframes": ["golden/frames/geometry-keyframe.svg"],
+      "dimensions": {"width": 854, "height": 480},
+      "duration_seconds": 4.0
+    },
+    {
+      "id": "equation",
+      "plan": "scenes/02_equation/plan.json",
+      "code": "scenes/02_equation/scene.py",
+      "expectations": "scenes/02_equation/expectations.json",
+      "capabilities": ["equations", "typography"],
+      "expected_facts": {
+        "initial_state": [],
+        "final_state": ["vector", "formula", "label"],
+        "checkpoints": ["persist", "define", "label"],
+        "animations": ["Create", "Create", "Create"]
+      },
+      "semantic_expectations": {
+        "required_objects": ["vector", "formula", "label"],
+        "required_regions": {"vector": "left", "formula": "right", "label": "top"},
+        "required_color_roles": {"vector": "primary", "formula": "accent", "label": "text"}
+      },
+      "expected_findings": [],
+      "keyframes": ["golden/frames/equation-keyframe.svg"],
+      "dimensions": {"width": 854, "height": 480},
+      "duration_seconds": 4.0
+    }
+  ],
+  "continuity": {
+    "boundaries": [
+      {
+        "from": "geometry",
+        "to": "equation",
+        "recurring_objects": ["vector"],
+        "expected_transition": "none",
+        "expected_findings": []
+      }
+    ]
+  }
+}

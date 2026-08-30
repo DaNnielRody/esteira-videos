@@ -2,28 +2,44 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-from typing import Literal
-
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from video_pipeline.expectations import SceneExpectations
+from video_pipeline.project import (
+    AudioMediaFacts,
+    Project,
+    ProjectSceneRef,
+    ProjectStageState,
+    ProjectState,
+    load_project,
+)
 from video_pipeline.reference_catalog import ReferenceTopic
+from video_pipeline.scene_plan import ScenePlan
+from video_pipeline.timeline import (
+    PauseInterval,
+    SilenceDetector,
+    Timeline,
+    TimelineSegment,
+    load_timeline,
+)
 
 
 class SceneSpec(BaseModel):
-    """The v1 input accepted by the pipeline for one scene."""
+    """One authored scene in a video."""
 
     model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
-    schema_version: Literal["1.0"]
+    id: str = Field(pattern=r"^[a-z][a-z0-9-]*$")
     scene_name: str = Field(pattern=r"^[A-Z][A-Za-z0-9_]*$")
     description: str
+    # Optional for existing render-only manifests; when supplied this is the
+    # authoritative visual contract sent to the coder and quality critics.
+    plan: ScenePlan | None = None
     # Optional: without it the pipeline keeps the renderability-only contract.
     expect: SceneExpectations | None = None
     # Explicit topics select a small authorized 3b1b-derived Community corpus.
     topics: list[ReferenceTopic] = Field(default_factory=list, max_length=4)
-    # Zero is the control condition for the few-shot experiment.
+    # Zero disables local few-shot references for this scene.
     reference_examples: int = Field(default=2, ge=0, le=3)
 
     @field_validator("description")
@@ -40,9 +56,25 @@ class SceneSpec(BaseModel):
             raise ValueError("topics must be unique")
         return value
 
+    @model_validator(mode="after")
+    def _plan_identity_matches_scene(self) -> SceneSpec:
+        if self.plan is not None:
+            if self.plan.id != self.id or self.plan.scene_name != self.scene_name:
+                raise ValueError("scene plan identity must match scene identity")
+        return self
 
-def load_scene_spec(path: str | Path) -> SceneSpec:
-    """Load and validate a UTF-8 JSON scene specification."""
 
-    document = Path(path).read_text(encoding="utf-8")
-    return SceneSpec.model_validate_json(document)
+__all__ = [
+    "AudioMediaFacts",
+    "Project",
+    "ProjectSceneRef",
+    "ProjectStageState",
+    "ProjectState",
+    "PauseInterval",
+    "SceneSpec",
+    "SilenceDetector",
+    "Timeline",
+    "TimelineSegment",
+    "load_project",
+    "load_timeline",
+]

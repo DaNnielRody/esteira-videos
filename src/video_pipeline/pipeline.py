@@ -4,12 +4,15 @@ from __future__ import annotations
 
 import ast
 import json
+import os
+import tempfile
 import traceback
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
 
+from video_pipeline.capabilities import DEFAULT_CAPABILITY_REGISTRY, CapabilityRegistry
 from video_pipeline.expectations import SceneExpectations, check_expectations
 from video_pipeline.latex_validation import (
     LatexValidationResult,
@@ -30,8 +33,17 @@ from video_pipeline.provider import (
     ProviderResponse,
     UnloadResult,
 )
+from video_pipeline.quality import QualityFinding, QualityReport
 from video_pipeline.rendering import ManimRunner, RenderResult
+from video_pipeline.runtime import ObservedScene
+from video_pipeline.scene_plan import ScenePlan
 from video_pipeline.spec import SceneSpec
+from video_pipeline.temporal import (
+    TemporalNormalizationResult,
+    TemporalNormalizer,
+    TemporalTolerances,
+    TemporalValidator,
+)
 from video_pipeline.validation import RenderValidator, ValidationResult
 from video_pipeline.workspace import RunHandle, RunWorkspace
 
@@ -58,23 +70,8 @@ class PipelineResult:
     mp4_path: Path | None = None
     error: str | None = None
     attempts: int = 0
-
-    @property
-    def terminal_state(self) -> PipelineState:
-        """Alias useful to callers that name the state explicitly."""
-
-        return self.state
-
-    @property
-    def output_path(self) -> Path | None:
-        """Alias for the accepted MP4 path, when the run succeeded."""
-
-        return self.mp4_path
-
-
-# The longer name is retained as a discoverable public result type.
-RenderPipelineResult = PipelineResult
-TerminalState = PipelineState
+    normalized_path: Path | None = None
+    temporal_normalization: TemporalNormalizationResult | None = None
 
 
 class RenderPipeline:
@@ -92,6 +89,10 @@ class RenderPipeline:
         id_factory: Callable[[], str] | None = None,
         temperature: float = 0.0,
         seed: int = 42,
+        capability_registry: CapabilityRegistry | None = None,
+        temporal_normalizer: TemporalNormalizer | None = None,
+        temporal_validator: TemporalValidator | None = None,
+        temporal_tolerances: TemporalTolerances | None = None,
     ) -> None:
         if not 0.0 <= temperature <= 2.0:
             raise ValueError("temperature must be between 0.0 and 2.0")
@@ -107,11 +108,27 @@ class RenderPipeline:
         self.id_factory = id_factory
         self.temperature = float(temperature)
         self.seed = seed
+        self.capability_registry = capability_registry or DEFAULT_CAPABILITY_REGISTRY
+        self.temporal_normalizer = temporal_normalizer
+        self.temporal_validator = temporal_validator
+        self.temporal_tolerances = temporal_tolerances or TemporalTolerances()
 
-    def render(self, spec: SceneSpec, max_attempts: int = 3) -> PipelineResult:
+    def render(
+        self,
+        spec: SceneSpec,
+        max_attempts: int = 3,
+        *,
+        previous_scene: Mapping[str, object] | None = None,
+        next_scene: Mapping[str, object] | None = None,
+    ) -> PipelineResult:
         """Generate, render, validate, and correct up to ``max_attempts`` times."""
 
         _validate_max_attempts(max_attempts)
+        capability_context: tuple[Mapping[str, object], ...] = ()
+        if spec.plan is not None:
+            capability_context = tuple(
+                self.capability_registry.prompt_context(spec.plan.capabilities)
+            )
         workspace = self._new_workspace()
         run = workspace.create_run()
         run_document = _new_run_document(run, spec, max_attempts)
@@ -124,18 +141,37 @@ class RenderPipeline:
         for attempt_number in range(1, max_attempts + 1):
             attempt = run.create_attempt()
             request = ProviderRequest(
-                schema_version=spec.schema_version,
                 scene_name=spec.scene_name,
                 description=spec.description,
                 topics=tuple(spec.topics),
                 reference_examples=spec.reference_examples,
-                expectations=(
-                    _expectations_document(spec.expect) if spec.expect is not None else None
+                expectations=_expectations_document(
+                    spec.expect or (spec.plan.expectations if spec.plan is not None else None)
                 ),
                 temperature=self.temperature,
                 seed=self.seed,
                 previous_code=previous_code,
                 diagnostics=diagnostics,
+                theme=(spec.plan.theme.to_document() if spec.plan is not None else None),
+                scene_plan=(spec.plan.to_document() if spec.plan is not None else None),
+                capabilities=(tuple(spec.plan.capabilities) if spec.plan is not None else ()),
+                capability_context=capability_context,
+                narration_text=(spec.plan.narration_text if spec.plan is not None else None),
+                start_seconds=(spec.plan.start_seconds if spec.plan is not None else None),
+                end_seconds=(spec.plan.end_seconds if spec.plan is not None else None),
+                target_duration_seconds=(
+                    spec.plan.duration_seconds if spec.plan is not None else None
+                ),
+                objective=(spec.plan.objective if spec.plan is not None else None),
+                previous_scene=previous_scene,
+                next_scene=next_scene,
+                required_objects=(
+                    tuple(item.id for item in spec.plan.objects if item.required)
+                    if spec.plan is not None
+                    else ()
+                ),
+                resolution=(spec.plan.theme.resolution if spec.plan is not None else None),
+                fps=(spec.plan.theme.fps if spec.plan is not None else None),
             )
             attempt_record: dict[str, object] = {
                 "attempt": attempt_number,
@@ -221,7 +257,11 @@ class RenderPipeline:
             )
             _write_text(attempt.path / "scene.py", response.code)
 
-            render_result = self._render(attempt.path / "scene.py", attempt.media_dir)
+            render_result = self._render(
+                attempt.path / "scene.py",
+                attempt.media_dir,
+                plan=spec.plan,
+            )
             render_document = _render_document(render_result)
             _write_json(attempt.path / "render.json", render_document)
             candidate = _first_candidate(render_result)
@@ -230,12 +270,15 @@ class RenderPipeline:
             # attempt should carry both what the frames showed and why the code
             # produced it, so one correction can address the whole failure.
             validation = self._with_observed_scene(
-                validation, candidate, attempt.path, spec.expect
+                validation,
+                candidate,
+                attempt.path,
+                spec.expect or (spec.plan.expectations if spec.plan is not None else None),
+                spec.plan,
+                attempt=attempt_number,
             )
             validation = _with_scene_semantics(validation, response.code)
-            _write_json(
-                attempt.path / "validation.json", _validation_document(validation)
-            )
+            _write_json(attempt.path / "validation.json", _validation_document(validation))
             diagnostics = _diagnostics(render_result, validation)
             _write_json(attempt.path / "diagnostics.json", diagnostics)
 
@@ -262,6 +305,99 @@ class RenderPipeline:
                     attempts=attempt_number,
                 )
 
+            temporal_normalization: TemporalNormalizationResult | None = None
+            temporal_document: dict[str, object] | None = None
+            if (
+                self.temporal_normalizer is not None
+                and self.temporal_validator is not None
+                and render_result.exit_code == 0
+                and validation.valid
+                and candidate is not None
+                and spec.plan is not None
+                and validation.duration_seconds is not None
+            ):
+                temporal_normalization = self.temporal_normalizer.normalize(
+                    candidate,
+                    normalized_path=attempt.media_dir / "normalized.mp4",
+                    observed_duration_seconds=validation.duration_seconds,
+                    target_duration_seconds=spec.plan.duration_seconds,
+                    target_resolution=spec.plan.theme.resolution,
+                    target_fps=spec.plan.theme.fps,
+                    target_timebase=90_000,
+                    target_pixel_format="yuv420p",
+                    validator=self.temporal_validator,
+                )
+                temporal_document = temporal_normalization.to_document()
+                _write_json(attempt.path / "temporal-normalization.json", temporal_document)
+                diagnostics["temporal"] = _temporal_diagnostics(
+                    temporal_normalization,
+                    self.temporal_tolerances,
+                )
+                diagnostics["temporal_normalization"] = temporal_document
+                _write_json(attempt.path / "diagnostics.json", diagnostics)
+
+            if (
+                temporal_normalization is not None
+                and temporal_normalization.status
+                not in {"accepted", "normalized"}
+            ):
+                error = _temporal_error(temporal_normalization)
+                terminal_state = (
+                    PipelineState.CORRECTING
+                    if attempt_number < max_attempts
+                    else PipelineState.ATTEMPTS_EXHAUSTED
+                )
+                attempt_state = (
+                    PipelineState.CORRECTING
+                    if attempt_number < max_attempts
+                    else PipelineState.ATTEMPTS_EXHAUSTED
+                )
+                temporal_extra = {
+                    "error": error,
+                    "render": _render_document(render_result),
+                    "validation": _validation_document(validation),
+                    "mp4_path": str(candidate) if candidate is not None else None,
+                    "diagnostics": diagnostics,
+                    "temporal_normalization": temporal_document,
+                }
+                self._finish_attempt(
+                    attempt.path,
+                    attempt_record,
+                    state=attempt_state,
+                    terminal_state=terminal_state,
+                    extra=temporal_extra,
+                )
+                attempt_record.update(
+                    {
+                        "state": "failed",
+                        "render": _render_document(render_result),
+                        "validation": _validation_document(validation),
+                        "mp4_path": str(candidate) if candidate is not None else None,
+                        "temporal_normalization": temporal_document,
+                        "error": error,
+                    }
+                )
+                if attempt_number == max_attempts:
+                    _set_run_state(run_document, PipelineState.ATTEMPTS_EXHAUSTED)
+                    self._mark_terminal_state(
+                        run_document,
+                        PipelineState.ATTEMPTS_EXHAUSTED,
+                    )
+                    _write_json(run.path / "run.json", run_document)
+                    return PipelineResult(
+                        state=PipelineState.ATTEMPTS_EXHAUSTED,
+                        run_path=run.path,
+                        mp4_path=candidate,
+                        error=error,
+                        attempts=attempt_number,
+                        temporal_normalization=temporal_normalization,
+                    )
+                previous_code = response.code
+                state = PipelineState.CORRECTING
+                _set_run_state(run_document, state)
+                _write_json(run.path / "run.json", run_document)
+                continue
+
             # Keep this exact gate visible: process exit alone never accepts a run.
             if render_result.exit_code == 0 and validation.valid:
                 self._finish_attempt(
@@ -273,6 +409,11 @@ class RenderPipeline:
                         "render": _render_document(render_result),
                         "validation": _validation_document(validation),
                         "mp4_path": str(candidate) if candidate is not None else None,
+                        "temporal_normalization": (
+                            temporal_normalization.to_document()
+                            if temporal_normalization is not None
+                            else None
+                        ),
                     },
                 )
                 _set_run_state(run_document, PipelineState.SUCCESS)
@@ -281,6 +422,11 @@ class RenderPipeline:
                         "mp4_path": str(candidate) if candidate is not None else None,
                         "render": _render_document(render_result),
                         "validation": _validation_document(validation),
+                        "temporal_normalization": (
+                            temporal_normalization.to_document()
+                            if temporal_normalization is not None
+                            else None
+                        ),
                     }
                 )
                 _write_json(run.path / "run.json", run_document)
@@ -289,6 +435,12 @@ class RenderPipeline:
                     run_path=run.path,
                     mp4_path=candidate,
                     attempts=attempt_number,
+                    normalized_path=(
+                        temporal_normalization.normalized_path
+                        if temporal_normalization is not None
+                        else None
+                    ),
+                    temporal_normalization=temporal_normalization,
                 )
 
             self._finish_attempt(
@@ -377,7 +529,19 @@ class RenderPipeline:
         except Exception:
             return None, traceback.format_exc()
 
-    def _render(self, scene_path: Path, media_dir: Path) -> RenderResult:
+    def _render(
+        self,
+        scene_path: Path,
+        media_dir: Path,
+        *,
+        plan: ScenePlan | None,
+    ) -> RenderResult:
+        plan_key = "VIDEO_PIPELINE_SCENE_PLAN"
+        previous_plan = os.environ.get(plan_key)
+        if plan is not None:
+            os.environ[plan_key] = json.dumps(plan.to_document(), ensure_ascii=False)
+        else:
+            os.environ.pop(plan_key, None)
         try:
             return self.runner.run(scene_path, media_dir)
         except Exception:
@@ -391,6 +555,11 @@ class RenderPipeline:
                 elapsed_seconds=0.0,
                 mp4_paths=[],
             )
+        finally:
+            if previous_plan is None:
+                os.environ.pop(plan_key, None)
+            else:
+                os.environ[plan_key] = previous_plan
 
     def _validate(self, candidate: Path | None, attempt_path: Path) -> ValidationResult:
         target = candidate or attempt_path / "media" / "missing.mp4"
@@ -420,6 +589,9 @@ class RenderPipeline:
         candidate: Path | None,
         attempt_path: Path,
         expectations: SceneExpectations | None,
+        plan: ScenePlan | None,
+        *,
+        attempt: int = 1,
     ) -> ValidationResult:
         """Reject a valid MP4 whose frames contradict the scene specification.
 
@@ -427,10 +599,10 @@ class RenderPipeline:
         an attempt that failed earlier keeps its original, more precise reason.
         """
 
-        if expectations is None or candidate is None or not validation.valid:
+        if candidate is None or not validation.valid or (expectations is None and plan is None):
             return validation
         observation = self._observe(candidate, attempt_path / "observation")
-        frames = observation.frames
+        frames = observation.evidence if observation.evidence is not None else []
         failure = observation.failure
         _write_json(
             attempt_path / "observation.json",
@@ -455,40 +627,85 @@ class RenderPipeline:
                 code=failure.code.value,
                 detail=failure.detail,
             )
-        reasons = check_expectations(frames, expectations)
-        try:
-            latex_observation = self.latex_validator.observe(
-                [*expectations.latex, *expectations.text],
-                attempt_path / "observation",
-                attempt_path / "latex-validation",
-            )
-        except Exception:
-            return _sensor_failed(
-                validation,
-                code=SensorFailureCode.LATEX_VALIDATOR_EXCEPTION.value,
-                detail=traceback.format_exc(),
-            )
-        if latex_observation.failure is not None:
-            latex = LatexValidationResult(
-                matches=[], reasons=[], failure=latex_observation.failure
-            )
+        reasons = check_expectations(frames, expectations) if expectations is not None else []
+        if expectations is not None:
+            try:
+                latex_observation = self.latex_validator.observe(
+                    [*expectations.latex, *expectations.text],
+                    attempt_path / "observation",
+                    attempt_path / "latex-validation",
+                )
+            except Exception:
+                return _sensor_failed(
+                    validation,
+                    code=SensorFailureCode.LATEX_VALIDATOR_EXCEPTION.value,
+                    detail=traceback.format_exc(),
+                )
+            if latex_observation.failure is not None:
+                latex = LatexValidationResult(
+                    matches=[], reasons=[], failure=latex_observation.failure
+                )
+                _write_json(attempt_path / "latex-validation.json", latex.to_document())
+                return _sensor_failed(
+                    validation,
+                    code=latex_observation.failure.code.value,
+                    detail=latex_observation.failure.detail,
+                )
+            matches = latex_observation.evidence if latex_observation.evidence is not None else []
+            latex = LatexValidationResult(matches=matches, reasons=check_latex_matches(matches))
             _write_json(attempt_path / "latex-validation.json", latex.to_document())
-            return _sensor_failed(
-                validation,
-                code=latex_observation.failure.code.value,
-                detail=latex_observation.failure.detail,
+            reasons.extend(latex.reasons)
+        quality_report: QualityReport | None = None
+        if plan is not None:
+            observed_scene = self._observed_scene(
+                candidate,
+                attempt_path,
+                plan,
+                frames,
             )
-        matches = (
-            latex_observation.evidence
-            if latex_observation.evidence is not None
-            else []
-        )
-        latex = LatexValidationResult(matches=matches, reasons=check_latex_matches(matches))
-        _write_json(attempt_path / "latex-validation.json", latex.to_document())
-        reasons.extend(latex.reasons)
+            quality_report = self._quality_report(plan, observed_scene, attempt=attempt)
+            _write_json(attempt_path / "observed-scene.json", observed_scene.to_document())
+            _write_json(attempt_path / "quality-report.json", quality_report.to_document())
+            reasons.extend(_quality_reason(finding) for finding in quality_report.failures)
         if not reasons:
-            return validation
-        return _rejected(validation, reasons)
+            return _with_quality_report(validation, quality_report)
+        return _rejected(_with_quality_report(validation, quality_report), reasons)
+
+    def _observed_scene(
+        self,
+        candidate: Path,
+        attempt_path: Path,
+        plan: ScenePlan,
+        frames: list[FrameObservation],
+    ) -> ObservedScene:
+        """Load runtime facts when present and attach the sampled frames."""
+
+        facts_path = attempt_path / "media" / "visual-facts.json"
+        if facts_path.is_file():
+            try:
+                loaded: object = json.loads(facts_path.read_text(encoding="utf-8"))
+                observed = ObservedScene.from_document(loaded)
+                return observed.model_copy(update={"frames": frames})  # type: ignore[misc]
+            except (OSError, ValueError, TypeError):
+                pass
+        del candidate
+        return ObservedScene(
+            scene_id=plan.id,
+            scene_name=plan.scene_name,
+            theme_id=plan.theme.id,
+            frames=frames,
+        )
+
+    def _quality_report(
+        self,
+        plan: ScenePlan,
+        observed: ObservedScene,
+        *,
+        attempt: int = 1,
+    ) -> QualityReport:
+        from video_pipeline.critics import evaluate_visual_quality
+
+        return evaluate_visual_quality(plan, observed, attempt=attempt)
 
     def _observe(
         self,
@@ -594,6 +811,7 @@ def _rejected(validation: ValidationResult, reasons: list[str]) -> ValidationRes
         size_bytes=validation.size_bytes,
         sensor_failure_code=validation.sensor_failure_code,
         sensor_failure_detail=validation.sensor_failure_detail,
+        quality_report=validation.quality_report,
     )
 
 
@@ -615,10 +833,46 @@ def _sensor_failed(
         size_bytes=validation.size_bytes,
         sensor_failure_code=code,
         sensor_failure_detail=detail,
+        quality_report=validation.quality_report,
     )
 
 
-def _expectations_document(expectations: SceneExpectations) -> dict[str, object]:
+def _with_quality_report(
+    validation: ValidationResult,
+    report: QualityReport | None,
+) -> ValidationResult:
+    """Attach deterministic visual findings without changing media facts."""
+
+    if report is None:
+        return validation
+    return ValidationResult(
+        path=validation.path,
+        valid=validation.valid,
+        reasons=list(validation.reasons),
+        width=validation.width,
+        height=validation.height,
+        duration_seconds=validation.duration_seconds,
+        size_bytes=validation.size_bytes,
+        sensor_failure_code=validation.sensor_failure_code,
+        sensor_failure_detail=validation.sensor_failure_detail,
+        quality_report=report.to_document(),
+    )
+
+
+def _quality_reason(finding: QualityFinding) -> str:
+    """Render one visual finding into actionable provider diagnostics."""
+
+    return (
+        f"{finding.code}: observed={finding.observed}; "
+        f"expected={finding.expected}; {finding.suggestion}"
+    )
+
+
+def _expectations_document(
+    expectations: SceneExpectations | None,
+) -> dict[str, object] | None:
+    if expectations is None:
+        return None
     return {
         "max_shapes": expectations.max_shapes,
         "beats": [
@@ -668,6 +922,9 @@ def _frame_document(frame: FrameObservation) -> dict[str, object]:
                 "center_y": round(shape.center_y, 4),
                 "area_fraction": round(shape.area_fraction, 5),
                 "extent": round(shape.extent, 4),
+                "observed_rgb": list(shape.observed_rgb)
+                if shape.observed_rgb is not None
+                else None,
             }
             for shape in frame.shapes
         ],
@@ -821,11 +1078,13 @@ def _new_run_document(
         "state_history": [PipelineState.ATTEMPTING.value],
         "max_attempts": max_attempts,
         "scene": {
-            "schema_version": spec.schema_version,
+            "id": spec.id,
             "scene_name": spec.scene_name,
             "description": spec.description,
             "topics": list(spec.topics),
             "reference_examples": spec.reference_examples,
+            "plan": spec.plan.to_document() if spec.plan is not None else None,
+            "theme": (spec.plan.theme.to_document() if spec.plan is not None else None),
         },
         "attempts": [],
     }
@@ -849,17 +1108,12 @@ def _first_candidate(result: RenderResult) -> Path | None:
     # Manim also emits per-animation fragments under ``partial_movie_files``.
     # Each fragment probes as a valid MP4, so it must never be mistaken for the
     # combined scene output.
-    combined = [
-        candidate
-        for candidate in candidates
-        if _PARTIAL_MOVIE_DIR not in candidate.parts
-    ]
+    combined = [candidate for candidate in candidates if _PARTIAL_MOVIE_DIR not in candidate.parts]
     return (combined or candidates)[0]
 
 
 def _request_document(request: ProviderRequest) -> dict[str, object]:
     return {
-        "schema_version": request.schema_version,
         "scene_name": request.scene_name,
         "description": request.description,
         "topics": list(request.topics),
@@ -869,6 +1123,24 @@ def _request_document(request: ProviderRequest) -> dict[str, object]:
         "seed": request.seed,
         "previous_code": request.previous_code,
         "diagnostics": _json_value(request.diagnostics),
+        "theme": _json_value(request.theme),
+        "scene_plan": _json_value(request.scene_plan),
+        "capabilities": list(request.capabilities),
+        "capability_context": _json_value(request.capability_context),
+        "narration_text": request.narration_text,
+        "start_seconds": request.start_seconds,
+        "end_seconds": request.end_seconds,
+        "target_duration_seconds": request.target_duration_seconds,
+        "objective": request.objective,
+        "previous_scene": _json_value(request.previous_scene),
+        "next_scene": _json_value(request.next_scene),
+        "required_objects": list(request.required_objects),
+        "required_elements": list(request.required_elements),
+        "resolution": (
+            list(request.resolution) if request.resolution is not None else None
+        ),
+        "fps": request.fps,
+        "prior_findings": _json_value(request.prior_findings),
     }
 
 
@@ -903,6 +1175,7 @@ def _validation_document(result: ValidationResult) -> dict[str, object]:
             if result.sensor_failure_code is not None
             else None
         ),
+        "quality_report": result.quality_report,
     }
 
 
@@ -916,15 +1189,54 @@ def _diagnostics(
         **rendered,
         "validation": validated,
         "validator_reasons": list(validation.reasons),
+        "quality_report": validation.quality_report,
+        "quality_findings": (
+            validation.quality_report.get("findings", [])
+            if validation.quality_report is not None
+            else []
+        ),
     }
 
 
+def _temporal_diagnostics(
+    result: TemporalNormalizationResult,
+    tolerances: TemporalTolerances,
+) -> dict[str, object]:
+    """Describe a temporal correction request in provider-facing terms."""
+
+    if result.status == "requires_regeneration":
+        action = "regenerate the scene with the target duration"
+    elif result.status == "failed":
+        action = "regenerate the scene after temporal normalization failed"
+    else:
+        action = "keep the scene duration within the accepted tolerance"
+    return {
+        "observed_duration_seconds": result.observed_duration_seconds,
+        "target_duration_seconds": result.target_duration_seconds,
+        "delta_seconds": result.delta_seconds,
+        "acceptance_tolerance_seconds": tolerances.acceptance_seconds,
+        "correction_limit_seconds": tolerances.correction_limit_seconds,
+        "requested_action": action,
+    }
+
+
+def _temporal_error(result: TemporalNormalizationResult) -> str:
+    """Return a concise retryable temporal failure for run evidence."""
+
+    detail = "; ".join(result.validation_reasons or [])
+    return (
+        f"temporal normalization {result.status}: "
+        f"{detail or result.stderr or 'no normalized artifact'}"
+    )
+
+
 def _write_text(path: Path, value: str) -> None:
-    path.write_text(value, encoding="utf-8")
+    _atomic_write_text(path, value)
 
 
 def _write_json(path: Path, value: object) -> None:
-    path.write_text(
+    _atomic_write_text(
+        path,
         json.dumps(
             _json_value(value),
             ensure_ascii=False,
@@ -933,8 +1245,31 @@ def _write_json(path: Path, value: object) -> None:
             default=str,
         )
         + "\n",
-        encoding="utf-8",
     )
+
+
+def _atomic_write_text(path: Path, value: str) -> None:
+    """Write one persistent text artifact through a durable same-dir replace."""
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary: Path | None = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w",
+            encoding="utf-8",
+            dir=path.parent,
+            prefix=f".{path.name}.",
+            suffix=".tmp",
+            delete=False,
+        ) as handle:
+            temporary = Path(handle.name)
+            handle.write(value)
+            handle.flush()
+            os.fsync(handle.fileno())
+        temporary.replace(path)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
 
 
 def _json_value(value: object) -> object:
@@ -953,6 +1288,4 @@ __all__ = [
     "PipelineResult",
     "PipelineState",
     "RenderPipeline",
-    "RenderPipelineResult",
-    "TerminalState",
 ]

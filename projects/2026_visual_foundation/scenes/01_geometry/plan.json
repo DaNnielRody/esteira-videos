@@ -1,0 +1,49 @@
+{
+  "schema_version": "visual.scene-plan/1",
+  "id": "geometry",
+  "scene_name": "GeometryFoundationScene",
+  "objective": "Introduce a primary vector and rotate it without leaving the safe area.",
+  "duration_seconds": 4.0,
+  "capabilities": ["basic_geometry"],
+  "objects": [
+    {
+      "id": "vector",
+      "kind": "arrow",
+      "color_role": "primary",
+      "semantic_role": "main-vector",
+      "region": "left",
+      "required": true,
+      "visible": true,
+      "overlap_policy": "forbidden"
+    }
+  ],
+  "beats": [
+    {
+      "id": "introduce",
+      "action": "introduce",
+      "objects": ["vector"],
+      "duration_seconds": 1.2,
+      "region": "left"
+    },
+    {
+      "id": "transform",
+      "action": "transform",
+      "objects": ["vector"],
+      "duration_seconds": 1.2,
+      "region": "left",
+      "movement": "rotate"
+    }
+  ],
+  "layout": {
+    "object_regions": {"vector": "left"},
+    "minimum_spacing": 0.18,
+    "max_text_lines": 3,
+    "max_content_density": 0.65,
+    "allow_background_overlap": true
+  },
+  "continuity_out": {
+    "required": true,
+    "expected_transition": "none",
+    "recurring_object_ids": ["vector"]
+  }
+}

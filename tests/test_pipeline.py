@@ -25,8 +25,12 @@ from video_pipeline.validation import ValidationResult
 
 try:
     from video_pipeline.pipeline import RenderPipeline as _RenderPipeline
+    from video_pipeline.pipeline import _write_json as _write_pipeline_json
+    from video_pipeline.pipeline import _write_text as _write_pipeline_text
 except (ImportError, ModuleNotFoundError):
     _RenderPipeline = None
+    _write_pipeline_json = None
+    _write_pipeline_text = None
 
 
 VALID_DESCRIPTION = (
@@ -45,7 +49,7 @@ def _require_pipeline() -> type[object]:
 
 def _scene(description: str = VALID_DESCRIPTION) -> SceneSpec:
     return SceneSpec(
-        schema_version="1.0",
+        id="acceptance",
         scene_name="AcceptanceScene",
         description=description,
     )
@@ -201,11 +205,7 @@ def _run_directory(output_root: Path) -> Path:
 
 
 def _attempt_directories(run_directory: Path) -> list[Path]:
-    return sorted(
-        candidate
-        for candidate in run_directory.glob("attempt-*")
-        if candidate.is_dir()
-    )
+    return sorted(candidate for candidate in run_directory.glob("attempt-*") if candidate.is_dir())
 
 
 def _artifact_text(directory: Path) -> str:
@@ -220,6 +220,40 @@ def _artifact_text(directory: Path) -> str:
         except UnicodeDecodeError:
             continue
     return "\n".join(chunks)
+
+
+@pytest.mark.parametrize(
+    ("writer_name", "payload"),
+    [
+        pytest.param("text", "NEW_TEXT", id="text"),
+        pytest.param("json", {"state": "new"}, id="json"),
+    ],
+)
+def test_pipeline_persistent_writers_preserve_destination_on_replace_failure(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    writer_name: str,
+    payload: object,
+) -> None:
+    """A failed atomic publication cannot expose a partial persistent file."""
+
+    writers = {"text": _write_pipeline_text, "json": _write_pipeline_json}
+    writer = writers[writer_name]
+    if writer is None:
+        pytest.fail("pipeline persistent writer seam is missing")
+    destination = tmp_path / "persistent.json"
+    destination.write_bytes(b"PREVIOUS_BYTES")
+
+    def fail_replace(self: Path, target: str | Path) -> Path:
+        del self, target
+        raise OSError("injected replace failure")
+
+    monkeypatch.setattr(Path, "replace", fail_replace)
+    with pytest.raises(OSError, match="injected replace failure"):
+        writer(destination, payload)
+
+    assert destination.read_bytes() == b"PREVIOUS_BYTES"
+    assert not list(tmp_path.glob(f".{destination.name}.*.tmp"))
 
 
 def _assert_attempt_evidence(
@@ -241,7 +275,7 @@ def _assert_attempt_evidence(
 
 
 def _state(result: object) -> str:
-    value = getattr(result, "state")
+    value = result.state  # type: ignore[attr-defined]
     return str(getattr(value, "value", value)).upper()
 
 
@@ -284,19 +318,14 @@ def test_render_pipeline_happy_path_writes_one_success_attempt(tmp_path: Path) -
 
     assert _state(result) == "SUCCESS"
     assert len(provider.requests) == 1
-    assert provider.requests[0].schema_version == "1.0"
     assert provider.requests[0].scene_name == "AcceptanceScene"
     assert provider.requests[0].description == VALID_DESCRIPTION
     assert provider.requests[0].temperature == 0.2
     assert provider.requests[0].seed == 17
-    assert provider.responses == [
-        _response("VALID_CODE_SENTINEL", "RAW_SUCCESS_RESPONSE_SENTINEL")
-    ]
+    assert provider.responses == [_response("VALID_CODE_SENTINEL", "RAW_SUCCESS_RESPONSE_SENTINEL")]
     assert provider.unload_count == 1
     assert provider.unload_results[0].ok is True
-    assert provider.unload_results[0].raw_response == {
-        "response": "UNLOAD_RESPONSE_1"
-    }
+    assert provider.unload_results[0].raw_response == {"response": "UNLOAD_RESPONSE_1"}
     assert events[:3] == ["generate-1", "unload-1", "render-1"]
     assert runner.run_states_at_render == ["attempting"]
     assert runner.results[0].argv[-1] == "SUCCESS_ARGV_SENTINEL"
@@ -314,9 +343,7 @@ def test_render_pipeline_happy_path_writes_one_success_attempt(tmp_path: Path) -
     run_directory = _run_directory(output_root)
     attempts = _attempt_directories(run_directory)
     assert [attempt.name for attempt in attempts] == ["attempt-01"]
-    request_document = json.loads(
-        (attempts[0] / "request.json").read_text(encoding="utf-8")
-    )
+    request_document = json.loads((attempts[0] / "request.json").read_text(encoding="utf-8"))
     assert request_document["temperature"] == 0.2
     assert request_document["seed"] == 17
     run_document = json.loads((run_directory / "run.json").read_text(encoding="utf-8"))
@@ -326,8 +353,8 @@ def test_render_pipeline_happy_path_writes_one_success_attempt(tmp_path: Path) -
     assert "success.mp4" in run_text
     success_mp4 = runner.results[0].mp4_paths[0]
     assert success_mp4.is_file()
-    assert Path(getattr(result, "mp4_path")) == success_mp4
-    assert Path(getattr(result, "run_path")) == run_directory
+    assert Path(result.mp4_path) == success_mp4  # type: ignore[attr-defined]
+    assert Path(result.run_path) == run_directory  # type: ignore[attr-defined]
     _assert_attempt_evidence(
         attempts[0],
         mp4_path=success_mp4,
@@ -420,7 +447,6 @@ def test_render_pipeline_preserves_failure_and_corrects_only_after_validation(
     correction = provider.requests[1]
     assert correction.previous_code == first_code
     diagnostics = dict(correction.diagnostics or {})
-    assert correction.schema_version == "1.0"
     assert correction.scene_name == "AcceptanceScene"
     assert correction.description == scene.description
     assert diagnostics["argv"] == [
@@ -448,13 +474,9 @@ def test_render_pipeline_preserves_failure_and_corrects_only_after_validation(
         "model": "deterministic-test",
     }
     assert provider.unload_results[0].ok is True
-    assert provider.unload_results[0].raw_response == {
-        "response": "UNLOAD_RESPONSE_1"
-    }
+    assert provider.unload_results[0].raw_response == {"response": "UNLOAD_RESPONSE_1"}
     assert provider.unload_results[1].ok is True
-    assert provider.unload_results[1].raw_response == {
-        "response": "UNLOAD_RESPONSE_2"
-    }
+    assert provider.unload_results[1].raw_response == {"response": "UNLOAD_RESPONSE_2"}
     assert runner.run_states_at_render == ["attempting", "correcting"]
     assert [render.exit_code for render in runner.results] == [17, 0]
     assert [render.timed_out for render in runner.results] == [False, False]
@@ -539,8 +561,8 @@ def test_render_pipeline_preserves_failure_and_corrects_only_after_validation(
     assert "attempt-01" in run_text
     assert "attempt-02" in run_text
     assert "corrected.mp4" in run_text
-    assert Path(getattr(result, "mp4_path")) == corrected_mp4
-    assert Path(getattr(result, "run_path")) == run_directory
+    assert Path(result.mp4_path) == corrected_mp4  # type: ignore[attr-defined]
+    assert Path(result.run_path) == run_directory  # type: ignore[attr-defined]
 
 
 def test_render_pipeline_exit_zero_with_invalid_validation_is_not_success(
@@ -566,9 +588,7 @@ def test_render_pipeline_exit_zero_with_invalid_validation_is_not_success(
         ],
         events,
     )
-    validator = RecordingValidator(
-        [ValidationPlan(False, ("INVALID_MP4_SENTINEL",))], events
-    )
+    validator = RecordingValidator([ValidationPlan(False, ("INVALID_MP4_SENTINEL",))], events)
     output_root = tmp_path / "runs"
     pipeline = _make_pipeline(
         pipeline_type,
@@ -675,7 +695,7 @@ def test_render_pipeline_exhaustion_preserves_every_bounded_attempt(tmp_path: Pa
     assert provider.unload_count == 3
     assert result.mp4_path is None  # type: ignore[attr-defined]
     run_directory = _run_directory(output_root)
-    assert Path(getattr(result, "run_path")) == run_directory
+    assert Path(result.run_path) == run_directory  # type: ignore[attr-defined]
     attempts = _attempt_directories(run_directory)
     assert [attempt.name for attempt in attempts] == [
         "attempt-01",
@@ -713,7 +733,11 @@ def test_render_pipeline_exhaustion_preserves_every_bounded_attempt(tmp_path: Pa
         0.0,
         0.0,
     ]
-    assert [validator_result.size_bytes for validator_result in validator.results] == [9311, 9312, 9313]
+    assert [validator_result.size_bytes for validator_result in validator.results] == [
+        9311,
+        9312,
+        9313,
+    ]
 
     codes = [
         "EXHAUSTED_CODE_01_SENTINEL",
@@ -749,12 +773,8 @@ def test_render_pipeline_exhaustion_preserves_every_bounded_attempt(tmp_path: Pa
     candidate_names = ["one.mp4", "two.mp4", "three.mp4"]
 
     assert [response.code for response in provider.responses] == codes
-    assert [
-        response.raw_response["response"] for response in provider.responses
-    ] == raw_responses
-    assert [
-        unload.raw_response["response"] for unload in provider.unload_results
-    ] == [
+    assert [response.raw_response["response"] for response in provider.responses] == raw_responses
+    assert [unload.raw_response["response"] for unload in provider.unload_results] == [
         "UNLOAD_RESPONSE_1",
         "UNLOAD_RESPONSE_2",
         "UNLOAD_RESPONSE_3",
@@ -770,9 +790,7 @@ def test_render_pipeline_exhaustion_preserves_every_bounded_attempt(tmp_path: Pa
         assert diagnostics["stderr"] == runner.results[index - 1].stderr
         assert diagnostics["validator_reasons"] == validator.results[index - 1].reasons
 
-    for index, (attempt, candidate_name) in enumerate(
-        zip(attempts, candidate_names, strict=True)
-    ):
+    for index, (attempt, candidate_name) in enumerate(zip(attempts, candidate_names, strict=True)):
         width, height, size = metadata[index]
         candidate = runner.results[index].mp4_paths[0]
         assert candidate.name == candidate_name
@@ -809,10 +827,7 @@ def test_render_pipeline_exhaustion_preserves_every_bounded_attempt(tmp_path: Pa
     for attempt, candidate_name in zip(attempts, candidate_names, strict=True):
         assert attempt.name in run_text
         assert candidate_name in run_text
-    assert not any(
-        candidate.name == "accepted.mp4"
-        for candidate in run_directory.rglob("*.mp4")
-    )
+    assert not any(candidate.name == "accepted.mp4" for candidate in run_directory.rglob("*.mp4"))
     assert len({attempt.resolve() for attempt in attempts}) == 3
 
 

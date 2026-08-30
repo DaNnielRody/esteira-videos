@@ -3,11 +3,10 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any
 
 import pytest
-
 
 try:
     from video_pipeline.validation import RenderValidator
@@ -32,11 +31,26 @@ class RecordingFfprobe:
 
     def __init__(self, result: CompletedProbe) -> None:
         self.result = result
-        self.calls: list[tuple[list[str], dict[str, Any]]] = []
+        self.calls: list[tuple[list[str], dict[str, object]]] = []
 
-    def __call__(self, argv: Any, *args: Any, **kwargs: Any) -> CompletedProbe:
-        del args
-        self.calls.append((list(argv), kwargs))
+    def __call__(
+        self,
+        argv: Sequence[str],
+        *,
+        capture_output: bool,
+        text: bool,
+        check: bool,
+    ) -> CompletedProbe:
+        self.calls.append(
+            (
+                list(argv),
+                {
+                    "capture_output": capture_output,
+                    "text": text,
+                    "check": check,
+                },
+            )
+        )
         return self.result
 
 
@@ -100,7 +114,10 @@ def test_render_validator_rejects_corrupt_mp4_when_ffprobe_fails(
     result = _validator(probe).validate(path)
 
     assert result.valid is False
-    assert any("probe" in reason.lower() or "corrupt" in reason.lower() for reason in result.reasons)
+    assert any(
+        "probe" in reason.lower() or "corrupt" in reason.lower()
+        for reason in result.reasons
+    )
 
 
 def test_render_validator_rejects_probe_results_without_a_video_stream(

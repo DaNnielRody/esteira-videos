@@ -104,6 +104,7 @@ class ObservedShape:
     center_y: float
     area_fraction: float
     extent: float
+    observed_rgb: tuple[int, int, int] | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -114,29 +115,15 @@ class FrameObservation:
     shapes: list[ObservedShape]
 
 
-@dataclass(frozen=True, slots=True, init=False)
+@dataclass(frozen=True, slots=True)
 class ObservationResult(SensorResult[list[FrameObservation]]):
     """Uniform frame-sensor result containing evidence or an explicit failure."""
-
-    def __init__(
-        self,
-        *,
-        frames: list[FrameObservation] | None = None,
-        failure: SensorFailure | None = None,
-    ) -> None:
-        SensorResult.__init__(self, evidence=frames, failure=failure)
-
-    @property
-    def frames(self) -> list[FrameObservation]:
-        """Compatibility name for successful frame evidence."""
-
-        return self.evidence if self.evidence is not None else []
 
     @classmethod
     def success(cls, evidence: list[FrameObservation]) -> ObservationResult:
         """Build successful frame evidence through the shared sensor contract."""
 
-        return cls(frames=evidence)
+        return cls(evidence=evidence, failure=None)
 
     @classmethod
     def failed(
@@ -147,10 +134,13 @@ class ObservationResult(SensorResult[list[FrameObservation]]):
         """Build a failed result without pretending an empty storyboard was seen."""
 
         if isinstance(failure, SensorFailure):
-            return cls(failure=failure)
+            return cls(evidence=None, failure=failure)
         if detail is None:
             raise ValueError("sensor failure detail is required")
-        return cls(failure=SensorFailure(code=failure, detail=detail))
+        return cls(
+            evidence=None,
+            failure=SensorFailure(code=failure, detail=detail),
+        )
 
 
 class SceneObserver:
@@ -236,7 +226,7 @@ class SceneObserver:
                 f"ffmpeg produced no readable frames from {source}",
             )
         np.savez_compressed(target / "frames.npz", frame_data=frames)
-        return ObservationResult(frames=analyze_frames(frames))
+        return ObservationResult.success(analyze_frames(frames))
 
 
 def analyze_frames(frames: npt.NDArray[np.uint8]) -> list[FrameObservation]:
@@ -308,13 +298,15 @@ def _describe(
     perimeter = float(cv2.arcLength(contour, True))
     vertices = len(cv2.approxPolyDP(contour, _POLYGON_EPSILON * perimeter, True))
 
+    drawn = _drawn_pixels(contour, mask=mask, colour=colour)
     return ObservedShape(
         kind=_classify(aspect=aspect, extent=extent, vertices=vertices),
-        color=_name_colour(_drawn_pixels(contour, mask=mask, colour=colour)),
+        color=_name_colour(drawn),
         center_x=float(center_x) / width,
         center_y=float(center_y) / height,
         area_fraction=area / float(width * height),
         extent=extent,
+        observed_rgb=_representative_rgb(drawn),
     )
 
 
@@ -367,6 +359,19 @@ def _name_colour(pixels: npt.NDArray[np.uint8]) -> str:
     if brightest >= _GREY_MIN_VALUE:
         return "grey"
     return "black"
+
+
+def _representative_rgb(pixels: npt.NDArray[np.uint8]) -> tuple[int, int, int] | None:
+    """Keep a compressed-frame RGB sample alongside the HSV colour label."""
+
+    if pixels.size == 0:
+        return None
+    median = np.median(pixels.astype(np.float64), axis=0)
+    return (
+        int(round(float(median[0]))),
+        int(round(float(median[1]))),
+        int(round(float(median[2]))),
+    )
 
 
 def _hue_name(degrees: float) -> str:

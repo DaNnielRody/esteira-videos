@@ -3,17 +3,18 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import Any
 from urllib.error import HTTPError
+from urllib.request import Request
 
 import pytest
-
 
 try:
     from video_pipeline.provider import (
         LLMProvider,
         OllamaProvider,
+        ProviderError,
         ProviderRequest,
         ProviderResponse,
         UnloadResult,
@@ -31,9 +32,7 @@ else:
 
 def _require_contract() -> None:
     if _CONTRACT_IMPORT_ERROR is not None:
-        pytest.fail(
-            "SCENE_PROVIDER_CONTRACT_MISSING: provider public seam unavailable"
-        )
+        pytest.fail("SCENE_PROVIDER_CONTRACT_MISSING: provider public seam unavailable")
 
 
 @dataclass
@@ -51,9 +50,8 @@ class ReplaceableProvider(LLMProvider):
         return UnloadResult(ok=True, raw_response={"unloaded": True})
 
 
-def _request(**overrides: Any) -> ProviderRequest:
-    values: dict[str, Any] = {
-        "schema_version": "1.0",
+def _request(**overrides: object) -> ProviderRequest:
+    values: dict[str, object] = {
         "scene_name": "AcceptanceScene",
         "description": "Draw a circle, transform it into a square, and move it right.",
     }
@@ -66,6 +64,11 @@ def _response() -> ProviderResponse:
         code="from manim import Scene\n\nclass AcceptanceScene(Scene):\n    pass\n",
         raw_response={"response": "```python\nfrom manim import Scene\n```"},
     )
+
+
+def test_ollama_provider_rejects_non_local_endpoints() -> None:
+    with pytest.raises(ValueError, match="local loopback"):
+        OllamaProvider(base_url="https://ollama.example.com")
 
 
 def test_llm_provider_is_replaceable_through_generate_and_unload() -> None:
@@ -98,9 +101,9 @@ class RecordingOpener:
 
     def __init__(self, responses: list[object]) -> None:
         self.responses = iter(responses)
-        self.requests: list[Any] = []
+        self.requests: list[tuple[Request, float]] = []
 
-    def __call__(self, request: Any, timeout: float) -> FakeHTTPResponse:
+    def __call__(self, request: Request, timeout: float) -> FakeHTTPResponse:
         self.requests.append((request, timeout))
         return FakeHTTPResponse(next(self.responses))
 
@@ -108,10 +111,10 @@ class RecordingOpener:
 class HTTPFailureOpener:
     """Boundary fake that exposes an Ollama HTTP failure to the adapter."""
 
-    def __call__(self, _request: Any, timeout: float) -> FakeHTTPResponse:
+    def __call__(self, _request: Request, timeout: float) -> FakeHTTPResponse:
         assert timeout > 0
         raise HTTPError(
-            url="http://ollama.test/api/generate",
+            url="http://localhost:11434/api/generate",
             code=503,
             msg="service unavailable",
             hdrs=None,
@@ -122,12 +125,12 @@ class HTTPFailureOpener:
 class TimeoutOpener:
     """Boundary fake that exposes a request timeout to the adapter."""
 
-    def __call__(self, _request: Any, timeout: float) -> FakeHTTPResponse:
+    def __call__(self, _request: Request, timeout: float) -> FakeHTTPResponse:
         assert timeout > 0
         raise TimeoutError("ollama request timed out")
 
 
-def _request_body(request: Any) -> dict[str, object]:
+def _request_body(request: Request) -> Mapping[str, object]:
     body = request.data
     if isinstance(body, bytes):
         body = body.decode("utf-8")
@@ -136,12 +139,10 @@ def _request_body(request: Any) -> dict[str, object]:
 
 def test_ollama_generate_posts_non_streaming_json_and_extracts_fenced_code() -> None:
     _require_contract()
-    opener = RecordingOpener(
-        [{"response": "Here is the scene:\n```python\nprint('scene')\n```"}]
-    )
+    opener = RecordingOpener([{"response": "Here is the scene:\n```python\nprint('scene')\n```"}])
     provider = OllamaProvider(
         model="test-model",
-        base_url="http://ollama.test",
+        base_url="http://localhost:11434",
         timeout=3.5,
         opener=opener,
     )
@@ -152,7 +153,7 @@ def test_ollama_generate_posts_non_streaming_json_and_extracts_fenced_code() -> 
     assert response.raw_response["response"].startswith("Here is the scene:")
     assert len(opener.requests) == 1
     request, timeout = opener.requests[0]
-    assert request.full_url == "http://ollama.test/api/generate"
+    assert request.full_url == "http://localhost:11434/api/generate"
     assert timeout == 3.5
     body = _request_body(request)
     assert body["model"] == "test-model"
@@ -164,11 +165,11 @@ def test_ollama_generate_posts_non_streaming_json_and_extracts_fenced_code() -> 
 
 
 def test_ollama_generate_sends_reproducible_sampling_options() -> None:
-    """Temperature and seed are explicit experimental inputs, not hidden defaults."""
+    """Temperature and seed are explicit render inputs, not hidden defaults."""
 
     _require_contract()
     opener = RecordingOpener([{"response": "print('scene')"}])
-    provider = OllamaProvider(base_url="http://ollama.test", opener=opener)
+    provider = OllamaProvider(base_url="http://localhost:11434", opener=opener)
 
     provider.generate(_request(temperature=0.2, seed=17))
 
@@ -179,7 +180,7 @@ def test_ollama_generate_sends_reproducible_sampling_options() -> None:
 def test_ollama_generate_accepts_plain_code_and_correction_context() -> None:
     _require_contract()
     opener = RecordingOpener([{"response": "print('corrected')"}])
-    provider = OllamaProvider(base_url="http://ollama.test", opener=opener)
+    provider = OllamaProvider(base_url="http://localhost:11434", opener=opener)
     diagnostics = {
         "argv": ["python", "-m", "manim", "render", "scene.py"],
         "exit_code": 17,
@@ -235,22 +236,22 @@ def test_ollama_uses_documented_defaults() -> None:
 def test_ollama_surfaces_http_failure_from_boundary() -> None:
     _require_contract()
     provider = OllamaProvider(
-        base_url="http://ollama.test",
+        base_url="http://localhost:11434",
         opener=HTTPFailureOpener(),
     )
 
-    with pytest.raises(Exception):
+    with pytest.raises(HTTPError):
         provider.generate(_request())
 
 
 def test_ollama_surfaces_timeout_failure_from_boundary() -> None:
     _require_contract()
     provider = OllamaProvider(
-        base_url="http://ollama.test",
+        base_url="http://localhost:11434",
         opener=TimeoutOpener(),
     )
 
-    with pytest.raises(Exception):
+    with pytest.raises(TimeoutError):
         provider.generate(_request())
 
 
@@ -267,9 +268,9 @@ def test_ollama_rejects_invalid_or_missing_response_shape(
 ) -> None:
     _require_contract()
     opener = RecordingOpener([response_body])
-    provider = OllamaProvider(base_url="http://ollama.test", opener=opener)
+    provider = OllamaProvider(base_url="http://localhost:11434", opener=opener)
 
-    with pytest.raises(Exception):
+    with pytest.raises(ProviderError):
         provider.generate(_request())
 
 
@@ -295,7 +296,7 @@ def test_ollama_unload_posts_explicit_keep_alive_zero() -> None:
     opener = RecordingOpener([{"response": ""}])
     provider = OllamaProvider(
         model="test-model",
-        base_url="http://ollama.test",
+        base_url="http://localhost:11434",
         opener=opener,
     )
 

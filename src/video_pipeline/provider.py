@@ -7,6 +7,7 @@ import re
 import urllib.request
 from dataclasses import dataclass
 from typing import Callable, Mapping, Protocol, runtime_checkable
+from urllib.parse import urlparse
 
 from video_pipeline.prompts import build_prompt
 
@@ -15,7 +16,6 @@ from video_pipeline.prompts import build_prompt
 class ProviderRequest:
     """One generation request, including all context needed for correction."""
 
-    schema_version: str
     scene_name: str
     description: str
     topics: tuple[str, ...] = ()
@@ -25,6 +25,27 @@ class ProviderRequest:
     seed: int = 42
     previous_code: str | None = None
     diagnostics: Mapping[str, object] | None = None
+    # Visual context is explicit and persisted so a correction can be replayed
+    # without reconstructing state from generated source.
+    theme: Mapping[str, object] | None = None
+    scene_plan: Mapping[str, object] | None = None
+    capabilities: tuple[str, ...] = ()
+    capability_context: tuple[Mapping[str, object], ...] = ()
+    # Temporal context is kept flat at the provider boundary so callers can
+    # persist exactly what the coder received without introducing another plan
+    # document or model.
+    narration_text: str | None = None
+    start_seconds: float | None = None
+    end_seconds: float | None = None
+    target_duration_seconds: float | None = None
+    objective: str | None = None
+    previous_scene: Mapping[str, object] | None = None
+    next_scene: Mapping[str, object] | None = None
+    required_objects: tuple[str, ...] = ()
+    required_elements: tuple[str, ...] = ()
+    resolution: tuple[int, int] | None = None
+    fps: int | None = None
+    prior_findings: tuple[object, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -98,6 +119,13 @@ class OllamaProvider:
             raise ValueError("model must not be blank")
         if not base_url.strip():
             raise ValueError("base_url must not be blank")
+        parsed_url = urlparse(base_url)
+        if parsed_url.scheme not in {"http", "https"} or parsed_url.hostname not in {
+            "localhost",
+            "127.0.0.1",
+            "::1",
+        }:
+            raise ValueError("Ollama base URL must be a local loopback endpoint")
         if timeout <= 0:
             raise ValueError("timeout must be positive")
 
@@ -179,3 +207,14 @@ def _extract_python_code(response: str) -> str:
         if generic_match is None:
             generic_match = code
     return generic_match or response.strip()
+
+
+__all__ = [
+    "LLMProvider",
+    "OllamaProvider",
+    "Opener",
+    "ProviderError",
+    "ProviderRequest",
+    "ProviderResponse",
+    "UnloadResult",
+]

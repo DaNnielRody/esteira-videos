@@ -15,7 +15,7 @@ try:
     from video_pipeline.expectations import SceneBeat, SceneExpectations
     from video_pipeline.observation import FrameObservation, ObservationResult, ObservedShape
     from video_pipeline.pipeline import RenderPipeline
-    from video_pipeline.spec import SceneSpec, load_scene_spec
+    from video_pipeline.spec import SceneSpec
 except (ImportError, ModuleNotFoundError):  # pragma: no cover - contract guard
     SceneBeat = None  # type: ignore[assignment,misc]
     SceneExpectations = None  # type: ignore[assignment,misc]
@@ -24,7 +24,6 @@ except (ImportError, ModuleNotFoundError):  # pragma: no cover - contract guard
     ObservationResult = None  # type: ignore[assignment,misc]
     RenderPipeline = None  # type: ignore[assignment,misc]
     SceneSpec = None  # type: ignore[assignment,misc]
-    load_scene_spec = None  # type: ignore[assignment]
 
 
 GOOD_CODE = "GOOD_SCENE_CODE_SENTINEL"
@@ -32,7 +31,7 @@ BAD_CODE = "BAD_SCENE_CODE_SENTINEL"
 
 
 def _require_contract() -> None:
-    if RenderPipeline is None or load_scene_spec is None:
+    if RenderPipeline is None:
         pytest.fail("SEMANTIC_GATE_CONTRACT_MISSING")
     if not hasattr(SceneSpec, "model_fields") or "expect" not in SceneSpec.model_fields:
         pytest.fail("SEMANTIC_GATE_CONTRACT_MISSING")
@@ -62,7 +61,7 @@ def _expectations() -> SceneExpectations:
 
 def _spec() -> SceneSpec:
     return SceneSpec(
-        schema_version="1.0",
+        id="acceptance",
         scene_name="AcceptanceScene",
         description="circle, then square, then right",
         expect=_expectations(),
@@ -144,8 +143,8 @@ class ScriptedObserver:
                 [_shape("square", 0.50)],
                 [_shape("square", 0.50), _shape("square", 0.64)],
             ]
-        return ObservationResult(
-            frames=[FrameObservation(index=i, shapes=row) for i, row in enumerate(rows)]
+        return ObservationResult.success(
+            [FrameObservation(index=i, shapes=row) for i, row in enumerate(rows)]
         )
 
 
@@ -252,7 +251,7 @@ def test_a_spec_without_expectations_skips_the_semantic_gate(tmp_path: Path) -> 
     provider = ScriptedProvider([BAD_CODE])
     pipeline = _pipeline(provider, tmp_path / "runs")
     spec = SceneSpec(
-        schema_version="1.0",
+        id="acceptance",
         scene_name="AcceptanceScene",
         description="circle, then square, then right",
     )
@@ -312,58 +311,6 @@ def test_latex_sensor_exception_is_terminal_and_never_sent_to_qwen(tmp_path: Pat
     )
     assert validation["sensor_failure"]["code"] == "latex_validator_exception"
     assert "LATEX_SENSOR_CRASH_SENTINEL" in validation["sensor_failure"]["detail"]
-
-
-def test_scene_spec_loads_declared_expectations(tmp_path: Path) -> None:
-    """The Scene Spec carries its semantic contract as strict, validated data."""
-
-    _require_contract()
-    path = tmp_path / "scene.json"
-    path.write_text(
-        json.dumps(
-            {
-                "schema_version": "1.0",
-                "scene_name": "AcceptanceScene",
-                "description": "circle, then square, then right",
-                "expect": {
-                    "max_shapes": 1,
-                    "beats": [
-                        {"shape": "circle", "region": "center"},
-                        {"shape": "square", "moved": "right"},
-                    ],
-                },
-            }
-        ),
-        encoding="utf-8",
-    )
-
-    spec = load_scene_spec(path)
-
-    assert spec.expect is not None
-    assert spec.expect.max_shapes == 1
-    assert [beat.shape for beat in spec.expect.beats] == ["circle", "square"]
-    assert spec.expect.beats[1].moved == "right"
-
-
-def test_scene_spec_rejects_an_unknown_beat_field(tmp_path: Path) -> None:
-    """An unreadable expectation is a spec error, never a silently skipped check."""
-
-    _require_contract()
-    path = tmp_path / "scene.json"
-    path.write_text(
-        json.dumps(
-            {
-                "schema_version": "1.0",
-                "scene_name": "AcceptanceScene",
-                "description": "circle",
-                "expect": {"beats": [{"shape": "circle", "colour": "blue"}]},
-            }
-        ),
-        encoding="utf-8",
-    )
-
-    with pytest.raises(ValueError):
-        load_scene_spec(path)
 
 
 def test_semantic_gate_audit_contract() -> None:

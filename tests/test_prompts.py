@@ -17,9 +17,7 @@ except (ImportError, ModuleNotFoundError):
     build_prompt = None  # type: ignore[assignment]
 
 
-SEMANTIC_REASON = (
-    "frame 10 shows 2 shapes (square, square) but the scene declares at most 1"
-)
+SEMANTIC_REASON = "frame 10 shows 2 shapes (square, square) but the scene declares at most 1"
 BEAT_REASON = "beat 3 was never observed: expected a square moved right"
 
 
@@ -30,7 +28,6 @@ def _require_contract() -> None:
 
 def _request(**diagnostics: object) -> ProviderRequest:
     return ProviderRequest(
-        schema_version="1.0",
         scene_name="AcceptanceScene",
         description="circle, then square, then right",
         previous_code="PREVIOUS_CODE_SENTINEL",
@@ -112,7 +109,6 @@ def test_a_first_attempt_carries_no_failure_language() -> None:
     _require_contract()
     prompt = build_prompt(
         ProviderRequest(
-            schema_version="1.0",
             scene_name="AcceptanceScene",
             description="circle",
         )
@@ -128,7 +124,6 @@ def test_topic_reference_carries_immutable_provenance_and_community_code() -> No
     _require_contract()
     prompt = build_prompt(
         ProviderRequest(
-            schema_version="1.0",
             scene_name="LinearAlgebraScene",
             description="Transforme os vetores da base com uma matriz.",
             topics=("linear_algebra",),
@@ -148,7 +143,6 @@ def test_reference_limit_is_filled_with_complementary_examples_for_one_topic() -
     _require_contract()
     prompt = build_prompt(
         ProviderRequest(
-            schema_version="1.0",
             scene_name="LinearAlgebraScene",
             description="Mostre uma transformação e uma rede como matrizes.",
             topics=("linear_algebra",),

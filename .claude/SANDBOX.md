@@ -1,29 +1,42 @@
-# Sandbox contract
+# Contrato do sandbox
 
-Status: `pending first slice`
-
-The repository has no application manifest, dependency lock, test runner, or
-runtime entry point. The first tracer-bullet issue must replace the pending
-script with a reproducible Python sandbox after it verifies the selected Manim
-and Python versions.
-
-## Required surfaces
-
-- Unit tests: required for the first product slice.
-- Integration render: required; execute one real headless Manim scene and
-  validate its MP4 artifact.
-- Frontend build: not applicable.
-- Database services: not applicable.
-- Design gate: not applicable.
-
-## Command
+O sandbox executa os gates determinísticos do projeto sem modelo, rede,
+download, integração ou mídia real:
 
 ```bash
-.claude/scripts/sandbox.sh
+.venv/bin/python -m pytest -q -m "not integration"
+.venv/bin/ruff check .
+.venv/bin/mypy \
+  --follow-imports=silent \
+  src/video_pipeline/video.py \
+  src/video_pipeline/pipeline.py \
+  src/video_pipeline/prompts.py \
+  src/video_pipeline/expectations.py \
+  src/video_pipeline/spec.py \
+  src/video_pipeline/theme.py \
+  src/video_pipeline/scene_plan.py \
+  src/video_pipeline/quality.py \
+  src/video_pipeline/capabilities.py \
+  src/video_pipeline/project.py \
+  src/video_pipeline/timeline.py \
+  src/video_pipeline/temporal.py \
+  src/video_pipeline/validation.py
 ```
 
-Exit `2` is intentional until the first slice supplies pinned dependencies and
-the real commands. The eventual sandbox must run as uid 1001, drop all Linux
-capabilities, enable `no-new-privileges`, avoid real secrets and host ports,
-and use only disposable writable state.
+O comando requer o `.venv` local criado por `uv sync`. A lista de mypy contém
+13 módulos com contratos tipados confirmados: orquestração (`video`,
+`pipeline`), contratos visuais (`prompts`, `expectations`, `spec`, `theme`,
+`scene_plan`, `quality`, `capabilities`) e contratos de projeto/timeline
+(`project`, `timeline`, `temporal`, `validation`).
 
+## Exclusões honestas
+
+`golden.py` e `runtime.py`, além dos adaptadores de evidência de pixels e AST,
+ficam fora do mypy estrito porque atravessam JSON cru, Manim, NumPy/OpenCV e
+AST dinâmicos. `provider.py`, `rendering.py` e `cli.py` também ficam fora por
+suas fronteiras dinâmicas de provider, subprocesso e argparse. Esses módulos
+continuam sob Ruff e testes comportamentais determinísticos; a exclusão não é
+uma alegação de tipagem estrita não verificada.
+
+Os testes substituem provider, Manim, FFmpeg, ffprobe e sensores por fakes.
+Testes de integração ficam marcados e não fazem parte do gate padrão.

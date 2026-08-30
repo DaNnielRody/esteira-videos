@@ -44,6 +44,7 @@ _TRACEBACK_MARKER = "\u2771"
 
 # A reason mentioning the scene source tells the model what to edit.
 _NAMES_A_CODE_CHANGE = "scene animates"
+_QUALITY_KEYS = ("quality_report", "quality_findings")
 
 
 def build_prompt(request: ProviderRequest) -> str:
@@ -52,10 +53,46 @@ def build_prompt(request: ProviderRequest) -> str:
     lines = [
         _BASE_INSTRUCTIONS,
         "Scene specification:",
-        f"schema_version: {request.schema_version}",
         f"scene_name: {request.scene_name}",
         f"description: {request.description}",
+        f"Use VisualScene and define the requested class as class "
+        f"{request.scene_name}(VisualScene).",
     ]
+    temporal_context = _temporal_context_lines(request)
+    if temporal_context:
+        lines.extend(["Temporal scene context:", *temporal_context])
+    if request.theme is not None:
+        lines.extend(
+            [
+                "Visual identity contract (use semantic roles, never scene-local hex values):",
+                json.dumps(request.theme, ensure_ascii=False, sort_keys=True),
+            ]
+        )
+    if request.scene_plan is not None:
+        lines.extend(
+            [
+                "ScenePlan (the contract exists before this Python source):",
+                json.dumps(request.scene_plan, ensure_ascii=False, sort_keys=True),
+                "Use VisualScene, register every planned object with its semantic ID, "
+                "and checkpoint each beat. Preserve the plan's timing and continuity.",
+            ]
+        )
+    if request.capabilities:
+        lines.append(
+            "Capabilities authorized for this scene only: "
+            + ", ".join(request.capabilities)
+        )
+        if request.capability_context:
+            lines.extend(
+                [
+                    "Proven helper contracts for these capabilities:",
+                    json.dumps(
+                        list(request.capability_context),  # type: ignore[misc]
+                        ensure_ascii=False,
+                        sort_keys=True,
+                    ),
+                ]
+            )
     if request.topics:
         lines.append(f"topics: {', '.join(request.topics)}")
     if request.expectations:
@@ -129,6 +166,70 @@ def build_prompt(request: ProviderRequest) -> str:
     return "\n".join(lines)
 
 
+def _temporal_context_lines(request: ProviderRequest) -> list[str]:
+    """Render authored timing and adjacent-scene context when supplied."""
+
+    lines: list[str] = []
+    if request.narration_text is not None:
+        lines.append(f"narration_text: {request.narration_text}")
+    if request.start_seconds is not None:
+        lines.append(f"start_seconds: {request.start_seconds}")
+    if request.end_seconds is not None:
+        lines.append(f"end_seconds: {request.end_seconds}")
+    if request.target_duration_seconds is not None:
+        lines.append(f"target_duration_seconds: {request.target_duration_seconds}")
+    if request.objective is not None:
+        lines.append(f"objective: {request.objective}")
+    if request.previous_scene is not None:
+        lines.append(
+            "previous_scene: "
+            + json.dumps(request.previous_scene, ensure_ascii=False, sort_keys=True)
+        )
+    if request.next_scene is not None:
+        lines.append(
+            "next_scene: "
+            + json.dumps(request.next_scene, ensure_ascii=False, sort_keys=True)
+        )
+    if request.required_objects:
+        lines.append(
+            "required_objects: "
+            + str(
+                json.dumps(
+                    list(request.required_objects),  # type: ignore[misc]
+                    ensure_ascii=False,
+                )
+            )
+        )
+    if request.required_elements:
+        lines.append(
+            "required_elements: "
+            + str(
+                json.dumps(
+                    list(request.required_elements),  # type: ignore[misc]
+                    ensure_ascii=False,
+                )
+            )
+        )
+    if request.resolution is not None:
+        lines.append(
+            "resolution: "
+            + str(
+                json.dumps(
+                    list(request.resolution),  # type: ignore[misc]
+                    ensure_ascii=False,
+                )
+            )
+        )
+    if request.fps is not None:
+        lines.append(f"fps: {request.fps}")
+    if request.prior_findings:
+        lines.append(
+            "prior_findings: "
+            + json.dumps(request.prior_findings, ensure_ascii=False, sort_keys=True)
+        )
+    return lines
+
+
 def build_generation_prompt(request: ProviderRequest) -> str:
     """Build the first-pass generation prompt."""
 
@@ -170,6 +271,10 @@ def _diagnostic_lines(
         rendered.add(key)
         lines.extend([f"{key} (tail):", _tail(diagnostics[key])])
 
+    quality_lines = _quality_lines(diagnostics)
+    if quality_lines:
+        lines.extend(["Deterministic visual findings:", *quality_lines])
+
     remaining = [key for key in sorted(diagnostics) if key not in rendered]
     for key in remaining:
         lines.append(f"{key}: {_scalar(diagnostics[key])}")
@@ -191,6 +296,8 @@ def _corrective_instruction(
     # The render succeeded and the video was still rejected. Saying "make it
     # render" here contradicts the diagnosis and the model repeats itself.
     reasons = _reasons(diagnostics)
+    quality = _quality_reasons(diagnostics)
+    reasons.extend(item for item in quality if item not in reasons)
     if reasons:
         joined = "; ".join(reasons)
         return (
@@ -198,6 +305,61 @@ def _corrective_instruction(
             f"one of these stops being true: {joined}. {tail}"
         )
     return f"Fix the rejection above. {tail}"
+
+
+def _quality_lines(diagnostics: Mapping[str, object]) -> list[str]:
+    """Render structured visual findings with their measured evidence."""
+
+    values: list[object] = []
+    for key in _QUALITY_KEYS:
+        value = diagnostics.get(key)
+        if isinstance(value, list):
+            values.extend(value)
+        elif isinstance(value, Mapping):
+            findings = value.get("findings")
+            if isinstance(findings, list):
+                values.extend(findings)
+    lines: list[str] = []
+    for value in values:
+        if not isinstance(value, Mapping):
+            continue
+        code: object = value.get("code", "VISUAL_FINDING")
+        severity: object = value.get("severity", "failure")
+        observed: object = value.get("observed", {})
+        expected: object = value.get("expected", {})
+        suggestion: object = value.get("suggestion", "")
+        lines.append(
+            f"{severity} {code}: observed={_scalar(observed)}; "
+            f"expected={_scalar(expected)}; correction={suggestion}"
+        )
+    return lines
+
+
+def _quality_reasons(diagnostics: Mapping[str, object]) -> list[str]:
+    """Return actionable correction text for structured findings."""
+
+    values: list[object] = []
+    for key in _QUALITY_KEYS:
+        value = diagnostics.get(key)
+        if isinstance(value, list):
+            values.extend(value)
+        elif isinstance(value, Mapping):
+            findings = value.get("findings")
+            if isinstance(findings, list):
+                values.extend(findings)
+    reasons: list[str] = []
+    for value in values:
+        if not isinstance(value, Mapping):
+            continue
+        code = str(value.get("code", "VISUAL_FINDING"))
+        suggestion = str(value.get("suggestion", "")).strip()
+        observed = _scalar(value.get("observed", {}))
+        expected = _scalar(value.get("expected", {}))
+        detail = f"{code} (observed {observed}; expected {expected})"
+        if suggestion:
+            detail += f": {suggestion}"
+        reasons.append(detail)
+    return reasons
 
 
 def _headline(diagnostics: Mapping[str, object]) -> str:

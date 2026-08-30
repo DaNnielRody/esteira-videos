@@ -31,13 +31,10 @@ class RenderedTextProvider:
 
     def generate(self, request: ProviderRequest) -> ProviderResponse:
         if self.constructor == "Text":
-            expression = (
-                f"Text({self.content!r}, font='DejaVu Sans', "
-                "font_size=42, color=YELLOW)"
-            )
+            expression = f"Text({self.content!r}, font='DejaVu Sans', font_size=42, color=YELLOW)"
         else:
             expression = f"Tex({self.content!r}, font_size=42, color=YELLOW)"
-        code = f'''from manim import *
+        code = f"""from manim import *
 
 class RenderedTextScene(Scene):
     def construct(self):
@@ -45,7 +42,7 @@ class RenderedTextScene(Scene):
         label.move_to([{self.x!r}, 0.0, 0.0])
         self.add(label)
         self.wait(0.5)
-'''
+"""
         return ProviderResponse(code=code, raw_response={"response": code})
 
     def unload(self) -> UnloadResult:
@@ -65,7 +62,7 @@ def _spec(renderer: str, content: str) -> SceneSpec:
     assert TextExpectation is not None
     font = "DejaVu Sans" if renderer == "text" else None
     return SceneSpec(
-        schema_version="1.0",
+        id="rendered-text",
         scene_name="RenderedTextScene",
         description="Exiba o texto fixado na especificação.",
         reference_examples=0,
@@ -82,7 +79,7 @@ def _spec(renderer: str, content: str) -> SceneSpec:
                     y=0.0,
                     min_iou=0.95,
                 )
-            ]
+            ],
         ),
     )
 

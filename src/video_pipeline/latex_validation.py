@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -71,31 +70,6 @@ class LatexValidator:
 
     def __init__(self, *, timeout: float = 60.0) -> None:
         self.timeout = timeout
-
-    def validate(
-        self,
-        expectations: list[RenderedTextExpectation],
-        candidate_frames_dir: str | Path,
-        evidence_dir: str | Path,
-    ) -> LatexValidationResult:
-        """Compatibility facade that observes first and judges second."""
-
-        observed = self.observe(expectations, candidate_frames_dir, evidence_dir)
-        if observed.failure is not None:
-            return LatexValidationResult(matches=[], reasons=[], failure=observed.failure)
-        matches = observed.evidence if observed.evidence is not None else []
-        result = LatexValidationResult(
-            matches=matches,
-            reasons=check_latex_matches(matches),
-        )
-        root = Path(evidence_dir)
-        root.mkdir(parents=True, exist_ok=True)
-        (root / "result.json").write_text(
-            json.dumps(result.to_document(), ensure_ascii=False, indent=2, sort_keys=True)
-            + "\n",
-            encoding="utf-8",
-        )
-        return result
 
     def observe(
         self,

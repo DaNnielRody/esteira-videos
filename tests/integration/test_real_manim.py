@@ -94,16 +94,15 @@ def test_real_manim_renders_and_independently_validates_acceptance_scene(
         id_factory=lambda: "real-manim-run",
     )
     spec = SceneSpec(
-        schema_version="1.0",
+        id="acceptance",
         scene_name="AcceptanceScene",
         description=ACCEPTANCE_DESCRIPTION,
     )
 
     result = pipeline.render(spec, max_attempts=1)  # type: ignore[attr-defined]
 
-    assert str(getattr(getattr(result, "state"), "value", getattr(result, "state"))).upper() == (
-        "SUCCESS"
-    )
+    state = result.state  # type: ignore[attr-defined]
+    assert str(getattr(state, "value", state)).upper() == "SUCCESS"
     assert provider.generate_calls == 1
     assert provider.unload_calls == 1
     mp4_paths = sorted(output_root.rglob("*.mp4"))

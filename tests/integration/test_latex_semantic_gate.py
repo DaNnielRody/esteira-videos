@@ -55,7 +55,7 @@ class LatexValidationScene(Scene):
 
 def _spec() -> SceneSpec:
     return SceneSpec(
-        schema_version="1.0",
+        id="latex-validation",
         scene_name="LatexValidationScene",
         description="Mostre a transformação linear indicada.",
         topics=["linear_algebra"],
@@ -121,9 +121,7 @@ def test_exact_latex_is_accepted_and_records_mask_iou(tmp_path: Path) -> None:
 
     assert result.state.value == "success"
     evidence = json.loads(
-        (result.run_path / "attempt-01" / "latex-validation.json").read_text(
-            encoding="utf-8"
-        )
+        (result.run_path / "attempt-01" / "latex-validation.json").read_text(encoding="utf-8")
     )
     assert evidence["failure"] is None
     assert evidence["matches"][0]["best_iou"] >= 0.95

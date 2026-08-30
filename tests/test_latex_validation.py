@@ -24,11 +24,9 @@ def test_corrupt_candidate_png_is_sensor_failure_not_semantic_rejection(
         y=0.0,
     )
 
-    result = LatexValidator(timeout=120).validate(
-        [expectation], frames, tmp_path / "evidence"
-    )
+    result = LatexValidator(timeout=120).observe([expectation], frames, tmp_path / "evidence")
 
-    assert result.reasons == []
+    assert result.evidence is None
     assert result.failure is not None
     assert result.failure.code == "frame_decode_failed"
     assert "frame-001.png" in result.failure.detail

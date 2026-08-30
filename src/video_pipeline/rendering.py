@@ -92,52 +92,62 @@ class ManimRunner:
         ]
 
         started = time.monotonic()
+        observation_key = "VIDEO_PIPELINE_OBSERVATION_PATH"
+        media_key = "VIDEO_PIPELINE_MEDIA_DIR"
+        previous_observation = os.environ.get(observation_key)
+        previous_media = os.environ.get(media_key)
+        os.environ[observation_key] = str(media / "visual-facts.json")
+        os.environ[media_key] = str(media)
         try:
-            completed = self._subprocess_run(
-                argv,
-                capture_output=True,
-                text=True,
-                timeout=self.timeout,
-                start_new_session=True,
-                check=False,
-            )
-        except subprocess.TimeoutExpired as exc:
-            self._terminate_process_group()
-            return RenderResult(
-                argv=argv,
-                exit_code=None,
-                timed_out=True,
-                missing_executable=False,
-                stdout=_text_output(exc.stdout),
-                stderr=_text_output(exc.stderr),
-                elapsed_seconds=max(0.0, time.monotonic() - started),
-                mp4_paths=[],
-            )
-        except FileNotFoundError:
-            return RenderResult(
-                argv=argv,
-                exit_code=None,
-                timed_out=False,
-                missing_executable=True,
-                stdout="",
-                stderr="",
-                elapsed_seconds=max(0.0, time.monotonic() - started),
-                mp4_paths=[],
-            )
+            try:
+                completed = self._subprocess_run(
+                    argv,
+                    capture_output=True,
+                    text=True,
+                    timeout=self.timeout,
+                    start_new_session=True,
+                    check=False,
+                )
+            except subprocess.TimeoutExpired as exc:
+                self._terminate_process_group()
+                return RenderResult(
+                    argv=argv,
+                    exit_code=None,
+                    timed_out=True,
+                    missing_executable=False,
+                    stdout=_text_output(exc.stdout),
+                    stderr=_text_output(exc.stderr),
+                    elapsed_seconds=max(0.0, time.monotonic() - started),
+                    mp4_paths=[],
+                )
+            except FileNotFoundError:
+                return RenderResult(
+                    argv=argv,
+                    exit_code=None,
+                    timed_out=False,
+                    missing_executable=True,
+                    stdout="",
+                    stderr="",
+                    elapsed_seconds=max(0.0, time.monotonic() - started),
+                    mp4_paths=[],
+                )
 
-        stdout = completed.stdout or ""
-        stderr = completed.stderr or ""
-        paths = _discover_mp4_paths(media) if completed.returncode == 0 else []
-        return RenderResult(
-            argv=argv,
-            exit_code=completed.returncode,
-            timed_out=False,
-            missing_executable=False,
-            stdout=stdout,
-            stderr=stderr,
-            elapsed_seconds=max(0.0, time.monotonic() - started),
-            mp4_paths=paths,
-        )
+            stdout = completed.stdout or ""
+            stderr = completed.stderr or ""
+            paths = _discover_mp4_paths(media) if completed.returncode == 0 else []
+            return RenderResult(
+                argv=argv,
+                exit_code=completed.returncode,
+                timed_out=False,
+                missing_executable=False,
+                stdout=stdout,
+                stderr=stderr,
+                elapsed_seconds=max(0.0, time.monotonic() - started),
+                mp4_paths=paths,
+            )
+        finally:
+            _restore_environment(observation_key, previous_observation)
+            _restore_environment(media_key, previous_media)
 
     def _terminate_process_group(self) -> None:
         """Terminate the child session when a bounded render times out."""
@@ -158,6 +168,15 @@ def _discover_mp4_paths(media_dir: Path) -> list[Path]:
         (candidate for candidate in media_dir.rglob("*.mp4") if candidate.is_file()),
         key=lambda path: str(path),
     )
+
+
+def _restore_environment(key: str, previous: str | None) -> None:
+    """Restore one inherited runtime variable after the child exits."""
+
+    if previous is None:
+        os.environ.pop(key, None)
+    else:
+        os.environ[key] = previous
 
 
 def _run_with_process_group(

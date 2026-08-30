@@ -1,0 +1,10 @@
+{
+  "id": "2026_visual_foundation",
+  "status": "accepted",
+  "title": "Visual foundation",
+  "capabilities": [
+    "basic_geometry",
+    "equations",
+    "typography"
+  ]
+}

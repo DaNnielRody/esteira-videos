@@ -8,14 +8,15 @@ test body rather than as a collection/import error.
 
 from __future__ import annotations
 
+import json
+import os
 import signal
 import subprocess
 import sys
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any
 
 import pytest
-
 
 try:
     from video_pipeline.rendering import ManimRunner
@@ -40,9 +41,14 @@ class RecordingSubprocess:
 
     def __init__(self, result: CompletedProcessFake) -> None:
         self.result = result
-        self.calls: list[tuple[list[str], dict[str, Any]]] = []
+        self.calls: list[tuple[list[str], dict[str, object]]] = []
 
-    def __call__(self, argv: Any, *args: Any, **kwargs: Any) -> CompletedProcessFake:
+    def __call__(
+        self,
+        argv: Sequence[str],
+        *args: object,
+        **kwargs: object,
+    ) -> CompletedProcessFake:
         del args
         self.calls.append((list(argv), kwargs))
         return self.result
@@ -52,15 +58,22 @@ class TimeoutSubprocess:
     """Boundary fake exposing a subprocess timeout and partial output."""
 
     def __init__(self) -> None:
-        self.calls: list[tuple[list[str], dict[str, Any]]] = []
+        self.calls: list[tuple[list[str], dict[str, object]]] = []
 
-    def __call__(self, argv: Any, *args: Any, **kwargs: Any) -> CompletedProcessFake:
+    def __call__(
+        self,
+        argv: Sequence[str],
+        *args: object,
+        **kwargs: object,
+    ) -> CompletedProcessFake:
         del args
         command = list(argv)
         self.calls.append((command, kwargs))
+        timeout = kwargs.get("timeout", 1)
+        timeout_value = timeout if isinstance(timeout, (int, float)) else 1
         raise subprocess.TimeoutExpired(
             cmd=command,
-            timeout=kwargs.get("timeout", 1),
+            timeout=timeout_value,
             output="PARTIAL_STDOUT_SENTINEL",
             stderr="PARTIAL_STDERR_SENTINEL",
         )
@@ -72,11 +85,51 @@ class MissingExecutableSubprocess:
     def __init__(self) -> None:
         self.calls: list[list[str]] = []
 
-    def __call__(self, argv: Any, *args: Any, **kwargs: Any) -> CompletedProcessFake:
+    def __call__(
+        self,
+        argv: Sequence[str],
+        *args: object,
+        **kwargs: object,
+    ) -> CompletedProcessFake:
         del args, kwargs
         command = list(argv)
         self.calls.append(command)
         raise FileNotFoundError(2, "No such file or directory", command[0])
+
+
+class ObservationWritingSubprocess:
+    """Fake child that proves the runner exports its runtime observation seam."""
+
+    def __init__(self, media_dir: Path) -> None:
+        self.media_dir = media_dir
+        self.observation_path: str | None = None
+
+    def __call__(
+        self,
+        argv: Sequence[str],
+        *args: object,
+        **kwargs: object,
+    ) -> CompletedProcessFake:
+        del argv, args, kwargs
+        self.observation_path = os.environ.get("VIDEO_PIPELINE_OBSERVATION_PATH")
+        assert self.observation_path is not None
+        assert os.environ.get("VIDEO_PIPELINE_MEDIA_DIR") == str(self.media_dir)
+        observation = {
+            "schema_version": "visual.observed-scene/1",
+            "scene_id": "subprocess",
+            "scene_name": "SubprocessScene",
+            "initial_state": [],
+            "final_state": [],
+            "checkpoints": [],
+            "animations": [],
+            "camera_initial": {},
+            "camera_final": {},
+            "frames": [],
+        }
+        Path(self.observation_path).write_text(json.dumps(observation), encoding="utf-8")
+        candidate = self.media_dir / "subprocess.mp4"
+        candidate.write_bytes(b"fake mp4")
+        return CompletedProcessFake(returncode=0, stdout="", stderr="")
 
 
 def _require_contract() -> None:
@@ -88,13 +141,7 @@ def _scene_and_media(tmp_path: Path) -> tuple[Path, Path, Path]:
     scene_path = tmp_path / "AcceptanceScene.py"
     scene_path.write_text("# controlled scene boundary\n", encoding="utf-8")
     media_dir = tmp_path / "attempt-01" / "media"
-    final_mp4 = (
-        media_dir
-        / "videos"
-        / scene_path.stem
-        / "480p15"
-        / f"{scene_path.stem}.mp4"
-    )
+    final_mp4 = media_dir / "videos" / scene_path.stem / "480p15" / f"{scene_path.stem}.mp4"
     final_mp4.parent.mkdir(parents=True)
     final_mp4.write_bytes(b"attempt-local mp4 bytes")
     return scene_path, media_dir, final_mp4
@@ -233,6 +280,32 @@ def test_manim_runner_distinguishes_missing_executable_from_timeout(
     assert result.exit_code is None
     assert result.elapsed_seconds >= 0
     assert result.mp4_paths == []
+
+
+def test_manim_runner_exports_observation_path_to_the_child_and_restores_environment(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A subprocess scene can write facts without receiving a Python argument."""
+
+    _require_contract()
+    scene_path = tmp_path / "SubprocessScene.py"
+    scene_path.write_text("# controlled scene boundary\n", encoding="utf-8")
+    media_dir = tmp_path / "media"
+    process = ObservationWritingSubprocess(media_dir)
+    monkeypatch.setenv("VIDEO_PIPELINE_OBSERVATION_PATH", "caller-owned.json")
+    monkeypatch.setenv("VIDEO_PIPELINE_MEDIA_DIR", "caller-owned-media")
+
+    result = ManimRunner(subprocess_run=process).run(scene_path, media_dir)
+
+    assert result.exit_code == 0
+    assert process.observation_path == str(media_dir / "visual-facts.json")
+    assert (
+        json.loads(Path(process.observation_path).read_text(encoding="utf-8"))["scene_id"]
+        == "subprocess"
+    )
+    assert os.environ["VIDEO_PIPELINE_OBSERVATION_PATH"] == "caller-owned.json"
+    assert os.environ["VIDEO_PIPELINE_MEDIA_DIR"] == "caller-owned-media"
 
 
 def test_rendering_audit_contract() -> None:

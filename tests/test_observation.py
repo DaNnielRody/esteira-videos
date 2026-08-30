@@ -15,6 +15,10 @@ import numpy as np
 import pytest
 from PIL import Image, ImageDraw
 
+from video_pipeline.critics import check_contrast
+from video_pipeline.runtime import BoundingBox, ObservedObject, ObservedScene
+from video_pipeline.scene_plan import ScenePlan, VisualObject
+
 try:
     from video_pipeline.observation import (
         FrameObservation,
@@ -110,6 +114,54 @@ def test_a_filled_circle_is_read_as_one_centred_circle() -> None:
     assert shapes[0].center_x == pytest.approx(0.5, abs=0.02)
     assert shapes[0].center_y == pytest.approx(0.5, abs=0.02)
     assert 0.0 < shapes[0].area_fraction < 1.0
+
+
+def test_coloured_frame_keeps_representative_rgb_for_post_render_critics() -> None:
+    """HSV naming is accompanied by the RGB actually sampled from pixels."""
+
+    _require_contract()
+    shape = _one(_circle())[0]
+
+    assert shape.color == "blue"
+    assert shape.observed_rgb is not None
+    assert shape.observed_rgb[0] == pytest.approx(60, abs=3)
+    assert shape.observed_rgb[1] == pytest.approx(130, abs=3)
+    assert shape.observed_rgb[2] == pytest.approx(200, abs=3)
+
+
+def test_real_sensor_rgb_drives_semantic_colour_critic() -> None:
+    """A frame-derived colour wins over the runtime's declared colour."""
+
+    _require_contract()
+    item = ObservedObject(
+        id="shape",
+        kind="circle",
+        bbox=BoundingBox(left=0.35, top=0.30, right=0.65, bottom=0.70),
+        center_x=0.50,
+        center_y=0.50,
+        width=0.30,
+        height=0.40,
+        observed_color="#F8FAFC",
+    )
+    plan = ScenePlan(
+        id="sensor-colour",
+        scene_name="SensorColourScene",
+        objective="Check frame colour evidence.",
+        duration_seconds=2.0,
+        objects=[VisualObject(id="shape", kind="circle", color_role="text")],
+    )
+    observed = ObservedScene(
+        scene_id="sensor-colour",
+        scene_name="SensorColourScene",
+        initial_state=[item],
+        final_state=[item],
+        frames=analyze_frames(_stack(_circle())),
+    )
+
+    findings = check_contrast(plan, observed)
+
+    mismatch = next(finding for finding in findings if finding.code == "SEMANTIC_COLOR_MISMATCH")
+    assert mismatch.observed["color"] == "#3C82C8"
 
 
 def test_an_outline_only_shape_is_measured_as_the_region_it_encloses() -> None:
@@ -277,9 +329,7 @@ def test_every_palette_colour_is_read_back_from_an_outline(constant: str) -> Non
     _require_contract()
     image = _blank()
     red, green, blue = _rgb(constant)
-    ImageDraw.Draw(image).line(
-        _square_points(0), fill=(red, green, blue, 255), width=STROKE
-    )
+    ImageDraw.Draw(image).line(_square_points(0), fill=(red, green, blue, 255), width=STROKE)
 
     assert [shape.color for shape in _one(image)] == [PALETTE[constant]]
 
@@ -342,7 +392,7 @@ def test_unreadable_media_returns_a_structured_sensor_failure(tmp_path: Path) ->
     assert SceneObserver is not None
     result = SceneObserver().observe(tmp_path / "missing.mp4", tmp_path / "frames")
 
-    assert result.frames == []
+    assert result.evidence is None
     assert result.failure is not None
     assert result.failure.code == "duration_unavailable"
     assert "missing.mp4" in result.failure.detail

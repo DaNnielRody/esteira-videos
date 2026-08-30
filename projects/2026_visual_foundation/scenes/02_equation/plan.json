@@ -1,0 +1,81 @@
+{
+  "schema_version": "visual.scene-plan/1",
+  "id": "equation",
+  "scene_name": "EquationFoundationScene",
+  "objective": "Keep the recurring vector identity while making a formula readable.",
+  "duration_seconds": 4.0,
+  "capabilities": ["equations", "typography"],
+  "objects": [
+    {
+      "id": "vector",
+      "kind": "arrow",
+      "color_role": "primary",
+      "semantic_role": "recurring-vector",
+      "region": "left",
+      "required": true,
+      "visible": true,
+      "overlap_policy": "forbidden"
+    },
+    {
+      "id": "formula",
+      "kind": "mathtex",
+      "formula": "x^2 + y^2 = r^2",
+      "color_role": "accent",
+      "semantic_role": "definition",
+      "region": "right",
+      "required": true,
+      "visible": true,
+      "overlap_policy": "forbidden"
+    },
+    {
+      "id": "label",
+      "kind": "text",
+      "text": "Pythagorean identity",
+      "color_role": "text",
+      "semantic_role": "context-label",
+      "region": "top",
+      "required": true,
+      "visible": true,
+      "overlap_policy": "forbidden"
+    }
+  ],
+  "beats": [
+    {
+      "id": "persist",
+      "action": "introduce",
+      "objects": ["vector"],
+      "duration_seconds": 1.2,
+      "region": "left"
+    },
+    {
+      "id": "define",
+      "action": "emphasize",
+      "objects": ["formula"],
+      "duration_seconds": 1.2,
+      "region": "right",
+      "formula": "x^2 + y^2 = r^2",
+      "min_read_seconds": 1.2
+    },
+    {
+      "id": "label",
+      "action": "introduce",
+      "objects": ["label"],
+      "duration_seconds": 0.8,
+      "region": "top",
+      "text": "Pythagorean identity",
+      "min_read_seconds": 0.8
+    }
+  ],
+  "layout": {
+    "object_regions": {"vector": "left", "formula": "right", "label": "top"},
+    "minimum_spacing": 0.18,
+    "max_text_lines": 2,
+    "max_content_density": 0.65,
+    "allow_background_overlap": true
+  },
+  "continuity_in": {
+    "required": true,
+    "expected_transition": "none",
+    "recurring_object_ids": ["vector"]
+  }
+}

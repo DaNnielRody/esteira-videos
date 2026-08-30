@@ -1,0 +1,49 @@
+{
+  "animation_durations": {
+    "create": 0.8,
+    "emphasis": 0.6,
+    "fade": 0.5,
+    "transform": 1.2
+  },
+  "font_families": {
+    "body": "DejaVu Sans",
+    "formula": "Computer Modern",
+    "label": "DejaVu Sans",
+    "title": "DejaVu Sans"
+  },
+  "font_sizes": {
+    "body": 32,
+    "formula": 40,
+    "label": 26,
+    "title": 48
+  },
+  "fps": 15,
+  "id": "production",
+  "min_read_duration": 1.2,
+  "min_spacing": 0.18,
+  "palette": {
+    "accent": "#F72585",
+    "background": "#0B1020",
+    "muted": "#94A3B8",
+    "primary": "#4CC9F0",
+    "secondary": "#4361EE",
+    "success": "#80ED99",
+    "text": "#F8FAFC",
+    "warning": "#FFD166"
+  },
+  "regions": {
+    "bottom": {"bottom": 0.92, "left": 0.08, "right": 0.92, "top": 0.62},
+    "center": {"bottom": 0.92, "left": 0.3, "right": 0.7, "top": 0.08},
+    "left": {"bottom": 0.92, "left": 0.08, "right": 0.38, "top": 0.08},
+    "middle": {"bottom": 0.7, "left": 0.08, "right": 0.92, "top": 0.3},
+    "right": {"bottom": 0.92, "left": 0.62, "right": 0.92, "top": 0.08},
+    "top": {"bottom": 0.38, "left": 0.08, "right": 0.92, "top": 0.08}
+  },
+  "resolution": [854, 480],
+  "safe_area": {"bottom": 0.92, "left": 0.08, "right": 0.92, "top": 0.08},
+  "stroke_widths": {"emphasis": 4.0, "normal": 2.0, "thin": 1.0},
+  "transition_presets": {
+    "default": {"duration_seconds": 0.5, "enter": "fade", "exit": "fade"},
+    "hard_cut": {"duration_seconds": 0.1, "enter": "none", "exit": "none"}
+  }
+}

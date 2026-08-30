@@ -1,4 +1,4 @@
-"""Command-line entry point for the render-in-the-loop pipeline."""
+"""Command-line interface for defining, rendering, and reviewing videos."""
 
 from __future__ import annotations
 
@@ -7,13 +7,27 @@ import json
 from collections.abc import Callable, Sequence
 from pathlib import Path
 
-from video_pipeline.calibration import calibrate_golden_set
-from video_pipeline.pipeline import PipelineState, RenderPipeline
-from video_pipeline.provider import LLMProvider, OllamaProvider
+from video_pipeline.golden import accept_project
+from video_pipeline.observation import SceneObserver
+from video_pipeline.project import (
+    AudioProbe,
+    SilenceDetector,
+    confirm_project_timeline,
+    initialize_project,
+    inspect_project,
+    validate_project_timeline,
+)
+from video_pipeline.provider import LLMProvider
 from video_pipeline.rendering import ManimRunner
-from video_pipeline.spec import load_scene_spec
-from video_pipeline.study import prepare_reference_study
+from video_pipeline.temporal import TemporalValidator
+from video_pipeline.timeline import SilenceSubprocessRun
 from video_pipeline.validation import RenderValidator
+from video_pipeline.video import (
+    FinalCompositionValidator,
+    TemporalNormalizer,
+    VideoComposer,
+    VideoPipeline,
+)
 
 
 def main(
@@ -22,203 +36,174 @@ def main(
     provider: LLMProvider | None = None,
     runner: ManimRunner | None = None,
     validator: RenderValidator | None = None,
-    output_root: str | Path = Path("artifacts/runs"),
+    composer: VideoComposer | None = None,
     id_factory: Callable[[], str] | None = None,
-    model: str = "qwen2.5-coder:7b",
-    base_url: str = "http://localhost:11434",
-    provider_timeout: float = 120.0,
-    render_timeout: float = 120.0,
-    max_attempts: int = 3,
-    temperature: float = 0.0,
-    seed: int = 42,
+    audio_probe: AudioProbe | None = None,
+    silence_detector: SilenceDetector | None = None,
+    silence_subprocess_run: SilenceSubprocessRun | None = None,
+    observer: SceneObserver | None = None,
+    temporal_normalizer: TemporalNormalizer | None = None,
+    normalized_validator: TemporalValidator | None = None,
+    final_validator: FinalCompositionValidator | None = None,
 ) -> int:
-    """Run ``video-pipeline render scene.json`` and return its process status."""
+    """Execute one definitive product command."""
 
-    parser = _build_parser(
-        model=model,
-        base_url=base_url,
-        provider_timeout=provider_timeout,
-        render_timeout=render_timeout,
-        max_attempts=max_attempts,
-        output_root=Path(output_root),
-        temperature=temperature,
-        seed=seed,
-    )
-    options = parser.parse_args(list(argv) if argv is not None else None)
-    if options.command == "calibrate":
-        try:
-            report = calibrate_golden_set(options.golden_root)
-            document = report.to_document()
-            destination = Path(options.output).resolve()
-            destination.parent.mkdir(parents=True, exist_ok=True)
-            destination.write_text(
-                json.dumps(document, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
-                encoding="utf-8",
+    parser = _build_parser()
+    options = parser.parse_args(argv)
+    try:
+        if options.command == "init":
+            return _init_video(
+                options,
+                audio_probe=audio_probe,
+                silence_detector=silence_detector,
+                silence_subprocess_run=silence_subprocess_run,
             )
-        except (OSError, ValueError) as exc:
-            print(f"ERROR: {exc}")
-            return 1
-        has_errors = bool(report.sensor_failures) or any(
-            metrics.false_positives or metrics.false_negatives
-            for metrics in report.axes.values()
-        )
-        print(f"STATE: {'CALIBRATION_FAILED' if has_errors else 'CALIBRATION_PASSED'}")
-        print(f"REPORT: {destination}")
-        return 1 if has_errors else 0
-    if options.command == "prepare-study":
-        try:
-            prepared = prepare_reference_study(options.manifest, options.output_root)
-        except (OSError, ValueError) as exc:
-            print(f"ERROR: {exc}")
-            return 1
-        print("STATE: STUDY_PREPARED")
-        print(f"STUDY: {prepared.root}")
-        print(f"SAMPLES_PER_CONDITION: {len(prepared.control_specs)}")
-        return 0
-    if options.command != "render":
-        parser.error("a command is required")
-
-    try:
-        spec = load_scene_spec(options.scene)
+        if options.command == "timeline":
+            if options.timeline_command == "validate":
+                return _validate_timeline(options.project)
+            if options.timeline_command == "confirm":
+                return _confirm_timeline(options.project)
+            parser.error("a timeline command is required")
+        if options.command == "inspect":
+            return _inspect_project(options.project)
+        if options.command == "accept":
+            return _accept_project(options.project, options.run)
+        if options.command == "render":
+            return _render_video(
+                options,
+                provider=provider,
+                runner=runner,
+                validator=validator,
+                observer=observer,
+                temporal_normalizer=temporal_normalizer,
+                normalized_validator=normalized_validator,
+                final_validator=final_validator,
+                composer=composer,
+                id_factory=id_factory,
+            )
     except (OSError, ValueError) as exc:
         print(f"ERROR: {exc}")
         return 1
-
-    configured_provider = provider if provider is not None else OllamaProvider(
-        model=options.model,
-        base_url=options.base_url,
-        timeout=options.provider_timeout,
-    )
-    configured_runner = runner if runner is not None else ManimRunner(
-        timeout=options.render_timeout
-    )
-    configured_validator = validator if validator is not None else RenderValidator()
-    pipeline = RenderPipeline(
-        provider=configured_provider,
-        runner=configured_runner,
-        validator=configured_validator,
-        output_root=options.output_root,
-        id_factory=id_factory,
-        temperature=options.temperature,
-        seed=options.seed,
-    )
-
-    try:
-        result = pipeline.render(spec, max_attempts=options.max_attempts)
-    except (OSError, ValueError) as exc:
-        print(f"ERROR: {exc}")
-        return 1
-
-    print(f"STATE: {result.state.value.upper()}")
-    print(f"RUN: {result.run_path}")
-    if result.mp4_path is not None:
-        print(f"MP4: {result.mp4_path}")
-    if result.error:
-        print(f"ERROR: {result.error}")
-    return 0 if result.state is PipelineState.SUCCESS else 1
+    parser.error("a command is required")
+    return 2
 
 
-def _build_parser(
+def _init_video(
+    options: argparse.Namespace,
     *,
-    model: str,
-    base_url: str,
-    provider_timeout: float,
-    render_timeout: float,
-    max_attempts: int,
-    output_root: Path,
-    temperature: float,
-    seed: int,
-) -> argparse.ArgumentParser:
+    audio_probe: AudioProbe | None = None,
+    silence_detector: SilenceDetector | None = None,
+    silence_subprocess_run: SilenceSubprocessRun | None = None,
+) -> int:
+    initialize_project(
+        options.video,
+        title=options.title,
+        script=options.script,
+        audio=options.audio,
+        audio_probe=audio_probe,
+        silence_detector=silence_detector,
+        silence_subprocess_run=silence_subprocess_run,
+    )
+    print(f"PROJECT: {Path(options.video).resolve()}")
+    return 0
+
+
+def _validate_timeline(project_path: Path) -> int:
+    _, timeline = validate_project_timeline(project_path)
+    print(f"TIMELINE: {timeline.status.upper()}")
+    print(f"METHOD: {timeline.method}")
+    if timeline.status == "candidate":
+        print("REVIEW: MANUAL REVIEW REQUIRED")
+        for reason in timeline.manual_review_reasons:
+            print(f"REVIEW_REASON: {reason}")
+    return 0
+
+
+def _confirm_timeline(project_path: Path) -> int:
+    _, timeline = confirm_project_timeline(project_path)
+    print(f"TIMELINE: {timeline.status.upper()}")
+    return 0
+
+
+def _render_video(
+    options: argparse.Namespace,
+    *,
+    provider: LLMProvider | None = None,
+    runner: ManimRunner | None = None,
+    validator: RenderValidator | None = None,
+    observer: SceneObserver | None = None,
+    temporal_normalizer: TemporalNormalizer | None = None,
+    normalized_validator: TemporalValidator | None = None,
+    final_validator: FinalCompositionValidator | None = None,
+    composer: VideoComposer | None = None,
+    id_factory: Callable[[], str] | None = None,
+) -> int:
+    """Render one confirmed canonical project through one orchestration path."""
+
+    pipeline = VideoPipeline(
+        provider=provider,
+        runner=runner,
+        validator=validator,
+        observer=observer,
+        temporal_normalizer=temporal_normalizer,
+        normalized_validator=normalized_validator,
+        final_validator=final_validator,
+        composer=composer,
+        id_factory=id_factory,
+    )
+    result = pipeline.render(
+        options.video,
+        max_attempts=options.max_attempts,
+        scene=options.scene,
+    )
+    if result.output_path is None:
+        raise ValueError("render completed without a final output")
+    print(f"READY: {result.output_path}")
+    print(f"RUN: {result.run_path}")
+    return 0
+
+
+def _inspect_project(project_path: Path) -> int:
+    print(json.dumps(inspect_project(project_path), ensure_ascii=False, sort_keys=True))
+    return 0
+
+
+def _accept_project(project_path: Path, run_id: str) -> int:
+    project = accept_project(project_path, run_id)
+    print(f"ACCEPTED: {project.id}")
+    print(f"RUN: {run_id}")
+    return 0
+
+
+def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="video-pipeline")
     subparsers = parser.add_subparsers(dest="command")
-    render = subparsers.add_parser("render", help="generate and render one scene")
-    render.add_argument("scene", type=Path, help="path to a Scene Spec JSON file")
-    render.add_argument(
-        "--model",
-        default=model,
-        help="Ollama model name",
-    )
-    render.add_argument(
-        "--base-url",
-        default=base_url,
-        help="Ollama base URL",
-    )
-    render.add_argument(
-        "--provider-timeout",
-        type=float,
-        default=provider_timeout,
-        help="Ollama request timeout in seconds",
-    )
-    render.add_argument(
-        "--render-timeout",
-        type=float,
-        default=render_timeout,
-        help="Manim render timeout in seconds",
-    )
-    render.add_argument(
-        "--max-attempts",
-        type=int,
-        default=max_attempts,
-        help="maximum generation/render attempts",
-    )
-    render.add_argument(
-        "--temperature",
-        type=_temperature,
-        default=temperature,
-        help="Ollama sampling temperature from 0.0 to 2.0",
-    )
-    render.add_argument(
-        "--seed",
-        type=_seed,
-        default=seed,
-        help="non-negative Ollama sampling seed",
-    )
-    render.add_argument(
-        "--output-root",
-        type=Path,
-        default=output_root,
-        help="directory under which isolated run directories are created",
-    )
-    calibrate = subparsers.add_parser(
-        "calibrate", help="measure sensor FP/FN on the labeled golden set"
-    )
-    calibrate.add_argument(
-        "--golden-root",
-        type=Path,
-        default=Path("tests/golden"),
-        help="directory containing expected.json and Manim control data",
-    )
-    calibrate.add_argument(
-        "--output",
-        type=Path,
-        default=Path("artifacts/sensor-calibration.json"),
-        help="JSON report destination",
-    )
-    study = subparsers.add_parser(
-        "prepare-study", help="materialize paired no-reference/reference scene specs"
-    )
-    study.add_argument("manifest", type=Path, help="reference-study JSON manifest")
-    study.add_argument(
-        "--output-root",
-        type=Path,
-        default=Path("artifacts/reference-study"),
-        help="destination for paired control and treatment specs",
-    )
+
+    init = subparsers.add_parser("init", help="create a canonical audiovisual project")
+    init.add_argument("video", type=Path)
+    init.add_argument("--title", required=True)
+    init.add_argument("--script", type=Path, required=True)
+    init.add_argument("--audio", type=Path, required=True)
+
+    timeline = subparsers.add_parser("timeline", help="validate or confirm a project timeline")
+    timeline_commands = timeline.add_subparsers(dest="timeline_command")
+    validate = timeline_commands.add_parser("validate", help="review a project timeline candidate")
+    validate.add_argument("project", type=Path)
+    confirm = timeline_commands.add_parser("confirm", help="confirm a project timeline")
+    confirm.add_argument("project", type=Path)
+
+    render = subparsers.add_parser("render", help="render a confirmed project")
+    render.add_argument("video", type=Path)
+    render.add_argument("--max-attempts", type=int, default=3)
+    render.add_argument("--scene")
+
+    inspect = subparsers.add_parser("inspect", help="inspect a canonical project")
+    inspect.add_argument("project", type=Path)
+
+    accept = subparsers.add_parser("accept", help="promote a ready run to golden")
+    accept.add_argument("project", type=Path)
+    accept.add_argument("--run", required=True)
     return parser
-
-
-def _temperature(value: str) -> float:
-    parsed = float(value)
-    if not 0.0 <= parsed <= 2.0:
-        raise argparse.ArgumentTypeError("temperature must be between 0.0 and 2.0")
-    return parsed
-
-
-def _seed(value: str) -> int:
-    parsed = int(value)
-    if parsed < 0:
-        raise argparse.ArgumentTypeError("seed must be non-negative")
-    return parsed
 
 
 __all__ = ["main"]

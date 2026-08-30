@@ -13,5 +13,4 @@ __pycache__/
 *.egg-info/
 build/
 dist/
-artifacts/runs/
-artifacts/runs/**
+projects/*/artifacts/

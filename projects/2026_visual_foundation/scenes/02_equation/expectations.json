@@ -1,0 +1,26 @@
+{
+  "max_shapes": 2,
+  "beats": [],
+  "latex": [
+    {
+      "tex": "x^2 + y^2 = r^2",
+      "font_size": 40,
+      "color": "pink",
+      "x": 2.5,
+      "y": 0.0,
+      "min_iou": 0.5
+    }
+  ],
+  "text": [
+    {
+      "renderer": "text",
+      "content": "Pythagorean identity",
+      "font": "DejaVu Sans",
+      "font_size": 26,
+      "color": "white",
+      "x": 0.0,
+      "y": 3.0,
+      "min_iou": 0.5
+    }
+  ]
+}

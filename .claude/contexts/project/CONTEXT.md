@@ -1,94 +1,131 @@
-# Project foundation
+# Fundação do projeto
 
-Owns the greenfield repository charter and the transition from the current
-README-only state to the first executable render-in-the-loop pipeline slice.
+O produto transforma um projeto audiovisual canônico em um run revisável e,
+depois de uma aceitação explícita, em um golden imutável. `project.json` é a
+fonte de identidade e de estado; roteiros, áudio, timeline, cenas e runs são
+referenciados por paths relativos seguros e hashes recalculados na aceitação.
 
-## Language
+## Fluxo público
 
-**Scene specification**:
-Structured input describing what one scene communicates and how it should be
-animated, independently from its generated Manim implementation.
-_Avoid_: roteiro, because the user supplies the script/content upstream.
+```text
+init PROJECT --title TITLE --script SCRIPT --audio AUDIO
+    ↓
+timeline validate PROJECT/project.json
+    ↓ (se candidate, revisão manual)
+timeline confirm PROJECT/project.json
+    ↓
+render PROJECT/project.json [--scene ID]
+    ↓
+inspect PROJECT/project.json
+    ↓
+accept PROJECT/project.json --run RUN_ID
+```
 
-**RITL**:
-The execution loop in which a real Manim render decides success and failures
-feed code plus diagnostics back to the replaceable model provider.
-_Avoid_: code generation, which omits execution and correction.
+`init` copia script e áudio para o projeto e cria `project.json`, timeline,
+planos, briefs e expectations quando o roteiro permite. Uma timeline heurística
+fica como `candidate` e exige confirmação; apenas `confirmed` pode entrar em
+render. `render` preserva cada tentativa e deixa candidatos dentro de
+`artifacts/<run-id>`. `inspect` expõe o estado e os paths do run atual.
 
-## Contracts
+## Formato determinístico do roteiro
 
-- The first milestone ends at one validated MP4 for one scene specification.
-- Real renderer exit status and output artifacts are the source of truth.
-- The MVP runtime is Manim Community 0.21.0 through its subprocess CLI; ManimGL
-  is reference-only and generated scenes target the Community API.
-- A render is successful only when Manim exits zero, independent MP4
-  validation observes a non-empty video stream with positive dimensions and
-  duration, the rendered frames satisfy the Scene Spec `expect` block, and the
-  generated scene code animates no mobject that never entered the scene.
-- Renderer exit status and container validity do not decide scene semantics.
-  A scene that keeps animating `b` after `self.play(Transform(a, b))` exits
-  zero and writes a probeable MP4 showing two shapes instead of one.
-- Exact frame comparison cannot judge a generated scene: two renders both
-  correct for one specification were measured 2,719x above Manim's own
-  mismatch tolerance. It applies only where the render is deterministic.
-- Semantic fidelity is decided by reading the rendered video back, not by
-  trusting the source: `observation.py` samples frames and reports the shapes
-  visible in each, and `expectations.py` matches them against the declared
-  beats. Static source analysis is the second layer, because two shapes that
-  overlap exactly still read as one region.
-- Semantic verification is opt-in per Scene Spec. Only what `expect` declares
-  is verified; text, timing and geometry outside circle/square/polygon are not.
-- Script/content generation, montage, audio, subtitles, and multi-scene editing
-  are outside the first milestone.
+O arquivo indicado por `--script` deve ser UTF-8 e é copiado, byte a byte, para
+`script.md`. Headings Markdown `#`/`##` delimitam cenas; o corpo depois dos
+metadados é a narração exata, sem reescrita. `@objective` é opcional. O par
+completo `@start`/`@end` é obrigatório em todos os headings quando há qualquer
+timestamp. Pares completos, contíguos, iniciando em zero e cobrindo toda a
+duração do áudio formam a timeline confirmada pelo autor:
 
-## Relationships
+```markdown
+# Abertura
+@objective: Apresente a ideia.
+@start: 0
+@end: 4
+A origem é mostrada exatamente nesta cena.
 
-- `cli` -> `spec` -> `pipeline`; `spec` -> `expectations`; `pipeline` ->
-  `prompts` -> `provider` (generation and unload), `rendering` (bounded Manim
-  subprocess), `validation` (ffprobe), `observation` -> `expectations` (frame
-  storyboard and semantic verdict), `workspace` (per-run/per-attempt dirs).
+## Soma
+@start: 4
+@end: 10
+Agora a soma é explicada passo a passo.
+```
 
-## Operational surface
+Quando nenhum heading contém timestamp, a timeline é `candidate`: uma detecção
+de pausas fakeável fornece intervalos; alvos ponderados pela contagem de
+palavras usam a pausa mais próxima de modo determinístico e recorrem a limites
+proporcionais quando necessário. Se qualquer `@start` ou `@end` aparecer, o
+par completo é obrigatório em todos os headings; metadados parciais ou mistos
+são erro, não fallback. A correspondência candidate é aproximada, sempre
+requer confirmação manual e não é ASR nem forced alignment. `.txt` ou texto
+sem headings usa blocos separados por linhas em branco e o mesmo fallback.
 
-- Python 3.13.9, Ollama 0.33.2, and FFmpeg 6.1.1 are available locally.
-- Manim Community 0.21.0 is installed only in the repository-local `.venv` and
-  is observed compatible with Python 3.13.9 using Cairo at 854x480/15 fps.
-- The default configurable local model is `qwen2.5-coder:7b`.
-- The 16 GB host requires Ollama inference and Manim rendering to be serialized,
-  with the Ollama model unloaded before rendering.
+## Inspect e interrupção
 
-## Proven patterns
+`inspect` é leitura pura. Ele resume áudio e duração, status/método/duração e
+limitações da timeline, `current_scene` do projeto/run, progresso agregado,
+estado/tentativas/erro/próxima ação de cada cena, correção temporal, ciclo de
+composição e validação final. Evidência JSON ausente ou inválida vira um
+status/erro legível; inspect não dispara provider, renderizador ou probing.
 
-- `README.md` — keeps the product scope limited to transforming supplied scripts
-  into rendered videos.
-- `/home/dan/saas/ads4you/pyproject.toml` — compatible modular src-layout
-  configuration for uv dependency groups, pytest, Ruff, and strict mypy.
-- `.claude/tmp/spike-ritl/REPORT.md` — observed Manim success, traceback, MP4
-  location/metadata, and timeout behavior for the chosen runtime.
-- `src/video_pipeline/prompts.py` — one prompt builder serves both the provider
-  request and the preserved `prompt.txt`, so the stored artifact reproduces
-  what was sent.
-- `src/video_pipeline/observation.py` — frames travel and are persisted in
-  Manim's control-data format: `(n, h, w, 4)` uint8 RGBA under `frame_data`.
-  Shape descriptors come from `cv2.minAreaRect`, the rotated minimum-area box,
-  so they hold at any angle; an axis-aligned box is not rotation invariant.
-  Colour is named in HSV over the drawn pixels using the 90th percentile of
-  saturation and value, never the median: antialiasing blends the stroke into
-  the background and drags the median of a white Manim stroke to 0.60, which
-  would name grey. Hue cuts sit at the midpoints between measured Manim palette
-  constants.
-- `tests/golden/` — Manim's own control data is the ground truth for the frame
-  reader. The scene name is the label, and the format is left unchanged so both
-  projects can read the same files.
-- `src/video_pipeline/prompts.py` — a correction prompt converges a 7B local
-  model only when it leads with the failing generated source line and the root
-  error and closes with the corrective instruction. A `repr()` dump of the full
-  Rich traceback made the model re-emit identical code every attempt.
+Uma interrupção deixa o mesmo run `rendering`, com `current_scene` escrito antes
+da fronteira longa. O próximo render retoma esse run, verifica cenas prontas,
+preserva evidências parciais e escolhe um caminho interno livre; ao terminar,
+limpa `current_scene`. Somente `accept` promove candidatos para fontes/golden.
 
-## Flagged ambiguities
+## Decisão de migração
 
-- Semantic verification covers what a Scene Spec declares in `expect`. Nothing
-  infers expectations from the prose description, so a scene can still be wrong
-  in a way no beat describes. Deriving beats from free text needs a model, and a
-  probabilistic judge contradicts the rule that deterministic observation of the
-  real artifact decides.
+`Project`/`Timeline` são canônicos e cada cena usa `SceneSpec`/`ScenePlan`; isso
+substituiu o entrypoint obsoleto baseado em arquivo de especificação isolado.
+Não existem `VideoSpec`, `load_video_spec`, `load_scene_spec`, `video-run.json`
+ou `artifacts/videos` como aliases ou caminhos do produto.
+
+## Estrutura canônica
+
+```text
+projects/YYYY_slug/
+├── project.json
+├── script.md
+├── audio/<narration>
+├── timeline.json
+├── scenes/<scene>/
+│   ├── plan.json
+│   ├── brief.json
+│   ├── expectations.json
+│   ├── scene.py             # após accept
+│   └── code-provenance.json # após accept
+├── artifacts/<run-id>/
+│   ├── run.json
+│   ├── scenes/<scene>/... candidatos e evidências ...
+│   ├── composition.json
+│   └── final.mp4
+└── golden/
+    ├── manifest.json
+    └── accepted/<run-id>/... snapshots do pacote ...
+```
+
+O candidato de código e sua proveniência pertencem ao run até o preflight de
+`accept`. A promoção publica fontes e documentos permanentes em uma transação
+lógica de payloads; falhas preservam a publicação anterior e não removem
+candidatos. O manifest e os snapshots aceitos são validados sem provider,
+modelo ou execução de mídia.
+
+## Contratos
+
+- `Project` usa estados explícitos de timeline, render e composição; run
+  solicitado, status e hashes devem coincidir antes de qualquer publicação.
+- A validação pública do golden usa o envelope `golden.manifest/1`, `version: 1`,
+  `profile: visual|audiovisual`, `status: accepted`, `project_id`, `title` e
+  `capabilities`. O dispatch por profile é explícito; profile ausente ou
+  desconhecido é erro.
+- A aceitação valida timeline, script, áudio, pacote de cena, candidatos,
+  composição e fatos finais. A validação posterior recompõe os mesmos hashes e
+  lê os snapshots imutáveis do golden.
+- O Qwen é uma fronteira local opcional para gerar ou corrigir somente código
+  visual. Timeline, áudio, aceitação e validação são contratos determinísticos.
+
+## Segurança de desenvolvimento
+
+Os testes normais usam fakes para provider, Manim, FFmpeg, ffprobe e sensores.
+Não fazem rede, download, inferência ou mídia real. O sandbox executa testes
+`not integration`, Ruff em todo o repositório e mypy somente nos módulos
+tipados declarados; as fronteiras dinâmicas são cobertas por testes
+comportamentais e Ruff.

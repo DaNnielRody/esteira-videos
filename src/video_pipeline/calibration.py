@@ -194,7 +194,7 @@ def _measure_latex_cases(
                 y=0.0,
                 min_iou=0.95,
             )
-            result = LatexValidator(timeout=120).validate(
+            result = LatexValidator(timeout=120).observe(
                 [expectation], root / "frames", root / "evidence"
             )
             if result.failure is not None:
@@ -202,7 +202,8 @@ def _measure_latex_cases(
                     CalibrationFailure(file=f"latex/{name}", detail=result.failure.detail)
                 )
                 continue
-            predicted_match = not result.reasons
+            matches = result.evidence if result.evidence is not None else []
+            predicted_match = not check_latex_matches(matches)
             if should_match and predicted_match:
                 metrics.true_positives += 1
             elif should_match:
