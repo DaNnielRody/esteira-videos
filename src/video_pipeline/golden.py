@@ -11,8 +11,10 @@ import ast
 import hashlib
 import json
 import math
+import os
 import platform
 import re
+import shutil
 import sys
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
@@ -24,6 +26,7 @@ from video_pipeline.capabilities import default_capability_registry
 from video_pipeline.expectations import SceneExpectations
 from video_pipeline.project import (
     Project,
+    ProjectSceneRef,
     ProjectState,
     _atomic_update_payloads,
     _project_package_hashes,
@@ -40,6 +43,7 @@ _PROJECT_ID = re.compile(r"^[0-9]{4}_[a-z0-9]+(?:[_-][a-z0-9]+)*$")
 _SHA256 = re.compile(r"^[0-9a-f]{64}$")
 _GOLDEN_SCHEMA_VERSION = "golden.manifest/1"
 _GOLDEN_PROFILES = frozenset({"visual", "audiovisual"})
+_SELECTIVE_LINEAGE_KEYS = ("base_run_id", "selected_scene_id", "correction")
 _AUDIOVISUAL_GOLDEN_STATUSES = frozenset(
     {
         ProjectState.accepted.value,
@@ -352,6 +356,12 @@ def accept_project(path: str | Path, run_id: str) -> Project:
         project_root,
         run_id,
     )
+    selective_lineage = _selective_lineage_from_document(
+        run_document,
+        project,
+        run_id,
+        label="ready run",
+    )
     if run_document.get("input_hashes") != input_hashes:
         raise ValueError("ready run input hashes do not match current project inputs")
     if run_document.get("package_hashes") != package_hashes:
@@ -576,6 +586,8 @@ def accept_project(path: str | Path, run_id: str) -> Project:
             "final_artifact": final_relative,
         },
     }
+    if selective_lineage is not None:
+        manifest.update(selective_lineage)
     project_document = json.loads(project.model_dump_json())
     if not isinstance(project_document, dict):
         raise ValueError("project document must be a JSON object")
@@ -583,18 +595,33 @@ def accept_project(path: str | Path, run_id: str) -> Project:
     project_document["accepted_run"] = run_id
     project_document["current_scene"] = None
     accepted_project = Project.model_validate_json(json.dumps(project_document))
-    manifest_path = project_root / "golden" / "manifest.json"
+    golden_root = project_root / "golden"
+    golden_root_existed = golden_root.exists()
+    manifest_path = golden_root / "manifest.json"
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
     (manifest_path.parent / "frames").mkdir(parents=True, exist_ok=True)
     (manifest_path.parent / "evidence").mkdir(parents=True, exist_ok=True)
-    _atomic_update_payloads(
-        (
-            *snapshot_payloads,
-            *scene_payloads,
-            (project_json, _serialize_json_payload(project_document)),
-            (manifest_path, _serialize_json_payload(manifest)),
+    def validate_published_golden() -> None:
+        validation = validate_golden_project(project_root)
+        if not validation.valid:
+            raise ValueError(
+                "golden validation failed: " + "; ".join(validation.reasons)
+            )
+
+    try:
+        _atomic_update_payloads(
+            (
+                *snapshot_payloads,
+                *scene_payloads,
+                (project_json, _serialize_json_payload(project_document)),
+                (manifest_path, _serialize_json_payload(manifest)),
+            ),
+            validate=validate_published_golden,
         )
-    )
+    except BaseException:
+        if not golden_root_existed:
+            shutil.rmtree(golden_root, ignore_errors=True)
+        raise
     return accepted_project
 
 
@@ -1083,6 +1110,59 @@ def _safe_run_id(value: str) -> bool:
     return _safe_relative_text(value) and Path(value).name == value
 
 
+def _selective_lineage_from_document(
+    document: Mapping[str, object],
+    project: Project,
+    run_id: str,
+    *,
+    label: str,
+) -> dict[str, str] | None:
+    """Validate and return the optional selective-render lineage fields."""
+
+    present = tuple(key for key in _SELECTIVE_LINEAGE_KEYS if key in document)
+    if not present:
+        return None
+    if len(present) != len(_SELECTIVE_LINEAGE_KEYS):
+        raise ValueError(
+            f"{label} selective lineage must include all of "
+            "base_run_id, selected_scene_id, and correction"
+        )
+    base_run_id = document.get("base_run_id")
+    selected_scene_id = document.get("selected_scene_id")
+    correction = document.get("correction")
+    if not isinstance(base_run_id, str) or not _safe_run_id(base_run_id):
+        raise ValueError(f"{label} base_run_id must be a safe name")
+    if not isinstance(selected_scene_id, str) or not _safe_run_id(selected_scene_id):
+        raise ValueError(f"{label} selected_scene_id must be a safe name")
+    if selected_scene_id not in {scene.id for scene in project.scenes}:
+        raise ValueError(f"{label} selected_scene_id is not a project scene")
+    if base_run_id == run_id:
+        raise ValueError(f"{label} base_run_id must differ from the accepted run")
+    if not isinstance(correction, str) or not correction.strip():
+        raise ValueError(f"{label} correction must be non-empty")
+    return {
+        "base_run_id": base_run_id,
+        "selected_scene_id": selected_scene_id,
+        "correction": correction,
+    }
+
+
+def _expected_provenance_run_id(
+    accepted_run_id: str,
+    scene_id: str,
+    selective_lineage: Mapping[str, str] | None,
+    base_provenance: Mapping[str, object] | None = None,
+) -> str:
+    """Return the run whose provenance a golden scene is expected to carry."""
+
+    if selective_lineage is not None and scene_id != selective_lineage["selected_scene_id"]:
+        origin_run_id = base_provenance.get("run_id") if base_provenance else None
+        if isinstance(origin_run_id, str) and _safe_run_id(origin_run_id):
+            return origin_run_id
+        return selective_lineage["base_run_id"]
+    return accepted_run_id
+
+
 def _mapping_value(value: object, label: str) -> dict[str, object]:
     if not isinstance(value, dict):
         raise ValueError(f"{label} must be an object")
@@ -1359,15 +1439,9 @@ def _validate_audiovisual_deep_snapshot(
     )
     if manifest_tolerances.get("final_duration_seconds") != 0.05:
         reasons.append("golden final duration tolerance must be 0.05 seconds")
+    selective_lineage: dict[str, str] | None = None
     if run_id is not None and _safe_run_id(run_id):
         _validate_audiovisual_package_snapshot_paths(
-            project,
-            manifest_scenes,
-            run_id,
-            reasons,
-        )
-        _validate_audiovisual_provenance_snapshots(
-            root,
             project,
             manifest_scenes,
             run_id,
@@ -1385,6 +1459,32 @@ def _validate_audiovisual_deep_snapshot(
     except (OSError, ValueError) as exc:
         reasons.append(f"accepted run cannot be loaded: {exc}")
         return
+    selective_lineage, base_run_path, base_run_document = _validate_selective_lineage_snapshot(
+        root,
+        project,
+        manifest,
+        run_document,
+        run_id,
+        reasons,
+    )
+    _validate_audiovisual_provenance_snapshots(
+        root,
+        project,
+        manifest_scenes,
+        run_id,
+        selective_lineage,
+        base_run_path,
+        base_run_document,
+        reasons,
+    )
+    _validate_selective_sibling_trees(
+        root,
+        project,
+        run_id,
+        selective_lineage,
+        base_run_path,
+        reasons,
+    )
     _validate_audiovisual_run_snapshot(
         root,
         project,
@@ -1434,6 +1534,9 @@ def _validate_audiovisual_provenance_snapshots(
     project: Project,
     manifest_scenes: list[object],
     run_id: str,
+    selective_lineage: Mapping[str, str] | None,
+    base_run_path: Path | None,
+    base_run_document: Mapping[str, object] | None,
     reasons: list[str],
 ) -> None:
     """Check permanent provenance bytes and embedded facts against the manifest."""
@@ -1479,15 +1582,281 @@ def _validate_audiovisual_provenance_snapshots(
             )
         if normalized.get("scene_id") != project_scene.id:
             reasons.append(f"scene {project_scene.id} provenance scene_id is incorrect")
-        if normalized.get("run_id") != run_id:
+        base_provenance = None
+        if (
+            selective_lineage is not None
+            and project_scene.id != selective_lineage["selected_scene_id"]
+        ):
+            base_provenance = _base_scene_provenance(
+                root,
+                project_scene,
+                base_run_path,
+                base_run_document,
+                reasons,
+            )
+        expected_run_id = _expected_provenance_run_id(
+            run_id,
+            project_scene.id,
+            selective_lineage,
+            base_provenance,
+        )
+        if base_provenance is not None and normalized != base_provenance:
+            reasons.append(
+                f"scene {project_scene.id} provenance differs from immediate base run"
+            )
+        if normalized.get("run_id") != expected_run_id:
             reasons.append(f"scene {project_scene.id} provenance run_id is incorrect")
-        if normalized.get("run_path") != f"artifacts/{run_id}":
+        if normalized.get("run_path") != f"artifacts/{expected_run_id}":
             reasons.append(f"scene {project_scene.id} provenance run_path is not canonical")
         source_path = normalized.get("source_path")
         if not isinstance(source_path, str) or not source_path.startswith(
-            f"artifacts/{run_id}/pipeline/{project_scene.id}/"
+            f"artifacts/{expected_run_id}/pipeline/{project_scene.id}/"
         ) or not source_path.endswith("/scene.py"):
             reasons.append(f"scene {project_scene.id} provenance source_path is not canonical")
+
+
+def _base_scene_provenance(
+    root: Path,
+    project_scene: ProjectSceneRef,
+    base_run_path: Path | None,
+    base_run_document: Mapping[str, object] | None,
+    reasons: list[str],
+) -> dict[str, object] | None:
+    """Load the corresponding sibling provenance from the immediate base run."""
+
+    if base_run_path is None or base_run_document is None:
+        return None
+    records = base_run_document.get("scenes")
+    if not isinstance(records, list):
+        reasons.append("selective base run scenes are required for sibling lineage")
+        return None
+    record = next(
+        (
+            item
+            for item in records
+            if isinstance(item, dict) and item.get("id") == project_scene.id
+        ),
+        None,
+    )
+    if not isinstance(record, dict):
+        reasons.append(
+            f"selective base run is missing sibling scene {project_scene.id}"
+        )
+        return None
+    base_run_id = base_run_path.name
+    relative = f"artifacts/{base_run_id}/{project_scene.path}/code-provenance.json"
+    provenance_path = _validate_file_reference(
+        root,
+        relative,
+        f"base scene {project_scene.id} provenance",
+        reasons,
+    )
+    if provenance_path is None:
+        return None
+    if _relative_or_error(
+        root,
+        record.get("provenance_path"),
+        f"base scene {project_scene.id} provenance path",
+        reasons,
+    ) != relative:
+        reasons.append(
+            f"base scene {project_scene.id} provenance path is not canonical"
+        )
+    try:
+        document = _read_object(provenance_path)
+        return _relative_document_paths(root, document, ("run_path", "source_path"))
+    except (OSError, ValueError) as exc:
+        reasons.append(
+            f"base scene {project_scene.id} provenance cannot be loaded: {exc}"
+        )
+        return None
+
+
+def _validate_selective_sibling_trees(
+    root: Path,
+    project: Project,
+    run_id: str,
+    selective_lineage: Mapping[str, str] | None,
+    base_run_path: Path | None,
+    reasons: list[str],
+) -> None:
+    """Require every reused sibling tree to match its immediate base byte-for-byte."""
+
+    if selective_lineage is None or base_run_path is None:
+        return
+    base_run_id = selective_lineage["base_run_id"]
+    for project_scene in project.scenes:
+        if project_scene.id == selective_lineage["selected_scene_id"]:
+            continue
+        current_scene_path = _artifact_tree_path(
+            root,
+            f"artifacts/{run_id}/{project_scene.path}",
+        )
+        base_scene_path = _artifact_tree_path(
+            root,
+            f"artifacts/{base_run_id}/{project_scene.path}",
+        )
+        current_pipeline_path = _artifact_tree_path(
+            root,
+            f"artifacts/{run_id}/pipeline/{project_scene.id}",
+        )
+        base_pipeline_path = _artifact_tree_path(
+            root,
+            f"artifacts/{base_run_id}/pipeline/{project_scene.id}",
+        )
+        current_scene_tree = _evidence_tree_snapshot(
+            current_scene_path,
+            label=f"scene {project_scene.id} current tree",
+            reasons=reasons,
+        )
+        base_scene_tree = _evidence_tree_snapshot(
+            base_scene_path,
+            label=f"scene {project_scene.id} immediate base tree",
+            reasons=reasons,
+        )
+        if current_scene_tree != base_scene_tree:
+            reasons.append(
+                f"scene {project_scene.id} scene tree differs from immediate base run"
+            )
+        current_pipeline_tree = _evidence_tree_snapshot(
+            current_pipeline_path,
+            label=f"scene {project_scene.id} current pipeline tree",
+            reasons=reasons,
+        )
+        base_pipeline_tree = _evidence_tree_snapshot(
+            base_pipeline_path,
+            label=f"scene {project_scene.id} immediate base pipeline tree",
+            reasons=reasons,
+        )
+        if current_pipeline_tree != base_pipeline_tree:
+            reasons.append(
+                f"scene {project_scene.id} pipeline tree differs from immediate base run"
+            )
+
+
+def _artifact_tree_path(root: Path, relative: str) -> Path:
+    """Build a project-relative tree path without resolving nested symlinks."""
+
+    base = root.resolve()
+    candidate = base / relative
+    try:
+        candidate.relative_to(base)
+    except ValueError as exc:
+        raise ValueError("artifact tree path escapes the project") from exc
+    return candidate
+
+
+def _evidence_tree_snapshot(
+    root: Path,
+    *,
+    label: str,
+    reasons: list[str],
+) -> dict[str, tuple[str, str]]:
+    """Snapshot regular evidence tree shape and file digests without following links."""
+
+    if root.is_symlink():
+        reasons.append(f"{label} contains symlink: {root}")
+        return {}
+    if not root.is_dir():
+        reasons.append(f"{label} is missing or not a directory: {root}")
+        return {}
+    snapshot: dict[str, tuple[str, str]] = {}
+    pending = [root]
+    while pending:
+        current = pending.pop()
+        try:
+            entries = list(os.scandir(current))
+        except OSError as exc:
+            reasons.append(f"{label} cannot be inspected: {exc}")
+            continue
+        for entry in entries:
+            entry_path = Path(entry.path)
+            relative = entry_path.relative_to(root).as_posix()
+            if entry.is_symlink():
+                reasons.append(f"{label} contains symlink: {entry_path}")
+                continue
+            if entry.is_dir(follow_symlinks=False):
+                snapshot[relative] = ("directory", "")
+                pending.append(entry_path)
+            elif entry.is_file(follow_symlinks=False):
+                try:
+                    digest = hash_file(entry_path)
+                except OSError as exc:
+                    reasons.append(f"{label} file cannot be hashed: {exc}")
+                    continue
+                snapshot[relative] = ("file", digest)
+            else:
+                reasons.append(
+                    f"{label} contains non-regular entry: {entry_path}"
+                )
+    return snapshot
+
+
+def _validate_selective_lineage_snapshot(
+    root: Path,
+    project: Project,
+    manifest: Mapping[str, object],
+    run_document: Mapping[str, object],
+    run_id: str,
+    reasons: list[str],
+) -> tuple[dict[str, str] | None, Path | None, dict[str, object] | None]:
+    """Cross-check selective lineage and its immutable base run evidence."""
+
+    try:
+        manifest_lineage = _selective_lineage_from_document(
+            manifest,
+            project,
+            run_id,
+            label="golden manifest",
+        )
+    except ValueError as exc:
+        reasons.append(str(exc))
+        manifest_lineage = None
+    try:
+        run_lineage = _selective_lineage_from_document(
+            run_document,
+            project,
+            run_id,
+            label="accepted run",
+        )
+    except ValueError as exc:
+        reasons.append(str(exc))
+        run_lineage = None
+
+    manifest_keys = tuple(key for key in _SELECTIVE_LINEAGE_KEYS if key in manifest)
+    run_keys = tuple(key for key in _SELECTIVE_LINEAGE_KEYS if key in run_document)
+    if manifest_keys != run_keys:
+        reasons.append("golden manifest selective lineage presence disagrees with accepted run")
+    elif manifest_lineage != run_lineage:
+        reasons.append("golden manifest selective lineage disagrees with accepted run")
+
+    lineage = run_lineage or manifest_lineage
+    if lineage is None:
+        return None, None, None
+    base_run_id = lineage["base_run_id"]
+    base_relative = f"artifacts/{base_run_id}/run.json"
+    try:
+        base_path = _safe_reference(root.resolve(), Path(base_relative))
+    except ValueError as exc:
+        reasons.append(f"selective base run path is invalid: {exc}")
+        return lineage, None, None
+    if not base_path.is_file():
+        reasons.append(f"selective base run is missing: {base_relative}")
+        return lineage, None, None
+    try:
+        base_document = _read_object(base_path)
+    except (OSError, ValueError) as exc:
+        reasons.append(f"selective base run cannot be loaded: {exc}")
+        return lineage, base_path.parent, None
+    if base_document.get("run_id") != base_run_id:
+        reasons.append("selective base run run_id disagrees with lineage")
+    if base_document.get("project_id") != project.id:
+        reasons.append("selective base run project_id disagrees with project")
+    if base_document.get("state") != "ready":
+        reasons.append("selective base run state must be ready")
+    if "current_scene" not in base_document or base_document.get("current_scene") is not None:
+        reasons.append("selective base run current_scene must be null")
+    return lineage, base_path.parent, base_document
 
 
 def _validate_audiovisual_timeline_projection(

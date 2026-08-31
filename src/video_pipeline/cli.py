@@ -81,6 +81,8 @@ def main(
                 composer=composer,
                 id_factory=id_factory,
             )
+        if options.command == "web":
+            return _serve_web(options)
     except (OSError, ValueError) as exc:
         print(f"ERROR: {exc}")
         return 1
@@ -155,6 +157,8 @@ def _render_video(
         options.video,
         max_attempts=options.max_attempts,
         scene=options.scene,
+        base_run_id=options.base_run,
+        correction=options.correction,
     )
     if result.output_path is None:
         raise ValueError("render completed without a final output")
@@ -172,6 +176,17 @@ def _accept_project(project_path: Path, run_id: str) -> int:
     project = accept_project(project_path, run_id)
     print(f"ACCEPTED: {project.id}")
     print(f"RUN: {run_id}")
+    return 0
+
+
+def _serve_web(options: argparse.Namespace) -> int:
+    from video_pipeline.web import WebService, serve
+
+    with WebService(
+        projects_root=options.projects_root,
+        audio_root=options.audio_root,
+    ) as service:
+        serve(service, host="127.0.0.1", port=options.port)
     return 0
 
 
@@ -196,6 +211,8 @@ def _build_parser() -> argparse.ArgumentParser:
     render.add_argument("video", type=Path)
     render.add_argument("--max-attempts", type=int, default=3)
     render.add_argument("--scene")
+    render.add_argument("--base-run")
+    render.add_argument("--correction")
 
     inspect = subparsers.add_parser("inspect", help="inspect a canonical project")
     inspect.add_argument("project", type=Path)
@@ -203,6 +220,11 @@ def _build_parser() -> argparse.ArgumentParser:
     accept = subparsers.add_parser("accept", help="promote a ready run to golden")
     accept.add_argument("project", type=Path)
     accept.add_argument("--run", required=True)
+
+    web = subparsers.add_parser("web", help="serve the local operator Web UI")
+    web.add_argument("--port", type=int, default=8000)
+    web.add_argument("--projects-root", type=Path, default=Path("projects"))
+    web.add_argument("--audio-root", type=Path, default=Path("audio"))
     return parser
 
 

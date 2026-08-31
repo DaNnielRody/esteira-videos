@@ -14,6 +14,7 @@ from typing import Literal, Protocol
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from video_pipeline.capabilities import default_capability_registry
 from video_pipeline.scene_plan import ScenePlan
 from video_pipeline.theme import VideoTheme
 
@@ -37,7 +38,7 @@ PAUSE_SEARCH_TOLERANCE_SECONDS = 1.0
 
 _ID = re.compile(r"^[a-z][a-z0-9-]*$")
 _HEADING = re.compile(r"^#{1,2}[ \t]+(.+?)[ \t]*$")
-_METADATA = re.compile(r"^@(start|end|objective):[ \t]*(.*?)[ \t]*$")
+_METADATA = re.compile(r"^@(start|end|objective|capabilities):[ \t]*(.*?)[ \t]*$")
 
 
 class PauseInterval(BaseModel):
@@ -289,6 +290,7 @@ class ExplicitScene:
     narration_text: str
     start_seconds: float | None
     end_seconds: float | None
+    capabilities: tuple[str, ...] | None = None
 
 
 def parse_explicit_timeline(script: str) -> tuple[ExplicitScene, ...] | None:
@@ -373,6 +375,7 @@ def _parse_sections(script: str) -> tuple[tuple[ExplicitScene, ...], bool]:
         narration_text = "\n".join(lines[cursor:end_index]).strip("\r\n")
         if not narration_text.strip():
             raise ValueError(f"scene {title!r} narration body must not be blank")
+        capabilities = _parse_capabilities(metadata.get("capabilities"), title)
         if "start" not in metadata or "end" not in metadata:
             if "start" in metadata or "end" in metadata:
                 raise ValueError(f"scene {title!r} requires both @start and @end")
@@ -384,6 +387,7 @@ def _parse_sections(script: str) -> tuple[tuple[ExplicitScene, ...], bool]:
                     narration_text=narration_text,
                     start_seconds=None,
                     end_seconds=None,
+                    capabilities=capabilities,
                 )
             )
             continue
@@ -400,10 +404,27 @@ def _parse_sections(script: str) -> tuple[tuple[ExplicitScene, ...], bool]:
                 narration_text=narration_text,
                 start_seconds=start_seconds,
                 end_seconds=end_seconds,
+                capabilities=capabilities,
             )
         )
 
+    declarations = [scene.capabilities is not None for scene in parsed]
+    if any(declarations) and not all(declarations):
+        raise ValueError("every scene must declare capabilities when any scene declares them")
     return tuple(parsed), explicit_sections
+
+
+def _parse_capabilities(value: str | None, title: str) -> tuple[str, ...] | None:
+    """Parse one authored comma-separated capability declaration."""
+
+    if value is None:
+        return None
+    capabilities = tuple(item.strip() for item in value.split(","))
+    if any(not item for item in capabilities):
+        raise ValueError(f"scene {title!r} capabilities must not contain empty IDs")
+    if len(capabilities) != len(set(capabilities)):
+        raise ValueError(f"scene {title!r} capabilities must be unique")
+    return capabilities
 
 
 def build_explicit_timeline(
@@ -417,6 +438,7 @@ def build_explicit_timeline(
     scenes = parse_explicit_timeline(script)
     if scenes is None:
         return None
+    capability_registry = default_capability_registry()
     plans: list[ScenePlan] = []
     segments: list[TimelineSegment] = []
     for order, scene in enumerate(scenes, start=1):
@@ -427,6 +449,8 @@ def build_explicit_timeline(
         duration = end_seconds - start_seconds
         scene_name = _scene_name(scene.title)
         plan_path = f"scenes/{order:02d}_{scene.id}/plan.json"
+        capabilities = list(scene.capabilities or ())
+        capability_registry.require(capabilities)
         plan = ScenePlan(
             id=scene.id,
             scene_name=scene_name,
@@ -436,6 +460,7 @@ def build_explicit_timeline(
             narration_text=scene.narration_text,
             start_seconds=start_seconds,
             end_seconds=end_seconds,
+            capabilities=capabilities,
         )
         plans.append(plan)
         segments.append(
@@ -481,6 +506,7 @@ def build_pause_aligned_timeline(
     scenes = parse_heading_sections(script)
     if scenes is None:
         return None
+    capability_registry = default_capability_registry()
     if search_tolerance_seconds < 0 or not math.isfinite(search_tolerance_seconds):
         raise ValueError("pause search tolerance must be finite and non-negative")
     if any(scene.start_seconds is not None or scene.end_seconds is not None for scene in scenes):
@@ -564,6 +590,8 @@ def build_pause_aligned_timeline(
         duration = end - start
         scene_name = _scene_name(scene.title)
         plan_path = f"scenes/{order:02d}_{scene.id}/plan.json"
+        capabilities = list(scene.capabilities or ())
+        capability_registry.require(capabilities)
         plan = ScenePlan(
             id=scene.id,
             scene_name=scene_name,
@@ -573,6 +601,7 @@ def build_pause_aligned_timeline(
             narration_text=scene.narration_text,
             start_seconds=start,
             end_seconds=end,
+            capabilities=capabilities,
         )
         plans.append(plan)
         segments.append(

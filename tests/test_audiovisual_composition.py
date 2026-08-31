@@ -243,3 +243,36 @@ def test_ffmpeg_composer_maps_original_narration_and_publishes_atomically(
         else:
             assert len(validator.calls) == 1
             assert result.error == "final audiovisual validation failed"
+
+
+def test_ffmpeg_composer_uses_mp4_suffix_for_temporary_candidate_and_publishes(
+    tmp_path: Path,
+) -> None:
+    """The FFmpeg output candidate must be identifiable as an MP4 file."""
+
+    scene = tmp_path / "scene-01.mp4"
+    narration = tmp_path / "narration.wav"
+    output = tmp_path / "final.mp4"
+    scene.write_bytes(b"SCENE_BYTES")
+    narration.write_bytes(b"NARRATION_BYTES")
+    ffmpeg = FakeFFmpeg(returncode=0)
+    profile = CompositionProfile(
+        resolution=(854, 480),
+        fps=15,
+        timebase=90_000,
+        pixel_format="yuv420p",
+    )
+
+    result = FFmpegComposer(subprocess_run=ffmpeg).compose(
+        [scene],
+        narration,
+        output,
+        expected_duration_seconds=10.0,
+        profile=profile,
+        validator=FakeFinalValidator(valid=True),
+    )
+
+    assert result.output_path == output
+    assert output.read_bytes() == b"COMPOSED_FINAL_BYTES"
+    argv = ffmpeg.calls[-1][0]
+    assert Path(argv[-1]).suffix == ".mp4"

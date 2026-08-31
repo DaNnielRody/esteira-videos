@@ -151,6 +151,70 @@ def test_accept_rejects_ready_run_when_timeline_input_hash_changes(
         assert not (scene_root / "code-provenance.json").exists()
 
 
+def test_accept_rejects_model_free_ready_run_without_capabilities(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    project, project_json = _initialize_project(tmp_path)
+    project_document = json.loads(project_json.read_text(encoding="utf-8"))
+    for scene_ref in project_document["scenes"]:
+        plan_path = project / scene_ref["plan_path"]
+        plan = ScenePlan.model_validate_json(plan_path.read_text(encoding="utf-8"))
+        plan_path.write_text(
+            json.dumps(
+                plan.model_copy(update={"capabilities": []}).to_document(),
+                ensure_ascii=False,
+            ),
+            encoding="utf-8",
+        )
+
+    assert _render_with_fakes(project_json, FakeProvider(project_json), "run-001") == 0
+    capsys.readouterr()
+
+    run_json = project / "artifacts" / "run-001" / "run.json"
+    golden_root = project / "golden"
+
+    def snapshot_tree(root: Path) -> dict[str, bytes]:
+        if not root.exists():
+            return {}
+        return {
+            path.relative_to(root).as_posix(): path.read_bytes()
+            for path in sorted(root.rglob("*"))
+            if path.is_file()
+        }
+
+    project_snapshot = project_json.read_bytes()
+    run_snapshot = run_json.read_bytes()
+    golden_exists = golden_root.exists()
+    golden_snapshot = snapshot_tree(golden_root)
+    permanent_paths = [
+        project / scene_ref["path"] / filename
+        for scene_ref in project_document["scenes"]
+        for filename in ("scene.py", "code-provenance.json")
+    ]
+    permanent_snapshots = {
+        path: path.read_bytes() if path.is_file() else None
+        for path in permanent_paths
+    }
+
+    assert main(["accept", str(project_json), "--run", "run-001"]) == 1
+    output = capsys.readouterr().out
+    assert "ERROR" in output
+    assert "capabil" in output.lower()
+
+    after_project = json.loads(project_json.read_text(encoding="utf-8"))
+    assert after_project["status"] == "ready"
+    assert after_project["accepted_run"] is None
+    assert project_json.read_bytes() == project_snapshot
+    assert run_json.read_bytes() == run_snapshot
+    assert golden_root.exists() == golden_exists
+    assert snapshot_tree(golden_root) == golden_snapshot
+    for path, snapshot in permanent_snapshots.items():
+        assert path.is_file() == (snapshot is not None)
+        if snapshot is not None:
+            assert path.read_bytes() == snapshot
+
+
 def test_accept_rejects_same_size_final_bytes_before_publication(
     tmp_path: Path,
     capsys: pytest.CaptureFixture[str],

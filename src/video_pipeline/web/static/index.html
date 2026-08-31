@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark light">
+    <title>Esteira de vídeo</title>
+    <link rel="stylesheet" href="/app.css">
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#workspace">Esteira <span>Vídeo local</span></a>
+      <p id="connection-status" class="connection" data-tone="quiet">Iniciando sessão…</p>
+    </header>
+
+    <div id="workspace" class="workspace">
+      <aside class="rail rail-project" aria-labelledby="project-heading">
+        <div class="rail-heading">
+          <p class="eyebrow">Projeto</p>
+          <h1 id="project-heading">Sessão editorial</h1>
+        </div>
+
+        <form id="create-form" class="stack form-card">
+          <label for="project-title">Título</label>
+          <input id="project-title" name="title" autocomplete="off" required>
+
+          <label for="project-script">Roteiro em Markdown</label>
+          <textarea id="project-script" name="script" rows="7" required></textarea>
+
+          <label for="project-audio">Narração</label>
+          <select id="project-audio" name="audio_asset_id" required>
+            <option value="">Carregando catálogo…</option>
+          </select>
+
+          <button class="button button-primary" type="submit">Criar projeto</button>
+        </form>
+
+        <section class="identity" aria-labelledby="identity-heading">
+          <h2 id="identity-heading">Projeto aberto</h2>
+          <p id="project-title-display" class="identity-title">Nenhum projeto</p>
+          <dl class="facts">
+            <div><dt>ID</dt><dd id="project-id">—</dd></div>
+            <div><dt>Timeline</dt><dd id="timeline-status">Vazia</dd></div>
+            <div><dt>Run</dt><dd id="run-id">—</dd></div>
+          </dl>
+          <div class="button-row">
+            <button id="confirm-button" class="button" type="button" disabled>
+              Confirmar timeline
+            </button>
+            <button id="render-button" class="button button-primary" type="button" disabled>
+              Gerar prévia
+            </button>
+          </div>
+        </section>
+
+        <section aria-labelledby="revision-heading">
+          <div class="section-heading">
+            <h2 id="revision-heading">Revisões</h2>
+            <span id="revision-count" class="count">0</span>
+          </div>
+          <div
+            id="revision-list"
+            class="selection-list"
+            role="group"
+            aria-label="Histórico de revisões"
+          >
+            <button class="selection-item" type="button" aria-pressed="false" disabled>
+              Restaurar revisão
+            </button>
+          </div>
+        </section>
+      </aside>
+
+      <main class="canvas" aria-labelledby="canvas-heading">
+        <div class="canvas-heading">
+          <div>
+            <p class="eyebrow">Operação</p>
+            <h2 id="canvas-heading">Prévia e diagnóstico</h2>
+          </div>
+          <span id="state-badge" class="badge" data-state="empty">Estado vazio</span>
+        </div>
+
+        <section class="media-card" aria-labelledby="final-heading">
+          <div class="section-heading">
+            <h3 id="final-heading">Composição final</h3>
+            <span id="final-label" class="media-label">Sem composição</span>
+          </div>
+          <video
+            id="final-video"
+            controls
+            preload="metadata"
+            aria-label="Vídeo final da revisão selecionada"
+          ></video>
+        </section>
+
+        <section class="status-card" aria-labelledby="status-heading">
+          <div class="section-heading">
+            <h3 id="status-heading">Estado do job</h3>
+            <span id="job-stage" class="stage">Aguardando</span>
+          </div>
+          <div class="progress-track" aria-hidden="true"><span id="progress-fill"></span></div>
+          <div id="operator-log" class="operator-log" role="log" aria-live="polite">
+            Selecione uma narração e crie um projeto para começar.
+          </div>
+        </section>
+
+        <section class="conversation-card" aria-labelledby="conversation-heading">
+          <h3 id="conversation-heading">Conversa da revisão</h3>
+          <div id="revision-conversation" class="conversation" aria-live="off">
+            <p class="conversation-empty">Nenhuma mensagem nesta revisão.</p>
+          </div>
+        </section>
+
+        <section class="script-card" aria-labelledby="script-heading">
+          <h3 id="script-heading">Próxima ação</h3>
+          <p id="action-next">Crie um projeto local.</p>
+          <p id="diagnostic" class="diagnostic" hidden></p>
+        </section>
+      </main>
+
+      <aside class="rail rail-scenes" aria-labelledby="scene-heading">
+        <div class="rail-heading">
+          <p class="eyebrow">Timeline canônica</p>
+          <h2 id="scene-heading">Cenas</h2>
+        </div>
+        <div
+          id="scene-list"
+          class="selection-list scene-list"
+          role="group"
+          aria-label="Cenas da timeline"
+        ></div>
+
+        <section class="scene-preview" aria-labelledby="scene-preview-heading">
+          <h3 id="scene-preview-heading">Prévia da cena</h3>
+          <video
+            id="scene-video"
+            controls
+            preload="metadata"
+            aria-label="Vídeo normalizado da cena selecionada"
+          ></video>
+        </section>
+
+        <form id="correction-form" class="stack correction-card">
+          <label for="scene-correction">Instrução de correção</label>
+          <textarea
+            id="scene-correction"
+            name="correction"
+            rows="4"
+            placeholder="Descreva apenas o ajuste desta cena"
+          ></textarea>
+          <button id="regenerate-button" class="button button-primary" type="submit" disabled>
+            Regenerar cena
+          </button>
+        </form>
+
+        <button id="accept-button" class="button button-accept" type="button" disabled>
+          Aceitar run como golden
+        </button>
+        <p id="golden-status" class="golden-status">Golden ainda não publicado</p>
+      </aside>
+    </div>
+  </body>
+</html>
