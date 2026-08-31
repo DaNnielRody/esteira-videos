@@ -40,6 +40,21 @@ video-pipeline accept projects/2026_vetores/project.json --run run-001
 `render --scene ID` pode ser usado para revisar uma cena, mas não substitui a
 timeline confirmada nem promove candidatos automaticamente.
 
+## Interface local de operação
+
+A mesma sequência canônica está disponível em uma UI local, sem upload e sem
+servidor externo:
+
+```bash
+video-pipeline web --projects-root projects --audio-root audio --port 8000
+```
+
+Abra `http://127.0.0.1:8000/`. A aplicação cria o projeto, confirma a timeline,
+enfileira render e regeneração seletiva, restaura revisões e aceita o run pronto.
+Ela só serve arquivos estáticos empacotados e MP4s referenciados por IDs opacos;
+paths do host não entram no HTML nem no JSON público. Para aceitar um golden,
+declare ao menos uma `@capabilities` suportada em cada cena do roteiro.
+
 ## Roteiro UTF-8 e timeline determinística
 
 `--script` recebe um arquivo UTF-8. O conteúdo narrado depois dos metadados é
@@ -51,16 +66,25 @@ e, para uma timeline confirmada pelo autor, deve ter o par completo
 
 ```markdown
 # Abertura
+@capabilities: basic_geometry, typography
 @objective: Apresente a ideia.
 @start: 0
 @end: 4
 A origem é mostrada exatamente nesta cena.
 
 ## Soma
+@capabilities: equations
 @start: 4
 @end: 10
 Agora a soma é explicada passo a passo.
 ```
+
+`@capabilities` é opcional e aceita IDs separados por vírgulas na ordem
+autoral. Cada ID precisa existir no registry visual e estar marcado como
+`supported`; IDs desconhecidos ou ainda não suportados são erro. Se uma cena
+declarar capabilities, todas as cenas do roteiro devem declarar uma lista
+(não há default global nem herança entre cenas). Roteiros sem nenhuma
+declaração continuam válidos e persistem `capabilities: []` em cada plano.
 
 Quando todos os pares estão completos, os intervalos precisam começar em zero,
 ser contíguos e terminar na duração do áudio; esse documento é uma timeline
@@ -97,6 +121,10 @@ projects/2026_vetores/
 │   ├── composition.json
 │   ├── final.mp4
 │   └── scenes/<scene>/... evidências e candidatos ...
+├── ui/
+│   ├── index.json            # ponteiro de checkout
+│   ├── revisions/vNNN.json   # histórico create-once
+│   └── working/<job-id>.json # jobs recuperáveis
 └── golden/
     ├── manifest.json
     └── accepted/<run-id>/... snapshots imutáveis ...
@@ -157,3 +185,9 @@ ffprobe e sensores por fakes; não fazem inferência, rede ou download.
 
 O sandbox executa apenas testes não-integração, Ruff e mypy no núcleo tipado.
 Integrações reais, modelos, rede e mídia ficam fora dos gates locais seguros.
+
+O contrato do browser usa Firefox/geckodriver e pode ser executado isoladamente:
+
+```bash
+python -m pytest -q tests/integration/test_web_e2e.py
+```

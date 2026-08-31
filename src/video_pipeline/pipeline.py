@@ -61,6 +61,29 @@ class PipelineState(StrEnum):
     ATTEMPTS_EXHAUSTED = "attempts_exhausted"
 
 
+class PipelineStage(StrEnum):
+    """Fine-grained boundaries crossed by one render attempt."""
+
+    GENERATING = "generating"
+    UNLOADING = "unloading"
+    RENDERING = "rendering"
+    VALIDATING = "validating"
+    OBSERVING = "observing"
+    CORRECTING = "correcting"
+    TERMINAL = "terminal"
+
+
+@dataclass(frozen=True, slots=True)
+class PipelineEvent:
+    """Best-effort, non-durable progress notification for one pipeline run."""
+
+    run_id: str
+    attempt: int
+    stage: PipelineStage
+    state: PipelineState
+    observation: str
+
+
 @dataclass(frozen=True, slots=True)
 class PipelineResult:
     """Terminal result returned by :class:`RenderPipeline`."""
@@ -120,6 +143,7 @@ class RenderPipeline:
         *,
         previous_scene: Mapping[str, object] | None = None,
         next_scene: Mapping[str, object] | None = None,
+        on_progress: Callable[[PipelineEvent], None] | None = None,
     ) -> PipelineResult:
         """Generate, render, validate, and correct up to ``max_attempts`` times."""
 
@@ -140,6 +164,13 @@ class RenderPipeline:
 
         for attempt_number in range(1, max_attempts + 1):
             attempt = run.create_attempt()
+            self._emit_progress(
+                on_progress,
+                run_path=run.path,
+                attempt=attempt_number,
+                stage=PipelineStage.GENERATING,
+                state=state,
+            )
             request = ProviderRequest(
                 scene_name=spec.scene_name,
                 description=spec.description,
@@ -191,6 +222,13 @@ class RenderPipeline:
             response, generation_error = self._generate(request)
             if generation_error is not None or response is None:
                 error = generation_error or "provider returned no response"
+                self._emit_progress(
+                    on_progress,
+                    run_path=run.path,
+                    attempt=attempt_number,
+                    stage=PipelineStage.UNLOADING,
+                    state=state,
+                )
                 unload, unload_error = self._unload()
                 if unload_error is not None:
                     error = f"{error}\nUnload failed:\n{unload_error}"
@@ -217,6 +255,13 @@ class RenderPipeline:
                 )
                 _set_run_state(run_document, PipelineState.PROVIDER_ERROR)
                 _write_json(run.path / "run.json", run_document)
+                self._emit_progress(
+                    on_progress,
+                    run_path=run.path,
+                    attempt=attempt_number,
+                    stage=PipelineStage.TERMINAL,
+                    state=PipelineState.PROVIDER_ERROR,
+                )
                 return PipelineResult(
                     state=PipelineState.PROVIDER_ERROR,
                     run_path=run.path,
@@ -227,6 +272,13 @@ class RenderPipeline:
             response_document = {"code": response.code, "raw_response": response.raw_response}
             _write_json(attempt.path / "response.json", response_document)
 
+            self._emit_progress(
+                on_progress,
+                run_path=run.path,
+                attempt=attempt_number,
+                stage=PipelineStage.UNLOADING,
+                state=state,
+            )
             unload, unload_error = self._unload()
             if unload_error is not None or unload is None or not unload.ok:
                 error = unload_error or "provider unload did not report success"
@@ -244,6 +296,13 @@ class RenderPipeline:
                 )
                 _set_run_state(run_document, PipelineState.PROVIDER_ERROR)
                 _write_json(run.path / "run.json", run_document)
+                self._emit_progress(
+                    on_progress,
+                    run_path=run.path,
+                    attempt=attempt_number,
+                    stage=PipelineStage.TERMINAL,
+                    state=PipelineState.PROVIDER_ERROR,
+                )
                 return PipelineResult(
                     state=PipelineState.PROVIDER_ERROR,
                     run_path=run.path,
@@ -257,6 +316,13 @@ class RenderPipeline:
             )
             _write_text(attempt.path / "scene.py", response.code)
 
+            self._emit_progress(
+                on_progress,
+                run_path=run.path,
+                attempt=attempt_number,
+                stage=PipelineStage.RENDERING,
+                state=state,
+            )
             render_result = self._render(
                 attempt.path / "scene.py",
                 attempt.media_dir,
@@ -265,10 +331,30 @@ class RenderPipeline:
             render_document = _render_document(render_result)
             _write_json(attempt.path / "render.json", render_document)
             candidate = _first_candidate(render_result)
+            self._emit_progress(
+                on_progress,
+                run_path=run.path,
+                attempt=attempt_number,
+                stage=PipelineStage.VALIDATING,
+                state=state,
+            )
             validation = self._validate(candidate, attempt.path)
             # Observe the finished video first, then lint the source. A failing
             # attempt should carry both what the frames showed and why the code
             # produced it, so one correction can address the whole failure.
+            observation_attempted = (
+                candidate is not None
+                and validation.valid
+                and (spec.expect is not None or spec.plan is not None)
+            )
+            if observation_attempted:
+                self._emit_progress(
+                    on_progress,
+                    run_path=run.path,
+                    attempt=attempt_number,
+                    stage=PipelineStage.OBSERVING,
+                    state=state,
+                )
             validation = self._with_observed_scene(
                 validation,
                 candidate,
@@ -298,6 +384,16 @@ class RenderPipeline:
                 )
                 _set_run_state(run_document, PipelineState.SENSOR_ERROR)
                 _write_json(run.path / "run.json", run_document)
+                self._emit_progress(
+                    on_progress,
+                    run_path=run.path,
+                    attempt=attempt_number,
+                    stage=PipelineStage.TERMINAL,
+                    state=PipelineState.SENSOR_ERROR,
+                    observation=(
+                        "observed" if observation_attempted else "not_applicable"
+                    ),
+                )
                 return PipelineResult(
                     state=PipelineState.SENSOR_ERROR,
                     run_path=run.path,
@@ -384,6 +480,16 @@ class RenderPipeline:
                         PipelineState.ATTEMPTS_EXHAUSTED,
                     )
                     _write_json(run.path / "run.json", run_document)
+                    self._emit_progress(
+                        on_progress,
+                        run_path=run.path,
+                        attempt=attempt_number,
+                        stage=PipelineStage.TERMINAL,
+                        state=PipelineState.ATTEMPTS_EXHAUSTED,
+                        observation=(
+                            "observed" if observation_attempted else "not_applicable"
+                        ),
+                    )
                     return PipelineResult(
                         state=PipelineState.ATTEMPTS_EXHAUSTED,
                         run_path=run.path,
@@ -393,6 +499,16 @@ class RenderPipeline:
                         temporal_normalization=temporal_normalization,
                     )
                 previous_code = response.code
+                self._emit_progress(
+                    on_progress,
+                    run_path=run.path,
+                    attempt=attempt_number,
+                    stage=PipelineStage.CORRECTING,
+                    state=PipelineState.CORRECTING,
+                    observation=(
+                        "observed" if observation_attempted else "not_applicable"
+                    ),
+                )
                 state = PipelineState.CORRECTING
                 _set_run_state(run_document, state)
                 _write_json(run.path / "run.json", run_document)
@@ -430,6 +546,16 @@ class RenderPipeline:
                     }
                 )
                 _write_json(run.path / "run.json", run_document)
+                self._emit_progress(
+                    on_progress,
+                    run_path=run.path,
+                    attempt=attempt_number,
+                    stage=PipelineStage.TERMINAL,
+                    state=PipelineState.SUCCESS,
+                    observation=(
+                        "observed" if observation_attempted else "not_applicable"
+                    ),
+                )
                 return PipelineResult(
                     state=PipelineState.SUCCESS,
                     run_path=run.path,
@@ -475,6 +601,16 @@ class RenderPipeline:
                     PipelineState.ATTEMPTS_EXHAUSTED,
                 )
                 _write_json(run.path / "run.json", run_document)
+                self._emit_progress(
+                    on_progress,
+                    run_path=run.path,
+                    attempt=attempt_number,
+                    stage=PipelineStage.TERMINAL,
+                    state=PipelineState.ATTEMPTS_EXHAUSTED,
+                    observation=(
+                        "observed" if observation_attempted else "not_applicable"
+                    ),
+                )
                 return PipelineResult(
                     state=PipelineState.ATTEMPTS_EXHAUSTED,
                     run_path=run.path,
@@ -482,6 +618,16 @@ class RenderPipeline:
                 )
 
             previous_code = response.code
+            self._emit_progress(
+                on_progress,
+                run_path=run.path,
+                attempt=attempt_number,
+                stage=PipelineStage.CORRECTING,
+                state=PipelineState.CORRECTING,
+                observation=(
+                    "observed" if observation_attempted else "not_applicable"
+                ),
+            )
             state = PipelineState.CORRECTING
             _set_run_state(run_document, state)
             _write_json(run.path / "run.json", run_document)
@@ -489,11 +635,44 @@ class RenderPipeline:
         # The loop always returns at a terminal branch; retain a defensive error.
         _set_run_state(run_document, PipelineState.ATTEMPTS_EXHAUSTED)
         _write_json(run.path / "run.json", run_document)
+        self._emit_progress(
+            on_progress,
+            run_path=run.path,
+            attempt=max_attempts,
+            stage=PipelineStage.TERMINAL,
+            state=PipelineState.ATTEMPTS_EXHAUSTED,
+        )
         return PipelineResult(
             state=PipelineState.ATTEMPTS_EXHAUSTED,
             run_path=run.path,
             attempts=max_attempts,
         )
+
+    def _emit_progress(
+        self,
+        callback: Callable[[PipelineEvent], None] | None,
+        *,
+        run_path: Path,
+        attempt: int,
+        stage: PipelineStage,
+        state: PipelineState,
+        observation: str = "not_applicable",
+    ) -> None:
+        """Notify an optional consumer without affecting pipeline execution."""
+
+        if callback is None:
+            return
+        event = PipelineEvent(
+            run_id=run_path.name,
+            attempt=attempt,
+            stage=stage,
+            state=state,
+            observation=observation,
+        )
+        try:
+            callback(event)
+        except Exception:
+            return
 
     def _new_workspace(self) -> RunWorkspace:
         if self.id_factory is None:

@@ -19,7 +19,7 @@ from test_project_render import (
 )
 
 from video_pipeline.cli import main
-from video_pipeline.project import Project, _project_package_hashes
+from video_pipeline.project import Project, _project_package_hashes, inspect_project
 from video_pipeline.provider import ProviderRequest, ProviderResponse, UnloadResult
 
 
@@ -244,6 +244,16 @@ def test_render_resumes_failed_run_and_reuses_ready_scenes(
     assert [len(scene["attempt_history"]) for scene in ready_run["scenes"]] == [1, 2]
     assert ready_run["scenes"][1]["attempt_history"][0]["state"] == "failed"
     assert ready_run["scenes"][1]["attempt_history"][1]["state"] == "ready"
+    assert ready_run["scenes"][1]["error"] is None
+    inspected_run = inspect_project(project_json)["latest_run"]
+    assert isinstance(inspected_run, dict)
+    inspected_scenes = {
+        scene["id"]: scene
+        for scene in inspected_run["scenes"]
+        if isinstance(scene, dict)
+    }
+    assert inspected_scenes["explicacao"]["state"] == "ready"
+    assert inspected_scenes["explicacao"]["error"] is None
 
     assert [request.scene_name for request in provider.requests] == [
         "AberturaScene",

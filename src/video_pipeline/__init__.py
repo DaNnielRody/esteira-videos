@@ -1,5 +1,6 @@
 """Public contracts for the render-in-the-loop video pipeline."""
 
+from video_pipeline.pipeline import PipelineEvent, PipelineStage
 from video_pipeline.project import (
     AudioMediaFacts,
     AudioProbe,
@@ -26,9 +27,15 @@ from video_pipeline.provider import (
     ProviderResponse,
     UnloadResult,
 )
+from video_pipeline.revisions import (
+    RevisionIndex,
+    RevisionManifest,
+    RevisionStore,
+    WorkingDraft,
+)
 from video_pipeline.spec import SceneSpec
 from video_pipeline.timeline import SceneBrief, Timeline, TimelineSegment, load_timeline
-from video_pipeline.video import VideoPipeline, VideoResult
+from video_pipeline.video import ProjectPipelineEvent, VideoPipeline, VideoResult
 
 __all__ = [
     "LLMProvider",
@@ -37,13 +44,19 @@ __all__ = [
     "FFmpegSilenceDetector",
     "PauseInterval",
     "OllamaProvider",
+    "PipelineEvent",
+    "PipelineStage",
     "ProviderError",
     "ProviderRequest",
     "ProviderResponse",
+    "RevisionIndex",
+    "RevisionManifest",
+    "RevisionStore",
     "Project",
     "ProjectSceneRef",
     "ProjectStageState",
     "ProjectState",
+    "ProjectPipelineEvent",
     "SceneSpec",
     "SceneBrief",
     "SilenceDetector",
@@ -53,6 +66,7 @@ __all__ = [
     "UnloadResult",
     "VideoPipeline",
     "VideoResult",
+    "WorkingDraft",
     "confirm_project_timeline",
     "inspect_project",
     "initialize_project",

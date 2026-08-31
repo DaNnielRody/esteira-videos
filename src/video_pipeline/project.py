@@ -9,7 +9,7 @@ import re
 import shutil
 import subprocess
 import tempfile
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from enum import Enum
 from pathlib import Path, PurePosixPath
 from typing import Literal, Protocol
@@ -1324,7 +1324,11 @@ def _atomic_update_json_documents(
     _atomic_update_payloads(payloads)
 
 
-def _atomic_update_payloads(payloads: tuple[tuple[Path, bytes], ...]) -> None:
+def _atomic_update_payloads(
+    payloads: tuple[tuple[Path, bytes], ...],
+    *,
+    validate: Callable[[], None] | None = None,
+) -> None:
     """Publish unique byte payloads with rollback on any replacement failure."""
 
     destinations = tuple(path.resolve() for path, _ in payloads)
@@ -1355,6 +1359,8 @@ def _atomic_update_payloads(payloads: tuple[tuple[Path, bytes], ...]) -> None:
         for (path, _), temporary in zip(normalized_payloads, new_temporaries, strict=True):
             temporary.replace(path)
             replaced.append((path, backups[path]))
+        if validate is not None:
+            validate()
     except BaseException as exc:
         rollback_failures: list[tuple[Path, BaseException]] = []
         for path, backup in reversed(replaced):
