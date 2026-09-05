@@ -7,12 +7,13 @@ it never executes a scene or asks a model to regenerate one.
 
 from __future__ import annotations
 
-import ast
 import hashlib
 import json
 import math
+import os
 import platform
 import re
+import shutil
 import sys
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
@@ -21,9 +22,9 @@ from pathlib import Path
 from pydantic import ValidationError
 
 from video_pipeline.capabilities import default_capability_registry
-from video_pipeline.expectations import SceneExpectations
 from video_pipeline.project import (
     Project,
+    ProjectSceneRef,
     ProjectState,
     _atomic_update_payloads,
     _project_package_hashes,
@@ -33,13 +34,12 @@ from video_pipeline.project import (
 )
 from video_pipeline.scene_plan import ScenePlan
 from video_pipeline.temporal import TemporalTolerances
-from video_pipeline.theme import VideoTheme
 from video_pipeline.timeline import Timeline, load_timeline
 
 _PROJECT_ID = re.compile(r"^[0-9]{4}_[a-z0-9]+(?:[_-][a-z0-9]+)*$")
 _SHA256 = re.compile(r"^[0-9a-f]{64}$")
 _GOLDEN_SCHEMA_VERSION = "golden.manifest/1"
-_GOLDEN_PROFILES = frozenset({"visual", "audiovisual"})
+_SELECTIVE_LINEAGE_KEYS = ("base_run_id", "selected_scene_id", "correction")
 _AUDIOVISUAL_GOLDEN_STATUSES = frozenset(
     {
         ProjectState.accepted.value,
@@ -48,7 +48,6 @@ _AUDIOVISUAL_GOLDEN_STATUSES = frozenset(
         ProjectState.failed.value,
     }
 )
-_REQUIRED_FACT_LISTS = ("initial_state", "final_state", "checkpoints", "animations")
 
 
 @dataclass(frozen=True, slots=True)
@@ -68,18 +67,6 @@ class GoldenValidation:
     valid: bool
     reasons: list[str]
     inference_calls: int = 0
-    code_hash: str | None = None
-    plan_hash: str | None = None
-
-
-@dataclass(frozen=True, slots=True)
-class _CodeEvidence:
-    """Static facts recoverable from reusable scene source without executing it."""
-
-    registrations: tuple[str, ...]
-    checkpoints: tuple[str, ...]
-    beat_ids: tuple[str, ...]
-    animations: tuple[str, ...]
 
 
 def discover_golden_projects(root: str | Path = Path("projects")) -> list[Path]:
@@ -98,8 +85,9 @@ def discover_golden_projects(root: str | Path = Path("projects")) -> list[Path]:
             manifest = _read_object(project_dir / "golden" / "manifest.json")
         except (OSError, ValueError):
             continue
-        profile = _common_manifest_profile(document, manifest)
-        if profile is not None and _golden_lifecycle_allowed(document, manifest, profile):
+        if _is_audiovisual_manifest(document, manifest) and _golden_lifecycle_allowed(
+            document, manifest
+        ):
             found.append(project_dir)
     return found
 
@@ -121,9 +109,8 @@ def read_golden_project(path: str | Path) -> GoldenProject:
         raise ValueError("golden manifest schema_version is unsupported")
     if manifest.get("version") != 1:
         raise ValueError("golden manifest version must be 1")
-    profile = manifest.get("profile")
-    if not isinstance(profile, str) or profile not in _GOLDEN_PROFILES:
-        raise ValueError("golden manifest profile must be visual or audiovisual")
+    if manifest.get("profile") != "audiovisual":
+        raise ValueError("golden manifest profile must be audiovisual")
     if manifest.get("status") != "accepted":
         raise ValueError("golden manifest status must be accepted")
     if manifest.get("project_id") != project_id:
@@ -136,7 +123,7 @@ def read_golden_project(path: str | Path) -> GoldenProject:
         raise ValueError("project title must be non-blank")
     if title != project_title:
         raise ValueError("golden manifest title must match the project")
-    if not _golden_lifecycle_allowed(document, manifest, profile):
+    if not _golden_lifecycle_allowed(document, manifest):
         raise ValueError("golden project is not a valid lifecycle snapshot")
     capabilities = manifest.get("capabilities")
     if not isinstance(capabilities, list) or not all(
@@ -156,7 +143,6 @@ def validate_golden_project(path: str | Path) -> GoldenValidation:
     reasons: list[str] = []
     project_document: dict[str, object] = {}
     manifest: dict[str, object] = {}
-    root_theme: VideoTheme | None = None
     try:
         project_document = _read_object(root / "project.json")
     except (OSError, ValueError) as exc:
@@ -168,106 +154,17 @@ def validate_golden_project(path: str | Path) -> GoldenValidation:
     except (OSError, ValueError) as exc:
         reasons.append(f"golden/manifest.json: {exc}")
 
-    profile = manifest.get("profile")
-    if not isinstance(profile, str) or profile not in _GOLDEN_PROFILES:
-        reasons.append("golden manifest profile must be visual or audiovisual")
+    if manifest.get("profile") != "audiovisual":
+        reasons.append("golden manifest profile must be audiovisual")
         return GoldenValidation(
             path=root,
             valid=False,
             reasons=reasons,
             inference_calls=0,
         )
-    _validate_project_lifecycle(project_document, manifest, profile, reasons)
-    manifest_capabilities = _validate_common_manifest(
-        manifest,
-        project_document,
-        reasons,
-    )
-
-    if profile == "audiovisual":
-        return _validate_audiovisual_project(
-            root,
-            project_document,
-            manifest,
-            reasons,
-        )
-
-    declared_capabilities = _string_list(
-        project_document.get("capabilities"), "project capabilities", reasons
-    )
-    if not declared_capabilities:
-        reasons.append("project capabilities must contain at least one proven capability")
-    _validate_capabilities(declared_capabilities, reasons)
-
-    theme_document: dict[str, object] = {}
-    try:
-        theme_document = _read_object(root / "theme.json")
-        root_theme = VideoTheme.model_validate(theme_document)
-    except (OSError, ValueError, ValidationError) as exc:
-        reasons.append(f"theme.json: {exc}")
-
-    if manifest_capabilities is None:
-        manifest_capabilities = []
-    if declared_capabilities != manifest_capabilities:
-        reasons.append("golden manifest capabilities disagree with project")
-
-    _validate_manifest_theme(root, manifest, theme_document, root_theme, reasons)
-    _validate_manifest_metadata(manifest, reasons)
-
-    scenes = manifest.get("scenes")
-    scene_documents: list[dict[str, object]] = []
-    if not isinstance(scenes, list):
-        reasons.append("golden manifest scenes must be a list")
-    elif len(scenes) < 2:
-        reasons.append("golden manifest must contain at least two real scenes")
-    else:
-        scene_documents = _validate_scenes(
-            root,
-            scenes,
-            declared_capabilities,
-            root_theme,
-            reasons,
-        )
-    scene_ids = (
-        {item.get("id") for item in scenes if isinstance(item, dict)}
-        if isinstance(scenes, list)
-        else set()
-    )
-    _validate_manifest_continuity(manifest, scene_ids, reasons)
-
-    code_hash = manifest.get("code_hash")
-    plan_hash = manifest.get("plan_hash")
-    if scene_documents:
-        code_paths = [Path(item["code"]) for item in scene_documents]
-        plan_paths = [Path(item["plan"]) for item in scene_documents]
-        actual_code_hash = hash_references(root, code_paths)
-        actual_plan_hash = hash_references(root, plan_paths)
-        if code_hash != actual_code_hash:
-            reasons.append(
-                "golden manifest code_hash does not match referenced scene code: "
-                f"expected {actual_code_hash}"
-            )
-        if plan_hash != actual_plan_hash:
-            reasons.append(
-                "golden manifest plan_hash does not match referenced scene plans: "
-                f"expected {actual_plan_hash}"
-            )
-
-    frames_dir = root / "golden" / "frames"
-    evidence_dir = root / "golden" / "evidence"
-    if not frames_dir.is_dir():
-        reasons.append("golden/frames directory is required")
-    if not evidence_dir.is_dir():
-        reasons.append("golden/evidence directory is required")
-
-    return GoldenValidation(
-        path=root,
-        valid=not reasons,
-        reasons=reasons,
-        inference_calls=0,
-        code_hash=code_hash if isinstance(code_hash, str) else None,
-        plan_hash=plan_hash if isinstance(plan_hash, str) else None,
-    )
+    _validate_project_lifecycle(project_document, manifest, reasons)
+    _validate_common_manifest(manifest, project_document, reasons)
+    return _validate_audiovisual_project(root, project_document, manifest, reasons)
 
 
 def validate_all_golden_projects(root: str | Path = Path("projects")) -> list[GoldenValidation]:
@@ -351,6 +248,12 @@ def accept_project(path: str | Path, run_id: str) -> Project:
         timeline,
         project_root,
         run_id,
+    )
+    selective_lineage = _selective_lineage_from_document(
+        run_document,
+        project,
+        run_id,
+        label="ready run",
     )
     if run_document.get("input_hashes") != input_hashes:
         raise ValueError("ready run input hashes do not match current project inputs")
@@ -576,6 +479,8 @@ def accept_project(path: str | Path, run_id: str) -> Project:
             "final_artifact": final_relative,
         },
     }
+    if selective_lineage is not None:
+        manifest.update(selective_lineage)
     project_document = json.loads(project.model_dump_json())
     if not isinstance(project_document, dict):
         raise ValueError("project document must be a JSON object")
@@ -583,31 +488,34 @@ def accept_project(path: str | Path, run_id: str) -> Project:
     project_document["accepted_run"] = run_id
     project_document["current_scene"] = None
     accepted_project = Project.model_validate_json(json.dumps(project_document))
-    manifest_path = project_root / "golden" / "manifest.json"
+    golden_root = project_root / "golden"
+    golden_root_existed = golden_root.exists()
+    manifest_path = golden_root / "manifest.json"
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
     (manifest_path.parent / "frames").mkdir(parents=True, exist_ok=True)
     (manifest_path.parent / "evidence").mkdir(parents=True, exist_ok=True)
-    _atomic_update_payloads(
-        (
-            *snapshot_payloads,
-            *scene_payloads,
-            (project_json, _serialize_json_payload(project_document)),
-            (manifest_path, _serialize_json_payload(manifest)),
+    def validate_published_golden() -> None:
+        validation = validate_golden_project(project_root)
+        if not validation.valid:
+            raise ValueError(
+                "golden validation failed: " + "; ".join(validation.reasons)
+            )
+
+    try:
+        _atomic_update_payloads(
+            (
+                *snapshot_payloads,
+                *scene_payloads,
+                (project_json, _serialize_json_payload(project_document)),
+                (manifest_path, _serialize_json_payload(manifest)),
+            ),
+            validate=validate_published_golden,
         )
-    )
+    except BaseException:
+        if not golden_root_existed:
+            shutil.rmtree(golden_root, ignore_errors=True)
+        raise
     return accepted_project
-
-
-def _load_acceptance_timeline(project_root: Path, project: Project) -> Timeline:
-    if project.timeline_path is None:
-        raise ValueError("accepted project must reference a timeline")
-    timeline_path = _required_reference(project_root, project.timeline_path, label="timeline")
-    timeline = load_timeline(timeline_path)
-    if timeline.status != "confirmed":
-        raise ValueError("accepted project must have a confirmed timeline")
-    if abs(timeline.duration_seconds - project.audio.duration) > timeline.tolerance_seconds:
-        raise ValueError("timeline duration does not match project audio duration")
-    return timeline
 
 
 def _validate_acceptance_timeline(
@@ -1083,6 +991,59 @@ def _safe_run_id(value: str) -> bool:
     return _safe_relative_text(value) and Path(value).name == value
 
 
+def _selective_lineage_from_document(
+    document: Mapping[str, object],
+    project: Project,
+    run_id: str,
+    *,
+    label: str,
+) -> dict[str, str] | None:
+    """Validate and return the optional selective-render lineage fields."""
+
+    present = tuple(key for key in _SELECTIVE_LINEAGE_KEYS if key in document)
+    if not present:
+        return None
+    if len(present) != len(_SELECTIVE_LINEAGE_KEYS):
+        raise ValueError(
+            f"{label} selective lineage must include all of "
+            "base_run_id, selected_scene_id, and correction"
+        )
+    base_run_id = document.get("base_run_id")
+    selected_scene_id = document.get("selected_scene_id")
+    correction = document.get("correction")
+    if not isinstance(base_run_id, str) or not _safe_run_id(base_run_id):
+        raise ValueError(f"{label} base_run_id must be a safe name")
+    if not isinstance(selected_scene_id, str) or not _safe_run_id(selected_scene_id):
+        raise ValueError(f"{label} selected_scene_id must be a safe name")
+    if selected_scene_id not in {scene.id for scene in project.scenes}:
+        raise ValueError(f"{label} selected_scene_id is not a project scene")
+    if base_run_id == run_id:
+        raise ValueError(f"{label} base_run_id must differ from the accepted run")
+    if not isinstance(correction, str) or not correction.strip():
+        raise ValueError(f"{label} correction must be non-empty")
+    return {
+        "base_run_id": base_run_id,
+        "selected_scene_id": selected_scene_id,
+        "correction": correction,
+    }
+
+
+def _expected_provenance_run_id(
+    accepted_run_id: str,
+    scene_id: str,
+    selective_lineage: Mapping[str, str] | None,
+    base_provenance: Mapping[str, object] | None = None,
+) -> str:
+    """Return the run whose provenance a golden scene is expected to carry."""
+
+    if selective_lineage is not None and scene_id != selective_lineage["selected_scene_id"]:
+        origin_run_id = base_provenance.get("run_id") if base_provenance else None
+        if isinstance(origin_run_id, str) and _safe_run_id(origin_run_id):
+            return origin_run_id
+        return selective_lineage["base_run_id"]
+    return accepted_run_id
+
+
 def _mapping_value(value: object, label: str) -> dict[str, object]:
     if not isinstance(value, dict):
         raise ValueError(f"{label} must be an object")
@@ -1359,15 +1320,9 @@ def _validate_audiovisual_deep_snapshot(
     )
     if manifest_tolerances.get("final_duration_seconds") != 0.05:
         reasons.append("golden final duration tolerance must be 0.05 seconds")
+    selective_lineage: dict[str, str] | None = None
     if run_id is not None and _safe_run_id(run_id):
         _validate_audiovisual_package_snapshot_paths(
-            project,
-            manifest_scenes,
-            run_id,
-            reasons,
-        )
-        _validate_audiovisual_provenance_snapshots(
-            root,
             project,
             manifest_scenes,
             run_id,
@@ -1385,6 +1340,32 @@ def _validate_audiovisual_deep_snapshot(
     except (OSError, ValueError) as exc:
         reasons.append(f"accepted run cannot be loaded: {exc}")
         return
+    selective_lineage, base_run_path, base_run_document = _validate_selective_lineage_snapshot(
+        root,
+        project,
+        manifest,
+        run_document,
+        run_id,
+        reasons,
+    )
+    _validate_audiovisual_provenance_snapshots(
+        root,
+        project,
+        manifest_scenes,
+        run_id,
+        selective_lineage,
+        base_run_path,
+        base_run_document,
+        reasons,
+    )
+    _validate_selective_sibling_trees(
+        root,
+        project,
+        run_id,
+        selective_lineage,
+        base_run_path,
+        reasons,
+    )
     _validate_audiovisual_run_snapshot(
         root,
         project,
@@ -1434,6 +1415,9 @@ def _validate_audiovisual_provenance_snapshots(
     project: Project,
     manifest_scenes: list[object],
     run_id: str,
+    selective_lineage: Mapping[str, str] | None,
+    base_run_path: Path | None,
+    base_run_document: Mapping[str, object] | None,
     reasons: list[str],
 ) -> None:
     """Check permanent provenance bytes and embedded facts against the manifest."""
@@ -1479,15 +1463,281 @@ def _validate_audiovisual_provenance_snapshots(
             )
         if normalized.get("scene_id") != project_scene.id:
             reasons.append(f"scene {project_scene.id} provenance scene_id is incorrect")
-        if normalized.get("run_id") != run_id:
+        base_provenance = None
+        if (
+            selective_lineage is not None
+            and project_scene.id != selective_lineage["selected_scene_id"]
+        ):
+            base_provenance = _base_scene_provenance(
+                root,
+                project_scene,
+                base_run_path,
+                base_run_document,
+                reasons,
+            )
+        expected_run_id = _expected_provenance_run_id(
+            run_id,
+            project_scene.id,
+            selective_lineage,
+            base_provenance,
+        )
+        if base_provenance is not None and normalized != base_provenance:
+            reasons.append(
+                f"scene {project_scene.id} provenance differs from immediate base run"
+            )
+        if normalized.get("run_id") != expected_run_id:
             reasons.append(f"scene {project_scene.id} provenance run_id is incorrect")
-        if normalized.get("run_path") != f"artifacts/{run_id}":
+        if normalized.get("run_path") != f"artifacts/{expected_run_id}":
             reasons.append(f"scene {project_scene.id} provenance run_path is not canonical")
         source_path = normalized.get("source_path")
         if not isinstance(source_path, str) or not source_path.startswith(
-            f"artifacts/{run_id}/pipeline/{project_scene.id}/"
+            f"artifacts/{expected_run_id}/pipeline/{project_scene.id}/"
         ) or not source_path.endswith("/scene.py"):
             reasons.append(f"scene {project_scene.id} provenance source_path is not canonical")
+
+
+def _base_scene_provenance(
+    root: Path,
+    project_scene: ProjectSceneRef,
+    base_run_path: Path | None,
+    base_run_document: Mapping[str, object] | None,
+    reasons: list[str],
+) -> dict[str, object] | None:
+    """Load the corresponding sibling provenance from the immediate base run."""
+
+    if base_run_path is None or base_run_document is None:
+        return None
+    records = base_run_document.get("scenes")
+    if not isinstance(records, list):
+        reasons.append("selective base run scenes are required for sibling lineage")
+        return None
+    record = next(
+        (
+            item
+            for item in records
+            if isinstance(item, dict) and item.get("id") == project_scene.id
+        ),
+        None,
+    )
+    if not isinstance(record, dict):
+        reasons.append(
+            f"selective base run is missing sibling scene {project_scene.id}"
+        )
+        return None
+    base_run_id = base_run_path.name
+    relative = f"artifacts/{base_run_id}/{project_scene.path}/code-provenance.json"
+    provenance_path = _validate_file_reference(
+        root,
+        relative,
+        f"base scene {project_scene.id} provenance",
+        reasons,
+    )
+    if provenance_path is None:
+        return None
+    if _relative_or_error(
+        root,
+        record.get("provenance_path"),
+        f"base scene {project_scene.id} provenance path",
+        reasons,
+    ) != relative:
+        reasons.append(
+            f"base scene {project_scene.id} provenance path is not canonical"
+        )
+    try:
+        document = _read_object(provenance_path)
+        return _relative_document_paths(root, document, ("run_path", "source_path"))
+    except (OSError, ValueError) as exc:
+        reasons.append(
+            f"base scene {project_scene.id} provenance cannot be loaded: {exc}"
+        )
+        return None
+
+
+def _validate_selective_sibling_trees(
+    root: Path,
+    project: Project,
+    run_id: str,
+    selective_lineage: Mapping[str, str] | None,
+    base_run_path: Path | None,
+    reasons: list[str],
+) -> None:
+    """Require every reused sibling tree to match its immediate base byte-for-byte."""
+
+    if selective_lineage is None or base_run_path is None:
+        return
+    base_run_id = selective_lineage["base_run_id"]
+    for project_scene in project.scenes:
+        if project_scene.id == selective_lineage["selected_scene_id"]:
+            continue
+        current_scene_path = _artifact_tree_path(
+            root,
+            f"artifacts/{run_id}/{project_scene.path}",
+        )
+        base_scene_path = _artifact_tree_path(
+            root,
+            f"artifacts/{base_run_id}/{project_scene.path}",
+        )
+        current_pipeline_path = _artifact_tree_path(
+            root,
+            f"artifacts/{run_id}/pipeline/{project_scene.id}",
+        )
+        base_pipeline_path = _artifact_tree_path(
+            root,
+            f"artifacts/{base_run_id}/pipeline/{project_scene.id}",
+        )
+        current_scene_tree = _evidence_tree_snapshot(
+            current_scene_path,
+            label=f"scene {project_scene.id} current tree",
+            reasons=reasons,
+        )
+        base_scene_tree = _evidence_tree_snapshot(
+            base_scene_path,
+            label=f"scene {project_scene.id} immediate base tree",
+            reasons=reasons,
+        )
+        if current_scene_tree != base_scene_tree:
+            reasons.append(
+                f"scene {project_scene.id} scene tree differs from immediate base run"
+            )
+        current_pipeline_tree = _evidence_tree_snapshot(
+            current_pipeline_path,
+            label=f"scene {project_scene.id} current pipeline tree",
+            reasons=reasons,
+        )
+        base_pipeline_tree = _evidence_tree_snapshot(
+            base_pipeline_path,
+            label=f"scene {project_scene.id} immediate base pipeline tree",
+            reasons=reasons,
+        )
+        if current_pipeline_tree != base_pipeline_tree:
+            reasons.append(
+                f"scene {project_scene.id} pipeline tree differs from immediate base run"
+            )
+
+
+def _artifact_tree_path(root: Path, relative: str) -> Path:
+    """Build a project-relative tree path without resolving nested symlinks."""
+
+    base = root.resolve()
+    candidate = base / relative
+    try:
+        candidate.relative_to(base)
+    except ValueError as exc:
+        raise ValueError("artifact tree path escapes the project") from exc
+    return candidate
+
+
+def _evidence_tree_snapshot(
+    root: Path,
+    *,
+    label: str,
+    reasons: list[str],
+) -> dict[str, tuple[str, str]]:
+    """Snapshot regular evidence tree shape and file digests without following links."""
+
+    if root.is_symlink():
+        reasons.append(f"{label} contains symlink: {root}")
+        return {}
+    if not root.is_dir():
+        reasons.append(f"{label} is missing or not a directory: {root}")
+        return {}
+    snapshot: dict[str, tuple[str, str]] = {}
+    pending = [root]
+    while pending:
+        current = pending.pop()
+        try:
+            entries = list(os.scandir(current))
+        except OSError as exc:
+            reasons.append(f"{label} cannot be inspected: {exc}")
+            continue
+        for entry in entries:
+            entry_path = Path(entry.path)
+            relative = entry_path.relative_to(root).as_posix()
+            if entry.is_symlink():
+                reasons.append(f"{label} contains symlink: {entry_path}")
+                continue
+            if entry.is_dir(follow_symlinks=False):
+                snapshot[relative] = ("directory", "")
+                pending.append(entry_path)
+            elif entry.is_file(follow_symlinks=False):
+                try:
+                    digest = hash_file(entry_path)
+                except OSError as exc:
+                    reasons.append(f"{label} file cannot be hashed: {exc}")
+                    continue
+                snapshot[relative] = ("file", digest)
+            else:
+                reasons.append(
+                    f"{label} contains non-regular entry: {entry_path}"
+                )
+    return snapshot
+
+
+def _validate_selective_lineage_snapshot(
+    root: Path,
+    project: Project,
+    manifest: Mapping[str, object],
+    run_document: Mapping[str, object],
+    run_id: str,
+    reasons: list[str],
+) -> tuple[dict[str, str] | None, Path | None, dict[str, object] | None]:
+    """Cross-check selective lineage and its immutable base run evidence."""
+
+    try:
+        manifest_lineage = _selective_lineage_from_document(
+            manifest,
+            project,
+            run_id,
+            label="golden manifest",
+        )
+    except ValueError as exc:
+        reasons.append(str(exc))
+        manifest_lineage = None
+    try:
+        run_lineage = _selective_lineage_from_document(
+            run_document,
+            project,
+            run_id,
+            label="accepted run",
+        )
+    except ValueError as exc:
+        reasons.append(str(exc))
+        run_lineage = None
+
+    manifest_keys = tuple(key for key in _SELECTIVE_LINEAGE_KEYS if key in manifest)
+    run_keys = tuple(key for key in _SELECTIVE_LINEAGE_KEYS if key in run_document)
+    if manifest_keys != run_keys:
+        reasons.append("golden manifest selective lineage presence disagrees with accepted run")
+    elif manifest_lineage != run_lineage:
+        reasons.append("golden manifest selective lineage disagrees with accepted run")
+
+    lineage = run_lineage or manifest_lineage
+    if lineage is None:
+        return None, None, None
+    base_run_id = lineage["base_run_id"]
+    base_relative = f"artifacts/{base_run_id}/run.json"
+    try:
+        base_path = _safe_reference(root.resolve(), Path(base_relative))
+    except ValueError as exc:
+        reasons.append(f"selective base run path is invalid: {exc}")
+        return lineage, None, None
+    if not base_path.is_file():
+        reasons.append(f"selective base run is missing: {base_relative}")
+        return lineage, None, None
+    try:
+        base_document = _read_object(base_path)
+    except (OSError, ValueError) as exc:
+        reasons.append(f"selective base run cannot be loaded: {exc}")
+        return lineage, base_path.parent, None
+    if base_document.get("run_id") != base_run_id:
+        reasons.append("selective base run run_id disagrees with lineage")
+    if base_document.get("project_id") != project.id:
+        reasons.append("selective base run project_id disagrees with project")
+    if base_document.get("state") != "ready":
+        reasons.append("selective base run state must be ready")
+    if "current_scene" not in base_document or base_document.get("current_scene") is not None:
+        reasons.append("selective base run current_scene must be null")
+    return lineage, base_path.parent, base_document
 
 
 def _validate_audiovisual_timeline_projection(
@@ -2613,67 +2863,54 @@ def _require_nonempty_mapping(value: object, label: str, reasons: list[str]) -> 
         reasons.append(f"audiovisual manifest {label} must be a non-empty object")
 
 
-def _common_manifest_profile(
+def _is_audiovisual_manifest(
     project_document: Mapping[str, object],
     manifest: Mapping[str, object],
-) -> str | None:
-    """Return a profile only for a minimally valid common golden envelope."""
+) -> bool:
+    """Return whether a document has the canonical audiovisual envelope."""
 
-    profile = manifest.get("profile")
     if (
         manifest.get("schema_version") != _GOLDEN_SCHEMA_VERSION
         or manifest.get("version") != 1
         or manifest.get("status") != "accepted"
-        or not isinstance(profile, str)
-        or profile not in _GOLDEN_PROFILES
+        or manifest.get("profile") != "audiovisual"
         or manifest.get("project_id") != project_document.get("id")
         or manifest.get("title") != project_document.get("title")
     ):
-        return None
-    return profile
+        return False
+    return True
 
 
 def _golden_lifecycle_allowed(
     project_document: Mapping[str, object],
     manifest: Mapping[str, object],
-    profile: str,
 ) -> bool:
     """Check whether the project status may expose this immutable snapshot."""
 
-    if profile == "visual":
-        return project_document.get("status") == ProjectState.accepted.value
-    if profile == "audiovisual":
-        run_id = manifest.get("run_id")
-        return (
-            project_document.get("status") in _AUDIOVISUAL_GOLDEN_STATUSES
-            and isinstance(run_id, str)
-            and _safe_run_id(run_id)
-            and project_document.get("accepted_run") == run_id
-        )
-    return False
+    run_id = manifest.get("run_id")
+    return (
+        project_document.get("status") in _AUDIOVISUAL_GOLDEN_STATUSES
+        and isinstance(run_id, str)
+        and _safe_run_id(run_id)
+        and project_document.get("accepted_run") == run_id
+    )
 
 
 def _validate_project_lifecycle(
     project_document: Mapping[str, object],
     manifest: Mapping[str, object],
-    profile: str,
     reasons: list[str],
 ) -> None:
-    """Record one profile-specific lifecycle failure without duplicate status errors."""
+    """Record lifecycle facts required by an audiovisual golden snapshot."""
 
     status = project_document.get("status")
-    if profile == "visual":
-        if status != ProjectState.accepted.value:
-            reasons.append("project.json status must be accepted")
+    if status not in _AUDIOVISUAL_GOLDEN_STATUSES:
+        reasons.append("project.json status is not allowed for an audiovisual golden snapshot")
         return
-    if profile == "audiovisual":
-        if status not in _AUDIOVISUAL_GOLDEN_STATUSES:
-            reasons.append("project.json status is not allowed for an audiovisual golden snapshot")
-            return
-        run_id = manifest.get("run_id")
-        if isinstance(run_id, str) and _safe_run_id(run_id):
-            if project_document.get("accepted_run") != run_id:
-                reasons.append("audiovisual manifest run_id disagrees with accepted run")
+    run_id = manifest.get("run_id")
+    if isinstance(run_id, str) and _safe_run_id(run_id):
+        if project_document.get("accepted_run") != run_id:
+            reasons.append("audiovisual manifest run_id disagrees with accepted run")
 
 
 def _validate_project_identity(
@@ -2692,35 +2929,19 @@ def _validate_project_identity(
         reasons.append("project.json id must match its directory name")
 
 
-def _validate_manifest_metadata(manifest: dict[str, object], reasons: list[str]) -> None:
-    for key in ("code_hash", "plan_hash"):
-        value = manifest.get(key)
-        if not isinstance(value, str) or _SHA256.fullmatch(value) is None:
-            reasons.append(f"golden manifest {key} must be a lowercase SHA-256 hash")
-    tolerances = manifest.get("tolerances")
-    if not isinstance(tolerances, dict) or not tolerances:
-        reasons.append("golden manifest tolerances must be a non-empty object")
-    elif any(
-        isinstance(value, bool) or not isinstance(value, (int, float)) or value < 0
-        for value in tolerances.values()
-    ):
-        reasons.append("golden manifest tolerances must contain non-negative numbers")
-
-
 def _validate_common_manifest(
     manifest: dict[str, object],
     project_document: Mapping[str, object],
     reasons: list[str],
-) -> list[str] | None:
-    """Validate fields shared by the visual and audiovisual golden profiles."""
+) -> None:
+    """Validate the canonical audiovisual golden envelope."""
 
     if manifest.get("schema_version") != _GOLDEN_SCHEMA_VERSION:
         reasons.append("golden manifest schema_version is unsupported")
     if manifest.get("version") != 1:
         reasons.append("golden manifest version must be 1")
-    profile = manifest.get("profile")
-    if not isinstance(profile, str) or profile not in _GOLDEN_PROFILES:
-        reasons.append("golden manifest profile must be visual or audiovisual")
+    if manifest.get("profile") != "audiovisual":
+        reasons.append("golden manifest profile must be audiovisual")
     if manifest.get("status") != "accepted":
         reasons.append("golden manifest status must be accepted")
     project_id = project_document.get("id")
@@ -2742,519 +2963,6 @@ def _validate_common_manifest(
     if not capabilities:
         reasons.append("golden manifest capabilities must contain at least one proven capability")
     _validate_capabilities(capabilities, reasons, label="golden manifest")
-    return capabilities
-
-
-def _validate_manifest_continuity(
-    manifest: dict[str, object],
-    scene_ids: set[object],
-    reasons: list[str],
-) -> None:
-    continuity = manifest.get("continuity")
-    if not isinstance(continuity, dict):
-        reasons.append("golden manifest continuity must be an object")
-        return
-    boundaries = continuity.get("boundaries")
-    if not isinstance(boundaries, list) or not boundaries:
-        reasons.append("golden manifest continuity.boundaries must be non-empty")
-        return
-    for index, boundary in enumerate(boundaries, start=1):
-        label = f"continuity boundary {index}"
-        if not isinstance(boundary, dict):
-            reasons.append(f"{label} must be an object")
-            continue
-        for key in ("from", "to"):
-            if not isinstance(boundary.get(key), str) or not boundary[key].strip():
-                reasons.append(f"{label} {key} is required")
-            elif boundary[key] not in scene_ids:
-                reasons.append(f"{label} {key} must reference a manifest scene")
-        recurring = boundary.get("recurring_objects")
-        if not isinstance(recurring, list) or not all(
-            isinstance(item, str) and item.strip() for item in recurring
-        ):
-            reasons.append(f"{label} recurring_objects must be a string list")
-        elif len(recurring) != len(set(recurring)):
-            reasons.append(f"{label} recurring_objects must be unique")
-        transition = boundary.get("expected_transition")
-        if not isinstance(transition, str) or not transition.strip():
-            reasons.append(f"{label} expected_transition is required")
-        expected_findings = boundary.get("expected_findings")
-        if not isinstance(expected_findings, list):
-            reasons.append(f"{label} expected_findings must be a list")
-        else:
-            for finding in expected_findings:
-                if (
-                    not isinstance(finding, dict)
-                    or not isinstance(finding.get("code"), str)
-                    or re.fullmatch(r"[A-Z][A-Z0-9_]*", str(finding.get("code"))) is None
-                ):
-                    reasons.append(f"{label} expected_findings entries need a code")
-
-
-def _validate_manifest_theme(
-    root: Path,
-    manifest: dict[str, object],
-    root_document: dict[str, object],
-    root_theme: VideoTheme | None,
-    reasons: list[str],
-) -> None:
-    reference = manifest.get("theme")
-    if isinstance(reference, str):
-        try:
-            referenced_document = _read_object(_safe_reference(root.resolve(), Path(reference)))
-            referenced_theme = VideoTheme.model_validate(referenced_document)
-        except (OSError, ValueError, ValidationError) as exc:
-            reasons.append(f"golden manifest theme: {exc}")
-            return
-        if root_theme is not None and referenced_theme != root_theme:
-            reasons.append("golden manifest theme differs from theme.json")
-        return
-    if isinstance(reference, dict):
-        try:
-            referenced_theme = VideoTheme.model_validate(reference)
-        except (ValueError, ValidationError) as exc:
-            reasons.append(f"golden manifest theme: {exc}")
-            return
-        if root_theme is not None and referenced_theme != root_theme:
-            reasons.append("golden manifest theme differs from theme.json")
-        return
-    del root_document
-    reasons.append("golden manifest theme is required")
-
-
-def _validate_scenes(
-    root: Path,
-    scenes: list[object],
-    declared_capabilities: list[str],
-    root_theme: VideoTheme | None,
-    reasons: list[str],
-) -> list[dict[str, object]]:
-    valid_documents: list[dict[str, object]] = []
-    seen_ids: set[str] = set()
-    for index, raw_scene in enumerate(scenes, start=1):
-        label = f"golden scene {index}"
-        if not isinstance(raw_scene, dict):
-            reasons.append(f"{label} must be an object")
-            continue
-        scene = {str(key): value for key, value in raw_scene.items()}
-        scene_id = scene.get("id")
-        if not isinstance(scene_id, str) or not scene_id.strip():
-            reasons.append(f"{label} id is required")
-        elif scene_id in seen_ids:
-            reasons.append(f"{label} id must be unique: {scene_id}")
-        else:
-            seen_ids.add(scene_id)
-
-        references: dict[str, Path] = {}
-        for key in ("plan", "code", "expectations"):
-            value = scene.get(key)
-            if not isinstance(value, str) or not value.strip():
-                reasons.append(f"{label} {key} reference is required")
-                continue
-            try:
-                target = _safe_reference(root.resolve(), Path(value))
-            except ValueError as exc:
-                reasons.append(f"{label} {key}: {exc}")
-                continue
-            if not target.is_file():
-                reasons.append(f"{label} missing {key}: {value}")
-                continue
-            references[key] = Path(value)
-
-        plan: ScenePlan | None = None
-        if "plan" in references:
-            try:
-                plan = _read_plan(root / references["plan"])
-            except (OSError, ValueError, ValidationError) as exc:
-                reasons.append(f"{label} plan: {exc}")
-        if plan is not None:
-            if isinstance(scene_id, str) and plan.id != scene_id:
-                reasons.append(f"{label} id does not match plan id")
-            if root_theme is not None and plan.theme != root_theme:
-                reasons.append(f"{label} plan theme differs from theme.json")
-
-        code_evidence: _CodeEvidence | None = None
-        if "code" in references:
-            code_evidence = _validate_code(root / references["code"], label, reasons)
-        if "expectations" in references:
-            try:
-                SceneExpectations.model_validate(_read_object(root / references["expectations"]))
-            except (OSError, ValueError, ValidationError) as exc:
-                reasons.append(f"{label} expectations: {exc}")
-
-        scene_capabilities = _string_list(
-            scene.get("capabilities"), f"{label} capabilities", reasons
-        )
-        if not scene_capabilities:
-            reasons.append(f"{label} must prove at least one capability")
-        unknown = set(scene_capabilities) - set(declared_capabilities)
-        if unknown:
-            reasons.append(
-                f"{label} capabilities are not declared by project: {', '.join(sorted(unknown))}"
-            )
-        _validate_capabilities(scene_capabilities, reasons, label=label)
-
-        _validate_scene_evidence(
-            root,
-            scene,
-            label,
-            reasons,
-            plan=plan,
-            root_theme=root_theme,
-            scene_capabilities=scene_capabilities,
-            code_evidence=code_evidence,
-        )
-        if references.keys() >= {"plan", "code", "expectations"}:
-            valid_documents.append(
-                {
-                    **scene,
-                    "plan": references["plan"],
-                    "code": references["code"],
-                    "expectations": references["expectations"],
-                }
-            )
-    return valid_documents
-
-
-def _validate_scene_evidence(
-    root: Path,
-    scene: dict[str, object],
-    label: str,
-    reasons: list[str],
-    *,
-    plan: ScenePlan | None,
-    root_theme: VideoTheme | None,
-    scene_capabilities: list[str],
-    code_evidence: _CodeEvidence | None,
-) -> None:
-    expected_facts = scene.get("expected_facts")
-    if not isinstance(expected_facts, dict):
-        reasons.append(f"{label} expected_facts must be an object")
-    else:
-        for key in _REQUIRED_FACT_LISTS:
-            if not isinstance(expected_facts.get(key), list):
-                reasons.append(f"{label} expected_facts.{key} must be a list")
-            elif any(
-                not isinstance(item, (str, dict)) or (isinstance(item, str) and not item.strip())
-                for item in expected_facts[key]
-            ):
-                reasons.append(f"{label} expected_facts.{key} must contain named facts or objects")
-        _validate_expected_facts(
-            expected_facts,
-            label,
-            reasons,
-            plan=plan,
-            code_evidence=code_evidence,
-        )
-
-    semantic = scene.get("semantic_expectations")
-    if not isinstance(semantic, dict) or not semantic:
-        reasons.append(f"{label} semantic_expectations must be a non-empty object")
-    elif plan is not None:
-        _validate_semantic_expectations(semantic, plan, label, reasons)
-
-    if plan is not None:
-        missing_capabilities = set(plan.capabilities) - set(scene_capabilities)
-        if missing_capabilities:
-            reasons.append(
-                f"{label} capabilities omit plan capabilities: "
-                f"{', '.join(sorted(missing_capabilities))}"
-            )
-
-    findings = scene.get("expected_findings")
-    if not isinstance(findings, list):
-        reasons.append(f"{label} expected_findings must be a list")
-    else:
-        for finding in findings:
-            if (
-                not isinstance(finding, dict)
-                or not isinstance(finding.get("code"), str)
-                or re.fullmatch(r"[A-Z][A-Z0-9_]*", str(finding.get("code"))) is None
-            ):
-                reasons.append(f"{label} expected_findings entries need a code")
-
-    dimensions = scene.get("dimensions")
-    if not isinstance(dimensions, dict):
-        reasons.append(f"{label} dimensions must be an object")
-    elif any(
-        isinstance(dimensions.get(key), bool)
-        or not isinstance(dimensions.get(key), int)
-        or dimensions.get(key, 0) <= 0
-        for key in ("width", "height")
-    ):
-        reasons.append(f"{label} dimensions need positive integer width and height")
-    elif root_theme is not None and (
-        dimensions["width"] != root_theme.resolution[0]
-        or dimensions["height"] != root_theme.resolution[1]
-    ):
-        reasons.append(f"{label} dimensions must match theme resolution")
-
-    duration = scene.get("duration_seconds")
-    if isinstance(duration, bool) or not isinstance(duration, (int, float)) or duration <= 0:
-        reasons.append(f"{label} duration_seconds must be positive")
-    elif plan is not None and abs(float(duration) - plan.duration_seconds) > 1e-6:
-        reasons.append(f"{label} duration_seconds must match its ScenePlan")
-
-    keyframes = scene.get("keyframes")
-    if not isinstance(keyframes, list) or not keyframes:
-        reasons.append(f"{label} keyframes must contain at least one small frame")
-        return
-    for frame_index, reference in enumerate(keyframes, start=1):
-        if not isinstance(reference, str) or not reference.strip():
-            reasons.append(f"{label} keyframe {frame_index} reference is required")
-            continue
-        try:
-            frame_path = _safe_reference(root.resolve(), Path(reference))
-        except ValueError as exc:
-            reasons.append(f"{label} keyframe {frame_index}: {exc}")
-            continue
-        if not frame_path.is_file():
-            reasons.append(f"{label} missing keyframe {frame_index}: {reference}")
-        elif frame_path.stat().st_size == 0 or frame_path.stat().st_size > 5 * 1024 * 1024:
-            reasons.append(f"{label} keyframe {frame_index} must be non-empty and <= 5 MiB")
-        else:
-            _validate_keyframe_payload(frame_path, label, frame_index, reasons)
-
-
-def _validate_keyframe_payload(
-    path: Path,
-    label: str,
-    frame_index: int,
-    reasons: list[str],
-) -> None:
-    """Reject evidence files that only have a plausible image extension."""
-
-    try:
-        prefix = path.read_bytes()[:4096]
-    except OSError as exc:
-        reasons.append(f"{label} keyframe {frame_index} cannot be read: {exc}")
-        return
-    suffix = path.suffix.lower()
-    valid = (
-        prefix.lstrip().lower().startswith(b"<svg")
-        if suffix == ".svg"
-        else prefix.startswith(b"\x89PNG\r\n\x1a\n")
-        if suffix == ".png"
-        else prefix.startswith(b"\xff\xd8")
-        if suffix in {".jpg", ".jpeg"}
-        else prefix.startswith(b"RIFF") and b"WEBP" in prefix[:16]
-        if suffix == ".webp"
-        else False
-    )
-    if not valid:
-        reasons.append(f"{label} keyframe {frame_index} is not a supported image payload")
-
-
-def _validate_expected_facts(
-    expected_facts: dict[str, object],
-    label: str,
-    reasons: list[str],
-    *,
-    plan: ScenePlan | None,
-    code_evidence: _CodeEvidence | None,
-) -> None:
-    """Cross-check manifest facts against plan IDs and source literals."""
-
-    if plan is None:
-        return
-    plan_ids = {item.id for item in plan.objects}
-    required_ids = {item.id for item in plan.objects if item.required}
-    registered = set(code_evidence.registrations) if code_evidence is not None else set()
-    final_ids = _fact_ids(expected_facts.get("final_state"))
-    initial_ids = _fact_ids(expected_facts.get("initial_state"))
-    for state_name, ids in (("initial_state", initial_ids), ("final_state", final_ids)):
-        unknown = ids - plan_ids
-        if unknown:
-            reasons.append(
-                f"{label} expected_facts.{state_name} has unknown IDs: {', '.join(sorted(unknown))}"
-            )
-        unregistered = ids - registered
-        if unregistered and code_evidence is not None:
-            reasons.append(
-                f"{label} expected_facts.{state_name} is not registered in scene code: "
-                f"{', '.join(sorted(unregistered))}"
-            )
-    missing_required = required_ids - final_ids
-    if missing_required:
-        reasons.append(
-            f"{label} expected_facts.final_state omits required IDs: "
-            f"{', '.join(sorted(missing_required))}"
-        )
-    checkpoint_ids = _fact_names(expected_facts.get("checkpoints"))
-    animation_names = _fact_names(expected_facts.get("animations"))
-    if code_evidence is not None:
-        missing_checkpoints = set(checkpoint_ids) - set(code_evidence.checkpoints)
-        if missing_checkpoints:
-            reasons.append(
-                f"{label} expected checkpoints are absent from scene code: "
-                f"{', '.join(sorted(missing_checkpoints))}"
-            )
-        missing_animations = set(animation_names) - set(code_evidence.animations)
-        if missing_animations:
-            reasons.append(
-                f"{label} expected animations are absent from scene code: "
-                f"{', '.join(sorted(missing_animations))}"
-            )
-        if list(code_evidence.checkpoints) != checkpoint_ids:
-            reasons.append(f"{label} expected checkpoints do not match scene code literals")
-        if list(code_evidence.animations) != animation_names:
-            reasons.append(f"{label} expected animations do not match scene code calls")
-        plan_beat_ids = {beat.id for beat in plan.beats if beat.id is not None}
-        missing_beat_ids = plan_beat_ids - set(code_evidence.beat_ids)
-        if missing_beat_ids:
-            reasons.append(
-                f"{label} plan beats are not attached to code checkpoints: "
-                f"{', '.join(sorted(missing_beat_ids))}"
-            )
-
-
-def _validate_semantic_expectations(
-    semantic: dict[str, object],
-    plan: ScenePlan,
-    label: str,
-    reasons: list[str],
-) -> None:
-    """Ensure semantic expectations name the same authored objects and roles."""
-
-    plan_objects = {item.id: item for item in plan.objects}
-    required_value = semantic.get("required_objects")
-    required = (
-        {item for item in required_value if isinstance(item, str)}
-        if isinstance(required_value, list)
-        else set()
-    )
-    if not isinstance(required_value, list) or not required:
-        reasons.append(f"{label} semantic_expectations.required_objects must be non-empty")
-    unknown_required = required - set(plan_objects)
-    if unknown_required:
-        reasons.append(
-            f"{label} semantic expectations have unknown IDs: {', '.join(sorted(unknown_required))}"
-        )
-    missing_required = {item.id for item in plan.objects if item.required} - required
-    if missing_required:
-        reasons.append(
-            f"{label} semantic expectations omit required IDs: "
-            f"{', '.join(sorted(missing_required))}"
-        )
-
-    regions = semantic.get("required_regions")
-    if regions is not None and not isinstance(regions, dict):
-        reasons.append(f"{label} semantic required_regions must be an object")
-    elif isinstance(regions, dict):
-        for object_id, region in regions.items():
-            declared = plan_objects.get(str(object_id))
-            if declared is None:
-                reasons.append(f"{label} semantic region names unknown object: {object_id}")
-            elif not isinstance(region, str) or region not in plan.theme.regions:
-                reasons.append(f"{label} semantic region is invalid: {region}")
-            elif declared.region is not None and region != declared.region:
-                reasons.append(f"{label} semantic region disagrees with plan for {object_id}")
-
-    colours = semantic.get("required_color_roles")
-    if colours is not None and not isinstance(colours, dict):
-        reasons.append(f"{label} semantic required_color_roles must be an object")
-    elif isinstance(colours, dict):
-        for object_id, role in colours.items():
-            declared = plan_objects.get(str(object_id))
-            if declared is None:
-                reasons.append(f"{label} semantic colour names unknown object: {object_id}")
-            elif not isinstance(role, str) or role not in plan.theme.palette:
-                reasons.append(f"{label} semantic colour role is invalid: {role}")
-            elif declared.color_role is not None and role != declared.color_role:
-                reasons.append(f"{label} semantic colour disagrees with plan for {object_id}")
-
-
-def _fact_names(value: object) -> list[str]:
-    if not isinstance(value, list):
-        return []
-    return [
-        item if isinstance(item, str) else str(item["name"])
-        for item in value
-        if isinstance(item, str) or isinstance(item, dict) and isinstance(item.get("name"), str)
-    ]
-
-
-def _fact_ids(value: object) -> set[str]:
-    if not isinstance(value, list):
-        return set()
-    ids: set[str] = set()
-    for item in value:
-        if isinstance(item, str) and item.strip():
-            ids.add(item)
-        elif isinstance(item, dict) and isinstance(item.get("id"), str):
-            ids.add(str(item["id"]))
-    return ids
-
-
-def _validate_code(path: Path, label: str, reasons: list[str]) -> _CodeEvidence | None:
-    try:
-        source = path.read_text(encoding="utf-8")
-        tree = ast.parse(source, filename=str(path))
-    except (OSError, SyntaxError, UnicodeError) as exc:
-        reasons.append(f"{label} code is not valid reusable Python: {exc}")
-        return None
-    if not source.strip():
-        reasons.append(f"{label} code must not be empty")
-    if "class " not in source or "Scene" not in source:
-        reasons.append(f"{label} code must define a Manim scene class")
-    registrations: list[str] = []
-    checkpoints: list[str] = []
-    beat_ids: list[str] = []
-    animations: list[str] = []
-    for node in ast.walk(tree):
-        if not isinstance(node, ast.Call) or not isinstance(node.func, ast.Attribute):
-            continue
-        method = node.func.attr
-        if method == "register_visual":
-            value = _literal_string(node.args[1]) if len(node.args) > 1 else None
-            if value is None:
-                value = _keyword_string(node, "object_id")
-            if value is not None:
-                registrations.append(value)
-        elif method == "checkpoint":
-            checkpoint = _literal_string(node.args[0]) if node.args else None
-            if checkpoint is not None:
-                checkpoints.append(checkpoint)
-            beat_id = _keyword_string(node, "beat_id")
-            if beat_id is not None:
-                beat_ids.append(beat_id)
-        elif method == "play":
-            animations.extend(_animation_names(node.args))
-    return _CodeEvidence(
-        registrations=tuple(dict.fromkeys(registrations)),
-        checkpoints=tuple(dict.fromkeys(checkpoints)),
-        beat_ids=tuple(dict.fromkeys(beat_ids)),
-        animations=tuple(animations),
-    )
-
-
-def _literal_string(node: ast.AST) -> str | None:
-    return node.value if isinstance(node, ast.Constant) and isinstance(node.value, str) else None
-
-
-def _keyword_string(node: ast.Call, name: str) -> str | None:
-    for keyword in node.keywords:
-        if keyword.arg == name:
-            return _literal_string(keyword.value)
-    return None
-
-
-def _animation_names(nodes: list[ast.AST]) -> list[str]:
-    names: list[str] = []
-    for root in nodes:
-        for node in ast.walk(root):
-            if not isinstance(node, ast.Call):
-                continue
-            if isinstance(node.func, ast.Name):
-                names.append(node.func.id)
-            elif isinstance(node.func, ast.Attribute) and node.func.attr in {
-                "shift",
-                "move_to",
-                "rotate",
-                "scale",
-            }:
-                names.append(node.func.attr)
-    return names
 
 
 def _validate_capabilities(
@@ -3279,14 +2987,6 @@ def _string_list(value: object, label: str, reasons: list[str]) -> list[str]:
     if len(values) != len(set(values)):
         reasons.append(f"{label} must not contain duplicates")
     return values
-
-
-def _read_plan(path: Path) -> ScenePlan:
-    document = _read_object(path)
-    version = document.pop("schema_version", None)
-    if version is not None and version != "visual.scene-plan/1":
-        raise ValueError("unsupported scene-plan schema version")
-    return ScenePlan.model_validate(document)
 
 
 def _safe_reference(root: Path, relative: Path) -> Path:

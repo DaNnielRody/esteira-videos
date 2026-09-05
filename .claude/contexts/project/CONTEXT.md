@@ -113,9 +113,8 @@ modelo ou execução de mídia.
 - `Project` usa estados explícitos de timeline, render e composição; run
   solicitado, status e hashes devem coincidir antes de qualquer publicação.
 - A validação pública do golden usa o envelope `golden.manifest/1`, `version: 1`,
-  `profile: visual|audiovisual`, `status: accepted`, `project_id`, `title` e
-  `capabilities`. O dispatch por profile é explícito; profile ausente ou
-  desconhecido é erro.
+  `profile: audiovisual`, `status: accepted`, `project_id`, `title` e
+  `capabilities`. Profile ausente ou desconhecido é erro.
 - A aceitação valida timeline, script, áudio, pacote de cena, candidatos,
   composição e fatos finais. A validação posterior recompõe os mesmos hashes e
   lê os snapshots imutáveis do golden.

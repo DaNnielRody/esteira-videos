@@ -17,7 +17,7 @@ def test_default_registry_exposes_only_evidenced_initial_capabilities() -> None:
     selected = registry.require(["typography", "equations"])
 
     assert [item.id for item in selected] == ["typography", "equations"]
-    assert all(item.supported and item.golden_projects for item in selected)
+    assert all(item.supported and item.evidence_tests for item in selected)
 
 
 def test_registry_rejects_unproven_capability_instead_of_claiming_support() -> None:

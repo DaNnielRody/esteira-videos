@@ -6,6 +6,7 @@ import hashlib
 import json
 import math
 import os
+import shutil
 import subprocess
 import tempfile
 import time
@@ -17,7 +18,7 @@ from typing import Protocol
 
 from video_pipeline.capabilities import CapabilityRegistry
 from video_pipeline.observation import SceneObserver
-from video_pipeline.pipeline import PipelineState, RenderPipeline
+from video_pipeline.pipeline import PipelineEvent, PipelineState, RenderPipeline
 from video_pipeline.project import (
     Project,
     ProjectSceneRef,
@@ -109,6 +110,14 @@ class VideoResult:
     run_path: Path
     output_path: Path | None = None
     error: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class ProjectPipelineEvent(PipelineEvent):
+    """A scene progress event annotated with its containing project run."""
+
+    project_run_id: str
+    scene_id: str
 
 
 class VideoComposer(Protocol):
@@ -417,9 +426,18 @@ class VideoPipeline:
         *,
         max_attempts: int = 3,
         scene: str | None = None,
+        base_run_id: str | None = None,
+        correction: str | None = None,
+        on_progress: Callable[[ProjectPipelineEvent], None] | None = None,
     ) -> VideoResult:
         """Render all or one confirmed timeline scene and publish final media."""
 
+        if (
+            isinstance(max_attempts, bool)
+            or not isinstance(max_attempts, int)
+            or max_attempts <= 0
+        ):
+            raise ValueError("max_attempts must be a positive integer")
         project_json = Path(project_path).resolve()
         project, timeline = validate_project_timeline(project_json)
         if timeline.status != "confirmed":
@@ -431,11 +449,24 @@ class VideoPipeline:
             timeline.segments,
             scene,
         )
+        selective_requested = base_run_id is not None or correction is not None
+        if selective_requested:
+            if selected_scene_id is None:
+                raise ValueError("base run and correction require an explicit scene")
+            if (base_run_id is None) != (correction is None):
+                raise ValueError("base run and correction must be provided together")
+            assert base_run_id is not None
+            assert correction is not None
+            base_run_id = base_run_id.strip()
+            correction = correction.strip()
+            if not base_run_id or not correction:
+                raise ValueError("base run and correction must not be blank")
         input_hashes = _project_input_hashes(project_root, project)
         package_hashes = _project_package_hashes(project_root, project)
         existing_run_id = project.current_run
         is_resume = (
-            existing_run_id is not None
+            not selective_requested
+            and existing_run_id is not None
             and project.status in {ProjectState.failed, ProjectState.rendering}
         )
         run_id: str
@@ -444,6 +475,14 @@ class VideoPipeline:
             assert existing_run_id is not None
             run_id = existing_run_id
             run_path, run_document = self._load_failed_run(project_root, run_id)
+            selective_metadata = _selective_resume_metadata(
+                run_document,
+                run_id=run_id,
+                scene_ids=tuple(segment.id for segment in timeline.segments),
+            )
+            if selective_metadata is not None:
+                base_run_id, selected_scene_id, correction = selective_metadata
+                selective_requested = True
             self._validate_resume_run(
                 project,
                 timeline.segments,
@@ -497,38 +536,56 @@ class VideoPipeline:
                 }
             )
         else:
-            run_id, run_path = self._create_run(project_root)
-            scene_records = [
-                {
-                    "id": segment.id,
-                    "order": segment.order,
-                    "plan_path": scene_ref.plan_path,
-                    "state": "queued",
-                    "attempts": 0,
-                    "attempt_history": [],
-                    "diagnostics": None,
-                    "diagnostics_path": None,
-                    "diagnostics_sha256": None,
-                    "observation_path": None,
-                    "observation_sha256": None,
-                    "quality_path": None,
-                    "quality_sha256": None,
-                    "run_path": None,
-                    "code_path": None,
-                    "provenance_path": None,
-                    "provenance_sha256": None,
-                    "raw_path": None,
-                    "normalized_path": None,
-                    "normalization_path": None,
-                    "action_next": "render scene",
-                    "error": None,
-                }
-                for segment, scene_ref in zip(
+            base_run_path: Path | None = None
+            if selective_requested:
+                assert base_run_id is not None
+                base_run_path, _, base_scene_records = self._load_ready_base_run(
+                    project,
                     timeline.segments,
-                    project.scenes,
-                    strict=True,
+                    project_root,
+                    base_run_id,
+                    input_hashes,
+                    package_hashes,
                 )
-            ]
+            run_id, run_path = self._create_run(
+                project_root,
+                forbidden_run_id=base_run_id if selective_requested else None,
+            )
+            try:
+                if selective_requested:
+                    assert base_run_path is not None
+                    scene_records = []
+                    for segment, scene_ref, base_record in zip(
+                        timeline.segments,
+                        project.scenes,
+                        base_scene_records,
+                        strict=True,
+                    ):
+                        if segment.id == selected_scene_id:
+                            scene_records.append(_new_scene_record(segment, scene_ref))
+                        else:
+                            scene_records.append(
+                                self._clone_ready_scene(
+                                    project_root,
+                                    base_run_path,
+                                    run_path,
+                                    segment,
+                                    scene_ref,
+                                    base_record,
+                                )
+                            )
+                else:
+                    scene_records = [
+                        _new_scene_record(segment, scene_ref)
+                        for segment, scene_ref in zip(
+                            timeline.segments,
+                            project.scenes,
+                            strict=True,
+                        )
+                    ]
+            except BaseException:
+                shutil.rmtree(run_path, ignore_errors=True)
+                raise
             run_document = {
                 "schema_version": "project.render-run/1",
                 "run_id": run_id,
@@ -549,6 +606,16 @@ class VideoPipeline:
                 "action_next": "complete the render before accepting this run",
                 "error": None,
             }
+            if selective_requested:
+                assert base_run_id is not None
+                assert correction is not None
+                run_document.update(
+                    {
+                        "base_run_id": base_run_id,
+                        "selected_scene_id": selected_scene_id,
+                        "correction": correction,
+                    }
+                )
         _validate_run_current_scene(
             run_document,
             [segment.id for segment in timeline.segments],
@@ -578,10 +645,13 @@ class VideoPipeline:
                     )
                 )
             except BaseException:
-                try:
-                    run_path.rmdir()
-                except OSError:
-                    pass
+                if selective_requested:
+                    shutil.rmtree(run_path, ignore_errors=True)
+                else:
+                    try:
+                        run_path.rmdir()
+                    except OSError:
+                        pass
                 raise
 
         profile = CompositionProfile(
@@ -648,8 +718,15 @@ class VideoPipeline:
                     max_attempts=max_attempts,
                     profile=profile,
                     record=record,
+                    correction=(
+                        correction
+                        if selective_requested and segment.id == selected_scene_id
+                        else None
+                    ),
+                    on_progress=on_progress,
                 )
                 normalized_paths.append(normalized_path)
+                record["error"] = None
                 record["state"] = "ready"
                 record["action_next"] = "include normalized scene in composition"
                 run_document["current_scene"] = None
@@ -859,15 +936,19 @@ class VideoPipeline:
     ) -> tuple[Path, dict[str, object]]:
         """Load the failed or interrupted run selected for a safe resume."""
 
-        if not run_id or Path(run_id).name != run_id or run_id in {".", ".."}:
-            raise ValueError("failed run ID must be a safe non-empty name")
-        root = (self.output_root or project_root / "artifacts").resolve()
-        run_path = (root / run_id).resolve()
+        _validate_safe_run_id(run_id, label="failed run ID")
+        root = _artifact_root(project_root, self.output_root)
+        run_entry = root / run_id
+        if run_entry.is_symlink():
+            raise ValueError("failed run path must not be a symlink")
+        run_path = run_entry.resolve()
         try:
             run_path.relative_to(root)
         except ValueError as exc:
             raise ValueError("failed run path escapes the artifact root") from exc
         run_document_path = run_path / "run.json"
+        if run_document_path.is_symlink():
+            raise ValueError("failed run run.json must be a regular file")
         if not run_document_path.is_file():
             raise ValueError(
                 "failed run evidence is missing; start a new run explicitly"
@@ -878,6 +959,106 @@ class VideoPipeline:
         if run_document.get("state") not in {"failed", "rendering", "composing"}:
             raise ValueError("current run is not a resumable run")
         return run_path, run_document
+
+    def _load_ready_base_run(
+        self,
+        project: Project,
+        segments: Sequence[TimelineSegment],
+        project_root: Path,
+        base_run_id: str,
+        input_hashes: Mapping[str, str],
+        package_hashes: Mapping[str, str],
+    ) -> tuple[Path, dict[str, object], list[dict[str, object]]]:
+        """Load and fully validate a ready run before selective regeneration."""
+
+        _validate_safe_run_id(base_run_id, label="base run ID")
+        artifacts_root = _artifact_root(project_root, self.output_root)
+        base_run_entry = artifacts_root / base_run_id
+        if base_run_entry.is_symlink():
+            raise ValueError("base run path must not be a symlink")
+        base_run_path = _safe_child_path(
+            artifacts_root,
+            base_run_id,
+            label="base run",
+        )
+        run_json = base_run_path / "run.json"
+        if run_json.is_symlink():
+            raise ValueError("base run run.json must be a regular file")
+        if not run_json.is_file():
+            raise ValueError(f"base run evidence is missing: {run_json}")
+        run_document = _load_json_document(run_json)
+        if not run_document:
+            raise ValueError(f"base run evidence is invalid: {run_json}")
+        if run_document.get("run_id") != base_run_id:
+            raise ValueError("base run document ID does not match requested base run")
+        if run_document.get("state") != "ready":
+            raise ValueError("base run must be ready before selective regeneration")
+        if "current_scene" not in run_document or run_document.get("current_scene") is not None:
+            raise ValueError("base run current_scene must be null")
+        if run_document.get("project_id") != project.id:
+            raise ValueError("base run project ID does not match project")
+        if run_document.get("input_hashes") != dict(input_hashes):
+            raise ValueError("base run input hashes do not match current project")
+        if run_document.get("package_hashes") != dict(package_hashes):
+            raise ValueError("base run package hashes do not match current project")
+        try:
+            _validate_reusable_final_attestation(
+                base_run_path,
+                run_document,
+                required=True,
+            )
+        except (OSError, ValueError) as exc:
+            raise ValueError(f"base run final attestation is invalid: {exc}") from exc
+        try:
+            records = _resume_scene_records(run_document, segments, project.scenes)
+        except (OSError, ValueError) as exc:
+            raise ValueError(f"base run scene records are invalid: {exc}") from exc
+        if any(record.get("state") != "ready" for record in records):
+            raise ValueError("base run must have every scene ready")
+        for segment, scene_ref, record in zip(
+            segments,
+            project.scenes,
+            records,
+            strict=True,
+        ):
+            base_scene_path = _safe_child_path(
+                base_run_path,
+                scene_ref.path,
+                label="base scene",
+            )
+            base_pipeline_path = _safe_child_path(
+                base_run_path,
+                f"pipeline/{segment.id}",
+                label="base scene pipeline",
+            )
+            _validate_reusable_source_tree(
+                base_scene_path,
+                label=f"base scene {segment.id}",
+                expected_root_files={
+                    "raw.mp4",
+                    "normalized.mp4",
+                    "normalization.json",
+                    "scene.py",
+                    "code-provenance.json",
+                },
+            )
+            _validate_reusable_source_tree(
+                base_pipeline_path,
+                label=f"base scene pipeline {segment.id}",
+            )
+            try:
+                self._validate_reusable_scene(
+                    project_root,
+                    base_run_path,
+                    segment,
+                    scene_ref,
+                    record,
+                )
+            except (OSError, ValueError) as exc:
+                raise ValueError(
+                    f"base run scene {segment.id} evidence is invalid: {exc}"
+                ) from exc
+        return base_run_path, run_document, records
 
     def _validate_resume_run(
         self,
@@ -1062,14 +1243,103 @@ class VideoPipeline:
                 )
         return normalized_path
 
-    def _create_run(self, project_root: Path) -> tuple[str, Path]:
-        root = self.output_root or project_root / "artifacts"
+    def _clone_ready_scene(
+        self,
+        project_root: Path,
+        base_run_path: Path,
+        new_run_path: Path,
+        segment: TimelineSegment,
+        scene_ref: ProjectSceneRef,
+        record: Mapping[str, object],
+    ) -> dict[str, object]:
+        """Atomically clone one ready scene and its inner pipeline evidence."""
+
+        if not new_run_path.is_dir():
+            raise ValueError(f"new run path does not exist: {new_run_path}")
+        base_scene_path = _safe_child_path(
+            base_run_path,
+            scene_ref.path,
+            label="base scene",
+        )
+        base_pipeline_path = _safe_child_path(
+            base_run_path,
+            f"pipeline/{segment.id}",
+            label="base scene pipeline",
+        )
+        new_scene_path = _safe_child_path(
+            new_run_path,
+            scene_ref.path,
+            label="new scene",
+        )
+        new_pipeline_path = _safe_child_path(
+            new_run_path,
+            f"pipeline/{segment.id}",
+            label="new scene pipeline",
+        )
+        if not base_scene_path.is_dir() or not base_pipeline_path.is_dir():
+            raise ValueError(f"base run scene evidence is missing: {segment.id}")
+        if os.path.lexists(new_scene_path) or os.path.lexists(new_pipeline_path):
+            raise ValueError(f"new run scene destinations already exist: {segment.id}")
+
+        cloned_value = _rebase_absolute_paths(record, base_run_path, new_run_path)
+        if not isinstance(cloned_value, dict):
+            raise ValueError(f"base run scene record is not an object: {segment.id}")
+        cloned_record = cloned_value
+        cloned_record["error"] = None
+        staging_path: Path | None = None
+        published_paths: list[Path] = []
+        try:
+            staging_path = Path(
+                tempfile.mkdtemp(
+                    prefix=f".scene-{segment.id}-",
+                    dir=new_run_path,
+                )
+            )
+            staged_scene_path = staging_path / scene_ref.path
+            staged_pipeline_path = staging_path / "pipeline" / segment.id
+            shutil.copytree(base_scene_path, staged_scene_path)
+            shutil.copytree(base_pipeline_path, staged_pipeline_path)
+            staged_scene_path.parent.mkdir(parents=True, exist_ok=True)
+            staged_pipeline_path.parent.mkdir(parents=True, exist_ok=True)
+            new_scene_path.parent.mkdir(parents=True, exist_ok=True)
+            new_pipeline_path.parent.mkdir(parents=True, exist_ok=True)
+            staged_scene_path.replace(new_scene_path)
+            published_paths.append(new_scene_path)
+            staged_pipeline_path.replace(new_pipeline_path)
+            published_paths.append(new_pipeline_path)
+            self._validate_reusable_scene(
+                project_root,
+                new_run_path,
+                segment,
+                scene_ref,
+                cloned_record,
+            )
+            return cloned_record
+        except BaseException:
+            for published_path in reversed(published_paths):
+                if published_path.is_dir() or published_path.is_symlink():
+                    shutil.rmtree(published_path, ignore_errors=True)
+            raise
+        finally:
+            if staging_path is not None:
+                shutil.rmtree(staging_path, ignore_errors=True)
+
+    def _create_run(
+        self,
+        project_root: Path,
+        *,
+        forbidden_run_id: str | None = None,
+    ) -> tuple[str, Path]:
+        root = _artifact_root(project_root, self.output_root)
         root.mkdir(parents=True, exist_ok=True)
         while True:
             run_id = self.id_factory()
-            if not run_id or Path(run_id).name != run_id or run_id in {".", ".."}:
-                raise ValueError("run id must be a safe non-empty name")
+            _validate_safe_run_id(run_id, label="run id")
+            if forbidden_run_id is not None and run_id == forbidden_run_id:
+                raise ValueError("base run ID must differ from the new run ID")
             run_path = root / run_id
+            if run_path.is_symlink():
+                raise ValueError("run path must not be a symlink")
             try:
                 run_path.mkdir()
             except FileExistsError:
@@ -1088,6 +1358,8 @@ class VideoPipeline:
         max_attempts: int,
         profile: CompositionProfile,
         record: dict[str, object],
+        correction: str | None = None,
+        on_progress: Callable[[ProjectPipelineEvent], None] | None = None,
     ) -> Path:
         # The public project contract has already validated these values; the
         # concrete models are reloaded here so generated requests use the
@@ -1099,7 +1371,11 @@ class VideoPipeline:
         spec = SceneSpec(
             id=plan.id,
             scene_name=plan.scene_name,
-            description=plan.objective,
+            description=(
+                plan.objective
+                if correction is None
+                else f"{plan.objective}\n\nEditorial correction: {correction}"
+            ),
             plan=plan,
         )
         previous_attempts = _record_attempts(record)
@@ -1133,11 +1409,29 @@ class VideoPipeline:
             temporal_validator=self.normalized_validator,
             temporal_tolerances=self.temporal_tolerances,
         )
+        def emit_project_event(event: PipelineEvent) -> None:
+            if on_progress is None:
+                return
+            project_event = ProjectPipelineEvent(
+                run_id=event.run_id,
+                attempt=event.attempt,
+                stage=event.stage,
+                state=event.state,
+                observation=event.observation,
+                project_run_id=run_id,
+                scene_id=segment.id,
+            )
+            try:
+                on_progress(project_event)
+            except Exception:
+                return
+
         result = scene_pipeline.render(
             spec,
             max_attempts=max_attempts,
             previous_scene=previous_scene,
             next_scene=next_scene,
+            on_progress=emit_project_event if on_progress is not None else None,
         )
         project_attempt_base = _project_attempt_base(record)
         pipeline_history = _pipeline_attempt_history(
@@ -1266,6 +1560,67 @@ class VideoPipeline:
         return normalized_path
 
 
+def _rebase_absolute_paths(
+    value: object,
+    base_run_path: Path,
+    new_run_path: Path,
+) -> object:
+    """Deep-copy JSON-shaped values, rebasing absolute paths under ``base``."""
+    base_root = base_run_path.resolve()
+    new_root = new_run_path.resolve()
+    json_object = _json_object(value)
+    if json_object is not None:
+        return {
+            key: _rebase_absolute_paths(item, base_root, new_root)
+            for key, item in json_object.items()
+        }
+    if isinstance(value, list):
+        return [_rebase_absolute_paths(item, base_root, new_root) for item in value]
+    if isinstance(value, str):
+        candidate = Path(value)
+        if candidate.is_absolute():
+            try:
+                relative = candidate.resolve().relative_to(base_root)
+            except (OSError, ValueError):
+                pass
+            else:
+                return str(new_root / relative)
+        return value.replace(str(base_root), str(new_root))
+    return value
+
+
+def _new_scene_record(
+    segment: TimelineSegment,
+    scene_ref: ProjectSceneRef,
+) -> dict[str, object]:
+    """Create the initial queued evidence record for one project scene."""
+
+    return {
+        "id": segment.id,
+        "order": segment.order,
+        "plan_path": scene_ref.plan_path,
+        "state": "queued",
+        "attempts": 0,
+        "attempt_history": [],
+        "diagnostics": None,
+        "diagnostics_path": None,
+        "diagnostics_sha256": None,
+        "observation_path": None,
+        "observation_sha256": None,
+        "quality_path": None,
+        "quality_sha256": None,
+        "run_path": None,
+        "code_path": None,
+        "provenance_path": None,
+        "provenance_sha256": None,
+        "raw_path": None,
+        "normalized_path": None,
+        "normalization_path": None,
+        "action_next": "render scene",
+        "error": None,
+    }
+
+
 def _project_input_hashes(project_root: Path, project: Project) -> dict[str, str]:
     """Hash the immutable project inputs used by a render run."""
 
@@ -1387,6 +1742,71 @@ def _validate_run_current_scene(
         raise ValueError("run current_scene must be a known scene ID or null")
 
 
+def _selective_resume_metadata(
+    run_document: Mapping[str, object],
+    *,
+    run_id: str,
+    scene_ids: Sequence[str],
+) -> tuple[str, str, str] | None:
+    """Validate the persisted lineage needed to resume a selective run."""
+
+    metadata_keys = ("base_run_id", "selected_scene_id", "correction")
+    present = [key for key in metadata_keys if key in run_document]
+    if not present:
+        return None
+    if len(present) != len(metadata_keys):
+        raise ValueError(
+            "selective run metadata must include base_run_id, "
+            "selected_scene_id, and correction"
+        )
+
+    raw_base_run_id = run_document["base_run_id"]
+    raw_selected_scene_id = run_document["selected_scene_id"]
+    raw_correction = run_document["correction"]
+    if (
+        not isinstance(raw_base_run_id, str)
+        or not isinstance(raw_selected_scene_id, str)
+        or not isinstance(raw_correction, str)
+    ):
+        raise ValueError("selective run metadata values must be strings")
+
+    base_run_id = raw_base_run_id.strip()
+    selected_scene_id = raw_selected_scene_id.strip()
+    correction = raw_correction.strip()
+    _validate_safe_run_id(base_run_id, label="base run ID")
+    if base_run_id == run_id:
+        raise ValueError("base run ID must differ from the resumed run ID")
+    if not selected_scene_id or selected_scene_id not in set(scene_ids):
+        raise ValueError("selective run selected_scene_id must be a known scene")
+    if not correction:
+        raise ValueError("selective run correction must not be blank")
+    return base_run_id, selected_scene_id, correction
+
+
+def _artifact_root(project_root: Path, output_root: Path | None) -> Path:
+    """Resolve the artifact root without following the project's root symlink."""
+
+    canonical_root = project_root / "artifacts"
+    if canonical_root.is_symlink():
+        if output_root is None or output_root.resolve() == canonical_root.resolve():
+            raise ValueError("project artifacts root must not be a symlink")
+    root = output_root if output_root is not None else canonical_root
+    return root.resolve()
+
+
+def _validate_safe_run_id(value: object, *, label: str) -> None:
+    """Reject run identifiers that can escape their artifact directory."""
+
+    if (
+        not isinstance(value, str)
+        or not value.strip()
+        or Path(value).name != value
+        or value in {".", ".."}
+        or "\\" in value
+    ):
+        raise ValueError(f"{label} must be a safe non-empty name")
+
+
 def _safe_child_path(base: Path, relative_path: str, *, label: str) -> Path:
     """Resolve a path beneath a known artifact root."""
 
@@ -1404,6 +1824,52 @@ def _safe_child_path(base: Path, relative_path: str, *, label: str) -> Path:
     except ValueError as exc:
         raise ValueError(f"{label} path escapes its root") from exc
     return candidate
+
+
+def _validate_reusable_source_tree(
+    root: Path,
+    *,
+    label: str,
+    expected_root_files: set[str] | None = None,
+) -> None:
+    """Reject unsafe base evidence before any selective clone is created."""
+
+    if root.is_symlink():
+        raise ValueError(f"{label} contains symlink: {root}")
+    if not root.is_dir():
+        raise ValueError(f"{label} contains an unmanifested non-regular root: {root}")
+
+    observed_root_entries: set[str] = set()
+    pending = [root]
+    while pending:
+        current = pending.pop()
+        try:
+            entries = list(os.scandir(current))
+        except OSError as exc:
+            raise ValueError(f"{label} cannot be inspected: {exc}") from exc
+        for entry in entries:
+            entry_path = Path(entry.path)
+            if current == root:
+                observed_root_entries.add(entry.name)
+            if entry.is_symlink():
+                raise ValueError(f"{label} contains symlink: {entry_path}")
+            if entry.is_dir(follow_symlinks=False):
+                pending.append(entry_path)
+            elif not entry.is_file(follow_symlinks=False):
+                raise ValueError(
+                    f"{label} contains an unmanifested non-regular entry: {entry_path}"
+                )
+
+    if expected_root_files is None:
+        return
+    missing = expected_root_files - observed_root_entries
+    if missing:
+        names = ", ".join(sorted(missing))
+        raise ValueError(f"{label} is missing manifest entries: {names}")
+    extras = observed_root_entries - expected_root_files
+    if extras:
+        names = ", ".join(sorted(extras))
+        raise ValueError(f"{label} contains unmanifested entries: {names}")
 
 
 def _record_path(
@@ -1604,12 +2070,16 @@ def _sha256_file(path: Path) -> str:
 def _validate_reusable_final_attestation(
     run_path: Path,
     run_document: Mapping[str, object],
+    *,
+    required: bool = False,
 ) -> None:
     """Reject a failed run carrying a stale ready-final attestation."""
 
     sha256 = run_document.get("final_sha256")
     size_bytes = run_document.get("final_size_bytes")
     if sha256 is None and size_bytes is None:
+        if required:
+            raise ValueError("stored final attestation is required; start a new run explicitly")
         return
     if not isinstance(sha256, str) or len(sha256) != 64:
         raise ValueError("stored final_sha256 is invalid; start a new run explicitly")
@@ -1849,7 +2319,7 @@ def _temporary_output_path(output_path: Path) -> Path:
         mode="wb",
         dir=output_path.parent,
         prefix=f".{output_path.name}.",
-        suffix=".tmp",
+        suffix=".tmp.mp4",
         delete=False,
     ) as handle:
         temporary = Path(handle.name)
@@ -1882,10 +2352,6 @@ def _run_ffmpeg(
         timeout=timeout,
         check=check,
     )
-
-
-def _composition_document(result: CompositionResult) -> dict[str, object]:
-    return result.to_document()
 
 
 def _write_json(path: Path, document: object) -> None:
@@ -1924,6 +2390,7 @@ __all__ = [
     "CompositionResult",
     "FinalCompositionValidator",
     "FFmpegComposer",
+    "ProjectPipelineEvent",
     "TemporalNormalizer",
     "VideoComposer",
     "VideoPipeline",

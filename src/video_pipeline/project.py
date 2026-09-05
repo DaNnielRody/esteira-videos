@@ -9,7 +9,7 @@ import re
 import shutil
 import subprocess
 import tempfile
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from enum import Enum
 from pathlib import Path, PurePosixPath
 from typing import Literal, Protocol
@@ -57,6 +57,10 @@ class ProjectStageState(str, Enum):
     review_required = "review_required"
     ready = "ready"
     failed = "failed"
+
+
+class ProjectInputValidationError(ValueError):
+    """The authored script cannot be materialized as a canonical timeline."""
 
 
 class AudioMediaFacts(BaseModel):
@@ -206,25 +210,35 @@ def initialize_project(
         )
         theme = VideoTheme.production()
         script_text = script_bytes.decode("utf-8")
-        explicit = build_explicit_timeline(
-            script_text,
-            facts.duration,
-            theme=theme,
-        )
+        try:
+            explicit = build_explicit_timeline(
+                script_text,
+                facts.duration,
+                theme=theme,
+            )
+        except ValueError as exc:
+            raise ProjectInputValidationError(str(exc)) from exc
         timeline = explicit[0] if explicit is not None else None
         plans = explicit[1] if explicit is not None else ()
         if timeline is None:
-            heading_sections = parse_heading_sections(script_text)
+            try:
+                heading_sections = parse_heading_sections(script_text)
+            except ValueError as exc:
+                raise ProjectInputValidationError(str(exc)) from exc
             if heading_sections is not None:
                 detector = silence_detector or FFmpegSilenceDetector(
                     subprocess_run=silence_subprocess_run
                 )
-                pause_aligned = build_pause_aligned_timeline(
-                    script_text,
-                    facts.duration,
-                    detector(staging_path / audio_relative),
-                    theme=theme,
-                )
+                pauses = detector(staging_path / audio_relative)
+                try:
+                    pause_aligned = build_pause_aligned_timeline(
+                        script_text,
+                        facts.duration,
+                        pauses,
+                        theme=theme,
+                    )
+                except ValueError as exc:
+                    raise ProjectInputValidationError(str(exc)) from exc
                 timeline = pause_aligned[0] if pause_aligned is not None else None
                 plans = pause_aligned[1] if pause_aligned is not None else ()
         scene_references: list[ProjectSceneRef] = []
@@ -1324,7 +1338,11 @@ def _atomic_update_json_documents(
     _atomic_update_payloads(payloads)
 
 
-def _atomic_update_payloads(payloads: tuple[tuple[Path, bytes], ...]) -> None:
+def _atomic_update_payloads(
+    payloads: tuple[tuple[Path, bytes], ...],
+    *,
+    validate: Callable[[], None] | None = None,
+) -> None:
     """Publish unique byte payloads with rollback on any replacement failure."""
 
     destinations = tuple(path.resolve() for path, _ in payloads)
@@ -1355,6 +1373,8 @@ def _atomic_update_payloads(payloads: tuple[tuple[Path, bytes], ...]) -> None:
         for (path, _), temporary in zip(normalized_payloads, new_temporaries, strict=True):
             temporary.replace(path)
             replaced.append((path, backups[path]))
+        if validate is not None:
+            validate()
     except BaseException as exc:
         rollback_failures: list[tuple[Path, BaseException]] = []
         for path, backup in reversed(replaced):
@@ -1521,6 +1541,7 @@ __all__ = [
     "AudioMediaFacts",
     "AudioProbe",
     "Project",
+    "ProjectInputValidationError",
     "ProjectSceneRef",
     "ProjectStageState",
     "ProjectState",

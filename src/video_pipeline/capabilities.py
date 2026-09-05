@@ -46,8 +46,8 @@ class VisualCapability(BaseModel):
         return value
 
     def model_post_init(self, __context: object) -> None:
-        if self.supported and (not self.golden_projects or not self.evidence_tests):
-            raise ValueError("a supported capability requires golden_projects and evidence_tests")
+        if self.supported and not self.evidence_tests:
+            raise ValueError("a supported capability requires evidence_tests")
 
 
 class CapabilityRegistry:
@@ -110,7 +110,6 @@ def _supported(
     helpers: list[str],
     expectations: list[str],
     critics: list[str],
-    examples: list[str],
 ) -> VisualCapability:
     return VisualCapability(
         id=capability_id,
@@ -118,9 +117,7 @@ def _supported(
         helpers=helpers,
         expectations_supported=expectations,
         critics_applicable=critics,
-        examples=examples,
         limitations=["Validated for 2D Cairo scenes at the production resolution."],
-        golden_projects=["2026_visual_foundation"],
         evidence_tests=["tests/test_capabilities.py", "tests/test_visual_critics.py"],
     )
 
@@ -136,7 +133,6 @@ def default_capability_registry() -> CapabilityRegistry:
                 helpers=["VisualScene.register_visual", "theme.font_sizes"],
                 expectations=["text", "latex"],
                 critics=["safe_area", "contrast", "legibility", "plan_coherence"],
-                examples=["projects/2026_visual_foundation/scenes/02_equation"],
             ),
             _supported(
                 "equations",
@@ -144,7 +140,6 @@ def default_capability_registry() -> CapabilityRegistry:
                 helpers=["MathTex", "LatexExpectation"],
                 expectations=["latex"],
                 critics=["safe_area", "contrast", "legibility"],
-                examples=["projects/2026_visual_foundation/scenes/02_equation"],
             ),
             _supported(
                 "basic_geometry",
@@ -152,7 +147,6 @@ def default_capability_registry() -> CapabilityRegistry:
                 helpers=["Circle", "Square", "Arrow", "Transform"],
                 expectations=["beats", "shape", "motion"],
                 critics=["safe_area", "overlap", "rhythm", "plan_coherence"],
-                examples=["projects/2026_visual_foundation/scenes/01_geometry"],
             ),
             VisualCapability(
                 id="coordinate_systems",
