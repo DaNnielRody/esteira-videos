@@ -1,7 +1,11 @@
 # Contrato do sandbox
 
-O sandbox executa os gates determinísticos do projeto sem modelo, rede,
-download, integração ou mídia real:
+O sandbox executa os gates determinísticos do projeto sem modelo, rede ou
+download durante os testes. A calibração usa renders locais pequenos de
+Manim/FFmpeg/LaTeX mesmo fora da marca `integration`; essas ferramentas devem
+estar instaladas antes da execução. No Ubuntu, LaTeX requer
+`texlive-latex-extra`, `texlive-fonts-recommended` e `dvisvgm`, além das
+dependências Cairo/Pango e FFmpeg do renderer.
 
 ```bash
 .venv/bin/python -m pytest -q -m "not integration"
@@ -38,5 +42,6 @@ suas fronteiras dinâmicas de provider, subprocesso e argparse. Esses módulos
 continuam sob Ruff e testes comportamentais determinísticos; a exclusão não é
 uma alegação de tipagem estrita não verificada.
 
-Os testes substituem provider, Manim, FFmpeg, ffprobe e sensores por fakes.
-Testes de integração ficam marcados e não fazem parte do gate padrão.
+Os testes de orquestração substituem provider, renderer e sensores por fakes;
+os testes de calibração conferem fixtures locais com o renderer real. Testes
+marcados como integração não fazem parte do gate padrão.

@@ -23,7 +23,10 @@ jobs:
       - name: Install renderer system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y ffmpeg libcairo2-dev libpango1.0-dev pkg-config fonts-dejavu-core fonts-liberation
+          sudo apt-get install -y --no-install-recommends \
+            ffmpeg libcairo2-dev libpango1.0-dev pkg-config \
+            fonts-dejavu-core fonts-liberation \
+            texlive-latex-extra texlive-fonts-recommended dvisvgm
       - name: Install locked Python dependencies
         run: uv sync --frozen --group dev
       - name: Check approved reference availability and hashes
