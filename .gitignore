@@ -1,0 +1,34 @@
+.claude/tmp/
+.claude/memory.db
+.claude/hooks/memory-reconcile.sh
+.codegraph/
+.venv/
+.env
+.env.*
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+projects/*/artifacts/
+
+# Generated runs and historical video iterations remain local.
+/artifacts/
+/audio/
+/media/
+/projects/
+/visual-facts.json
+/@@finding=*
+
+# Publish only the explicitly approved direction reference and its package.
+/videos/*
+!/videos/llm_fundation/
+/videos/llm_fundation/*
+!/videos/llm_fundation/README.md
+!/videos/llm_fundation/master.mp4
+!/videos/llm_fundation/master-validation.json
+!/videos/llm_fundation/master-changelog.md
+!/videos/llm_fundation/master-scenes/
