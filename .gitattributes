@@ -11,3 +11,5 @@ videos/llm_fundation/master-scenes/**/*.zip filter=lfs diff=lfs merge=lfs -text
 videos/llm_fundation/master-scenes/_assets/*.html filter=lfs diff=lfs merge=lfs -text
 videos/llm_fundation/master-scenes/_assets/*.js filter=lfs diff=lfs merge=lfs -text
 assets/fonts/**/*.ttf filter=lfs diff=lfs merge=lfs -text
+docs/direction/golden-v1/**/*.mp4 filter=lfs diff=lfs merge=lfs -text
+docs/direction/golden-v1/**/*.jpg filter=lfs diff=lfs merge=lfs -text

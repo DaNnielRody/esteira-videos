@@ -1,0 +1,857 @@
+{
+  "schema": "visual.direction.golden/1",
+  "approved_source_id": "master",
+  "source_inventory": [
+    {
+      "id": "final",
+      "path": "videos/llm_fundation/final.mp4",
+      "sha256": "64cb5c96ec8b2fab409e4b145d198699b50fdd95fdf61e6932220908d7560121",
+      "bytes": 25422168,
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "frames": 22167,
+      "duration_seconds": 738.9,
+      "has_audio": true,
+      "validation_path": null,
+      "validation_hash_matches": null,
+      "baseline_sha256": null,
+      "approval": "historical-unrated",
+      "same_content_as": [
+        "final1"
+      ]
+    },
+    {
+      "id": "final1",
+      "path": "videos/llm_fundation/final1.mp4",
+      "sha256": "64cb5c96ec8b2fab409e4b145d198699b50fdd95fdf61e6932220908d7560121",
+      "bytes": 25422168,
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "frames": 22167,
+      "duration_seconds": 738.9,
+      "has_audio": true,
+      "validation_path": null,
+      "validation_hash_matches": null,
+      "baseline_sha256": null,
+      "approval": "historical-unrated",
+      "same_content_as": [
+        "final"
+      ]
+    },
+    {
+      "id": "final10",
+      "path": "videos/llm_fundation/final10.mp4",
+      "sha256": "def755cc1d213d706a489060329bd82957c7ad546ac68bb3abcd66792b0745ed",
+      "bytes": 50255671,
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "frames": 22167,
+      "duration_seconds": 738.9,
+      "has_audio": true,
+      "validation_path": "videos/llm_fundation/final10-validation.json",
+      "validation_hash_matches": true,
+      "baseline_sha256": null,
+      "approval": "historical-unrated",
+      "same_content_as": []
+    },
+    {
+      "id": "final11",
+      "path": "videos/llm_fundation/final11.mp4",
+      "sha256": "ab44f1227adaf7f489c52859da9997ed587a4ccfea528459dd3c12419336b1fc",
+      "bytes": 50076964,
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "frames": 22167,
+      "duration_seconds": 738.9,
+      "has_audio": true,
+      "validation_path": "videos/llm_fundation/final11-validation.json",
+      "validation_hash_matches": true,
+      "baseline_sha256": null,
+      "approval": "historical-unrated",
+      "same_content_as": []
+    },
+    {
+      "id": "final12",
+      "path": "videos/llm_fundation/final12.mp4",
+      "sha256": "19d6ba045755f5030914ebf4168e67405b5612e1a663e1d08b944e2b27790b29",
+      "bytes": 50846745,
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "frames": 22167,
+      "duration_seconds": 738.9,
+      "has_audio": true,
+      "validation_path": "videos/llm_fundation/final12-validation.json",
+      "validation_hash_matches": true,
+      "baseline_sha256": null,
+      "approval": "historical-unrated",
+      "same_content_as": []
+    },
+    {
+      "id": "final13",
+      "path": "videos/llm_fundation/final13.mp4",
+      "sha256": "4ef5853b60e369a1f1c844b6a831051352269b3a55b70d6f24a8601f9495bca2",
+      "bytes": 51083213,
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "frames": 22167,
+      "duration_seconds": 738.9,
+      "has_audio": true,
+      "validation_path": "videos/llm_fundation/final13-validation.json",
+      "validation_hash_matches": true,
+      "baseline_sha256": null,
+      "approval": "historical-unrated",
+      "same_content_as": []
+    },
+    {
+      "id": "final14-estrutural",
+      "path": "videos/llm_fundation/final14-estrutural.mp4",
+      "sha256": "4cbb2b72e30dbc5399e3491ce15afbb97430c0452daa7782f42f81a4ea303a37",
+      "bytes": 55763854,
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "frames": 22167,
+      "duration_seconds": 738.9,
+      "has_audio": true,
+      "validation_path": "videos/llm_fundation/final14-estrutural-validation.json",
+      "validation_hash_matches": true,
+      "baseline_sha256": "05a9014b19b66b40bffa936442ef983c45656d0b9e2b955c3733de6090c582ed",
+      "approval": "historical-unrated",
+      "same_content_as": []
+    },
+    {
+      "id": "final14",
+      "path": "videos/llm_fundation/final14.mp4",
+      "sha256": "05a9014b19b66b40bffa936442ef983c45656d0b9e2b955c3733de6090c582ed",
+      "bytes": 52945260,
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "frames": 22167,
+      "duration_seconds": 738.9,
+      "has_audio": true,
+      "validation_path": "videos/llm_fundation/final14-validation.json",
+      "validation_hash_matches": true,
+      "baseline_sha256": null,
+      "approval": "historical-unrated",
+      "same_content_as": []
+    },
+    {
+      "id": "final15",
+      "path": "videos/llm_fundation/final15.mp4",
+      "sha256": "053e4a9775372b789087d7163a8a08c16a3abbbaa2beeeac3479f94233382300",
+      "bytes": 60114480,
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "frames": 22167,
+      "duration_seconds": 738.9,
+      "has_audio": true,
+      "validation_path": "videos/llm_fundation/final15-validation.json",
+      "validation_hash_matches": true,
+      "baseline_sha256": "4cbb2b72e30dbc5399e3491ce15afbb97430c0452daa7782f42f81a4ea303a37",
+      "approval": "historical-unrated",
+      "same_content_as": []
+    },
+    {
+      "id": "final16",
+      "path": "videos/llm_fundation/final16.mp4",
+      "sha256": "fde140457ed6c184a40e1cd25deaab8ef87a9290377353c1ee48ef0df8056bc8",
+      "bytes": 60979089,
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "frames": 22167,
+      "duration_seconds": 738.9,
+      "has_audio": true,
+      "validation_path": "videos/llm_fundation/final16-validation.json",
+      "validation_hash_matches": true,
+      "baseline_sha256": "823d91cb40c4d485746d52ef77a1be53e371b70494f7cf84a186528b8f637b5f",
+      "approval": "historical-unrated",
+      "same_content_as": []
+    },
+    {
+      "id": "final17",
+      "path": "videos/llm_fundation/final17.mp4",
+      "sha256": "5280eba28868ed86b23de5e02fe1298cf1ffee3b7c8027391704785bd2d85f76",
+      "bytes": 61505317,
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "frames": 22167,
+      "duration_seconds": 738.9,
+      "has_audio": true,
+      "validation_path": "videos/llm_fundation/final17-validation.json",
+      "validation_hash_matches": true,
+      "baseline_sha256": "fde140457ed6c184a40e1cd25deaab8ef87a9290377353c1ee48ef0df8056bc8",
+      "approval": "historical-unrated",
+      "same_content_as": []
+    },
+    {
+      "id": "final2",
+      "path": "videos/llm_fundation/final2.mp4",
+      "sha256": "dcc0bf7069d04bb554224e556f7d5e16ce53ed91cfdf7182d90deca70d2428f1",
+      "bytes": 32891643,
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "frames": 22167,
+      "duration_seconds": 738.9,
+      "has_audio": true,
+      "validation_path": "videos/llm_fundation/final2-validation.json",
+      "validation_hash_matches": true,
+      "baseline_sha256": null,
+      "approval": "historical-unrated",
+      "same_content_as": []
+    },
+    {
+      "id": "final3",
+      "path": "videos/llm_fundation/final3.mp4",
+      "sha256": "0da4a5f96e8e26874da8e0ed004f29305a8d3465e92cfe3b52796b2b01b4c9e6",
+      "bytes": 30724163,
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "frames": 22167,
+      "duration_seconds": 738.9,
+      "has_audio": true,
+      "validation_path": "videos/llm_fundation/final3-validation.json",
+      "validation_hash_matches": true,
+      "baseline_sha256": null,
+      "approval": "historical-unrated",
+      "same_content_as": []
+    },
+    {
+      "id": "final4",
+      "path": "videos/llm_fundation/final4.mp4",
+      "sha256": "e284ac7019186aecfd73fd5fae4fb942a5b7236e451e4d38c4e07e3194da4320",
+      "bytes": 42376794,
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "frames": 22167,
+      "duration_seconds": 738.9,
+      "has_audio": true,
+      "validation_path": "videos/llm_fundation/final4-validation.json",
+      "validation_hash_matches": true,
+      "baseline_sha256": null,
+      "approval": "historical-unrated",
+      "same_content_as": []
+    },
+    {
+      "id": "final5",
+      "path": "videos/llm_fundation/final5.mp4",
+      "sha256": "e51579a429815daf3f378e3ece95a1011ea6d42427e8064e4c9ccf69b0c9c541",
+      "bytes": 49624515,
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "frames": 22167,
+      "duration_seconds": 738.9,
+      "has_audio": true,
+      "validation_path": "videos/llm_fundation/final5-validation.json",
+      "validation_hash_matches": true,
+      "baseline_sha256": null,
+      "approval": "historical-unrated",
+      "same_content_as": []
+    },
+    {
+      "id": "final6",
+      "path": "videos/llm_fundation/final6.mp4",
+      "sha256": "8afd8c80d9655a28a17333d939bc4af77f44e0e2a8494f418fd320679c078ad1",
+      "bytes": 49912149,
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "frames": 22167,
+      "duration_seconds": 738.9,
+      "has_audio": true,
+      "validation_path": "videos/llm_fundation/final6-validation.json",
+      "validation_hash_matches": true,
+      "baseline_sha256": null,
+      "approval": "historical-unrated",
+      "same_content_as": []
+    },
+    {
+      "id": "final7",
+      "path": "videos/llm_fundation/final7.mp4",
+      "sha256": "1fcd5b7b6f809e3d1302e72f5780194bef2327a0478a1d2533f2af3e412431b8",
+      "bytes": 51466279,
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "frames": 22167,
+      "duration_seconds": 738.9,
+      "has_audio": true,
+      "validation_path": "videos/llm_fundation/final7-validation.json",
+      "validation_hash_matches": true,
+      "baseline_sha256": null,
+      "approval": "historical-unrated",
+      "same_content_as": []
+    },
+    {
+      "id": "final8",
+      "path": "videos/llm_fundation/final8.mp4",
+      "sha256": "d4efe58badfb385c32429f47e0c6865fc2864c11dbc865043534b4aa7b30ecdc",
+      "bytes": 50178943,
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "frames": 22167,
+      "duration_seconds": 738.9,
+      "has_audio": true,
+      "validation_path": "videos/llm_fundation/final8-validation.json",
+      "validation_hash_matches": true,
+      "baseline_sha256": null,
+      "approval": "historical-unrated",
+      "same_content_as": []
+    },
+    {
+      "id": "final9",
+      "path": "videos/llm_fundation/final9.mp4",
+      "sha256": "bc09626547c27800f2ec7cd45570f8dcbbe18719feff2070a7dbe34e863ba5e2",
+      "bytes": 50239661,
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "frames": 22167,
+      "duration_seconds": 738.9,
+      "has_audio": true,
+      "validation_path": "videos/llm_fundation/final9-validation.json",
+      "validation_hash_matches": true,
+      "baseline_sha256": null,
+      "approval": "historical-unrated",
+      "same_content_as": []
+    },
+    {
+      "id": "master-2",
+      "path": "videos/llm_fundation/master-2.mp4",
+      "sha256": "058a54cd0dffbefcbcc3b1e9f14841525ed6a50897d70d998b8131642a46725d",
+      "bytes": 59804788,
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "frames": 22167,
+      "duration_seconds": 738.9,
+      "has_audio": true,
+      "validation_path": "videos/llm_fundation/master-2-validation.json",
+      "validation_hash_matches": true,
+      "baseline_sha256": "fde140457ed6c184a40e1cd25deaab8ef87a9290377353c1ee48ef0df8056bc8",
+      "approval": "historical-unrated",
+      "same_content_as": []
+    },
+    {
+      "id": "master-anterior-v1-backup",
+      "path": "videos/llm_fundation/master-anterior-v1.mp4.bak",
+      "sha256": "1ebeac7e83b8c9b6c26cefffe3fb8c61961f69f38247aeaae20b923fa4543a4e",
+      "bytes": 59860710,
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "frames": 22167,
+      "duration_seconds": 738.9,
+      "has_audio": true,
+      "validation_path": null,
+      "validation_hash_matches": null,
+      "baseline_sha256": null,
+      "approval": "historical-unrated",
+      "same_content_as": []
+    },
+    {
+      "id": "master",
+      "path": "videos/llm_fundation/master.mp4",
+      "sha256": "7d52455e20cecb8c958bafceceb250558640e85f581b804d94bc524b8c409f33",
+      "bytes": 59863231,
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "frames": 22167,
+      "duration_seconds": 738.9,
+      "has_audio": true,
+      "validation_path": "videos/llm_fundation/master-validation.json",
+      "validation_hash_matches": true,
+      "baseline_sha256": "03aaa41d5660ebd22032eb2576eabbc5e82bc36325258511399e48e6efec2b3c",
+      "approval": "user-approved-reference",
+      "same_content_as": []
+    },
+    {
+      "id": "hotfix-baseline",
+      "path": "artifacts/llm-fundation-hotfix-final/baseline.mp4",
+      "sha256": "e5055ceb932bfb72be194890374dee55591ad203265f0a80d094a70ac84ef7c1",
+      "bytes": 60542623,
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "frames": 22167,
+      "duration_seconds": 738.9,
+      "has_audio": true,
+      "validation_path": "artifacts/llm-fundation-hotfix-final/validation.json",
+      "validation_hash_matches": null,
+      "baseline_sha256": null,
+      "approval": "historical-unrated",
+      "same_content_as": []
+    }
+  ],
+  "provenance": "Local historical files inventoried by SHA-256; numbering is not an approval or chronological proof.",
+  "alignment": "Same original timeline window, 30 fps, [start_frame,end_frame_exclusive). Internal beat timing differs: matching timestamps do not imply matching semantic states.",
+  "derivatives": "1080p H.264 CRF18 + AAC160k excerpts, reencoded with source audio. Hashes identify packaged bytes, not reproducibility across ffmpeg versions.",
+  "scope": "Six sampled regression pairs and one positive control from one production. Historical videos are not globally labeled bad. No full audiovisual review or automatic artistic approval.",
+  "cases": [
+    {
+      "id": "word-progression",
+      "category": "timing",
+      "principles": [
+        "DV10",
+        "DV15"
+      ],
+      "kind": "regression-pair",
+      "observation": "Antes, a palavra inteira permanece igual nas amostras 108–113 s; no master, a inspeção destaca segmentos antes da separação.",
+      "acceptance": "A interpretação progride de palavra inteira para segmentos e tokens; um zoom isolado não satisfaz este critério.",
+      "review": {
+        "method": "assistant-sampled-frames-and-local-changelogs",
+        "full_audiovisual_review": false,
+        "sample_seconds": [
+          108,
+          111,
+          113,
+          116,
+          119,
+          122
+        ],
+        "human_pair_approval": false
+      },
+      "evidence": "evidence/videos/llm_fundation/final17-scenes/changelog.md",
+      "contact_sheet": "word-progression/samples.jpg",
+      "automation": "catalog-integrity-only; semantic verdict requires audiovisual review",
+      "clips": {
+        "before": {
+          "path": "word-progression/before.mp4",
+          "source_id": "final16",
+          "source_sha256": "fde140457ed6c184a40e1cd25deaab8ef87a9290377353c1ee48ef0df8056bc8",
+          "start_frame": 3210,
+          "end_frame_exclusive": 3900,
+          "expected_frames": 690,
+          "fps": "30/1",
+          "audio": true
+        },
+        "after": {
+          "path": "word-progression/after.mp4",
+          "source_id": "master",
+          "source_sha256": "7d52455e20cecb8c958bafceceb250558640e85f581b804d94bc524b8c409f33",
+          "start_frame": 3210,
+          "end_frame_exclusive": 3900,
+          "expected_frames": 690,
+          "fps": "30/1",
+          "audio": true
+        }
+      }
+    },
+    {
+      "id": "token-padding",
+      "category": "layout",
+      "principles": [
+        "DV14",
+        "DV15"
+      ],
+      "kind": "regression-pair",
+      "observation": "Antes, o 6 cruza a borda esquerda do próprio container em 146–153 s; no master, acompanha o container com margem.",
+      "acceptance": "Texto permanece dentro do bbox do container com padding também durante deslocamentos; não avaliar o contorno ainda sendo desenhado como falha.",
+      "review": {
+        "method": "assistant-sampled-frames-and-local-changelogs",
+        "full_audiovisual_review": false,
+        "sample_seconds": [
+          137,
+          139,
+          142,
+          146,
+          149,
+          153
+        ],
+        "human_pair_approval": false
+      },
+      "evidence": "evidence/artifacts/llm-fundation-hotfix-final/changelog.md",
+      "contact_sheet": "token-padding/samples.jpg",
+      "automation": "catalog-integrity-only; semantic verdict requires audiovisual review",
+      "clips": {
+        "before": {
+          "path": "token-padding/before.mp4",
+          "source_id": "hotfix-baseline",
+          "source_sha256": "e5055ceb932bfb72be194890374dee55591ad203265f0a80d094a70ac84ef7c1",
+          "start_frame": 4110,
+          "end_frame_exclusive": 4650,
+          "expected_frames": 540,
+          "fps": "30/1",
+          "audio": true
+        },
+        "after": {
+          "path": "token-padding/after.mp4",
+          "source_id": "master",
+          "source_sha256": "7d52455e20cecb8c958bafceceb250558640e85f581b804d94bc524b8c409f33",
+          "start_frame": 4110,
+          "end_frame_exclusive": 4650,
+          "expected_frames": 540,
+          "fps": "30/1",
+          "audio": true
+        }
+      }
+    },
+    {
+      "id": "token-lifecycle",
+      "category": "lifecycle",
+      "principles": [
+        "DV08",
+        "DV13"
+      ],
+      "kind": "regression-pair",
+      "observation": "Antes, três retângulos vazios continuam atrás de CACHORRO em 161,5–168 s; no master, os containers anteriores saíram.",
+      "acceptance": "Texto e container antigos saem juntos. O novo container de CACHORRO é intencional e não deve ser contado como resíduo.",
+      "review": {
+        "method": "assistant-sampled-frames-and-local-changelogs",
+        "full_audiovisual_review": false,
+        "sample_seconds": [
+          159.3,
+          160,
+          161.5,
+          163.5,
+          166,
+          168
+        ],
+        "human_pair_approval": false
+      },
+      "evidence": "evidence/artifacts/llm-fundation-hotfix-final/qa/lifecycle.md",
+      "contact_sheet": "token-lifecycle/samples.jpg",
+      "automation": "catalog-integrity-only; semantic verdict requires audiovisual review",
+      "clips": {
+        "before": {
+          "path": "token-lifecycle/before.mp4",
+          "source_id": "hotfix-baseline",
+          "source_sha256": "e5055ceb932bfb72be194890374dee55591ad203265f0a80d094a70ac84ef7c1",
+          "start_frame": 4740,
+          "end_frame_exclusive": 5070,
+          "expected_frames": 330,
+          "fps": "30/1",
+          "audio": true
+        },
+        "after": {
+          "path": "token-lifecycle/after.mp4",
+          "source_id": "master",
+          "source_sha256": "7d52455e20cecb8c958bafceceb250558640e85f581b804d94bc524b8c409f33",
+          "start_frame": 4740,
+          "end_frame_exclusive": 5070,
+          "expected_frames": 330,
+          "fps": "30/1",
+          "audio": true
+        }
+      }
+    },
+    {
+      "id": "node-proportions",
+      "category": "layout",
+      "principles": [
+        "DV14"
+      ],
+      "kind": "regression-pair",
+      "observation": "Antes, nós amarelos aparecem como elipses estreitas no close de 449–450 s; no master, mantêm a forma circular.",
+      "acceptance": "Preservar proporções dos nós nesta janela. Medir apenas nós completos, sem oclusão; não generalizar a proibição para projeções 3D intencionais.",
+      "review": {
+        "method": "assistant-sampled-frames-and-local-changelogs",
+        "full_audiovisual_review": false,
+        "sample_seconds": [
+          447,
+          449,
+          450,
+          451,
+          453,
+          454
+        ],
+        "human_pair_approval": false
+      },
+      "evidence": "evidence/videos/llm_fundation/final16-scenes/changelog.md",
+      "contact_sheet": "node-proportions/samples.jpg",
+      "automation": "catalog-integrity-only; semantic verdict requires audiovisual review",
+      "clips": {
+        "before": {
+          "path": "node-proportions/before.mp4",
+          "source_id": "final15",
+          "source_sha256": "053e4a9775372b789087d7163a8a08c16a3abbbaa2beeeac3479f94233382300",
+          "start_frame": 13410,
+          "end_frame_exclusive": 13650,
+          "expected_frames": 240,
+          "fps": "30/1",
+          "audio": true
+        },
+        "after": {
+          "path": "node-proportions/after.mp4",
+          "source_id": "master",
+          "source_sha256": "7d52455e20cecb8c958bafceceb250558640e85f581b804d94bc524b8c409f33",
+          "start_frame": 13410,
+          "end_frame_exclusive": 13650,
+          "expected_frames": 240,
+          "fps": "30/1",
+          "audio": true
+        }
+      }
+    },
+    {
+      "id": "stair-payoff",
+      "category": "direction",
+      "principles": [
+        "DV05",
+        "DV06",
+        "DV09"
+      ],
+      "kind": "regression-pair",
+      "observation": "Antes, a câmera abandona a escada e chega a um quadro quase vazio em 688–690 s; o master revela a jornada inteira, criança e VOCÊ ESTÁ AQUI.",
+      "acceptance": "O recuo de câmera revela a jornada e seu protagonista; a pergunta seguinte mantém a ligação espacial.",
+      "review": {
+        "method": "assistant-sampled-frames-and-local-changelogs",
+        "full_audiovisual_review": false,
+        "sample_seconds": [
+          683,
+          685,
+          688,
+          690,
+          692,
+          694
+        ],
+        "human_pair_approval": false
+      },
+      "evidence": "evidence/videos/llm_fundation/final16-scenes/changelog.md",
+      "contact_sheet": "stair-payoff/samples.jpg",
+      "automation": "catalog-integrity-only; semantic verdict requires audiovisual review",
+      "clips": {
+        "before": {
+          "path": "stair-payoff/before.mp4",
+          "source_id": "final15",
+          "source_sha256": "053e4a9775372b789087d7163a8a08c16a3abbbaa2beeeac3479f94233382300",
+          "start_frame": 20460,
+          "end_frame_exclusive": 20850,
+          "expected_frames": 390,
+          "fps": "30/1",
+          "audio": true
+        },
+        "after": {
+          "path": "stair-payoff/after.mp4",
+          "source_id": "master",
+          "source_sha256": "7d52455e20cecb8c958bafceceb250558640e85f581b804d94bc524b8c409f33",
+          "start_frame": 20460,
+          "end_frame_exclusive": 20850,
+          "expected_frames": 390,
+          "fps": "30/1",
+          "audio": true
+        }
+      }
+    },
+    {
+      "id": "sum-continuity",
+      "category": "direction",
+      "principles": [
+        "DV03",
+        "DV04",
+        "DV12"
+      ],
+      "kind": "regression-pair",
+      "observation": "Antes, exemplos sucedem-se com um modelo minúsculo no canto e a soma aparece em outro enquadramento. No master, somar(a,b) transforma-se em 2 + 2 e entrega 4 no mesmo ambiente.",
+      "acceptance": "Preservar a ligação entre função, expressão, processamento e resposta, inclusive na fronteira de cena perto de 714,57 s.",
+      "review": {
+        "method": "assistant-sampled-frames-and-local-changelogs",
+        "full_audiovisual_review": false,
+        "sample_seconds": [
+          709,
+          710.5,
+          712,
+          713,
+          714,
+          715
+        ],
+        "human_pair_approval": false
+      },
+      "evidence": "evidence/artifacts/llm-fundation-hotfix-final/changelog.md",
+      "contact_sheet": "sum-continuity/samples.jpg",
+      "automation": "catalog-integrity-only; semantic verdict requires audiovisual review",
+      "clips": {
+        "before": {
+          "path": "sum-continuity/before.mp4",
+          "source_id": "hotfix-baseline",
+          "source_sha256": "e5055ceb932bfb72be194890374dee55591ad203265f0a80d094a70ac84ef7c1",
+          "start_frame": 21240,
+          "end_frame_exclusive": 21480,
+          "expected_frames": 240,
+          "fps": "30/1",
+          "audio": true
+        },
+        "after": {
+          "path": "sum-continuity/after.mp4",
+          "source_id": "master",
+          "source_sha256": "7d52455e20cecb8c958bafceceb250558640e85f581b804d94bc524b8c409f33",
+          "start_frame": 21240,
+          "end_frame_exclusive": 21480,
+          "expected_frames": 240,
+          "fps": "30/1",
+          "audio": true
+        }
+      }
+    },
+    {
+      "id": "intentional-hold",
+      "category": "positive-control",
+      "principles": [
+        "DV09",
+        "DV10"
+      ],
+      "kind": "positive-control",
+      "observation": "As duas versões sustentam NOVEMBRO 2022; a pausa curta após a escrita tem função de leitura e ênfase.",
+      "acceptance": "Não reprovar uma pausa apenas por pixels estáticos. Rever sua relação com a narração; nenhuma câmera artificial é exigida.",
+      "review": {
+        "method": "assistant-sampled-frames-and-local-changelogs",
+        "full_audiovisual_review": false,
+        "sample_seconds": [
+          567,
+          567.8,
+          568.2,
+          568.6,
+          569,
+          569.4
+        ],
+        "human_pair_approval": false
+      },
+      "evidence": "evidence/videos/llm_fundation/final15-scenes/changelog.md",
+      "contact_sheet": "intentional-hold/samples.jpg",
+      "automation": "catalog-integrity-only; semantic verdict requires audiovisual review",
+      "clips": {
+        "before": {
+          "path": "intentional-hold/before.mp4",
+          "source_id": "final16",
+          "source_sha256": "fde140457ed6c184a40e1cd25deaab8ef87a9290377353c1ee48ef0df8056bc8",
+          "start_frame": 16980,
+          "end_frame_exclusive": 17130,
+          "expected_frames": 150,
+          "fps": "30/1",
+          "audio": true
+        },
+        "after": {
+          "path": "intentional-hold/after.mp4",
+          "source_id": "master",
+          "source_sha256": "7d52455e20cecb8c958bafceceb250558640e85f581b804d94bc524b8c409f33",
+          "start_frame": 16980,
+          "end_frame_exclusive": 17130,
+          "expected_frames": 150,
+          "fps": "30/1",
+          "audio": true
+        }
+      }
+    }
+  ],
+  "assets": {
+    "evidence/videos/llm_fundation/final17-scenes/changelog.md": {
+      "sha256": "803821ee0d636f42f70efd07b594f5838fba1a39dfd66f7589c92cbae6f61300",
+      "bytes": 2703
+    },
+    "word-progression/samples.jpg": {
+      "sha256": "6a78f79e15f99c759187fa6890976ed19abe84011f9f89c079d82336e38e4e07",
+      "bytes": 139193
+    },
+    "evidence/artifacts/llm-fundation-hotfix-final/changelog.md": {
+      "sha256": "bd9285519bdeff20dd4db07009881e27f5696395dc4fbec4cac3a32a8fec326a",
+      "bytes": 1334
+    },
+    "token-padding/samples.jpg": {
+      "sha256": "f555d2f9f233a0c628231d2acf7936762a338ea3d7dcb567353353b133f49315",
+      "bytes": 153660
+    },
+    "evidence/artifacts/llm-fundation-hotfix-final/qa/lifecycle.md": {
+      "sha256": "a3c2a21846ef6b65e15d1be0c3cf321481c5fd78498abf8da1e779ad5e882e69",
+      "bytes": 2382
+    },
+    "token-lifecycle/samples.jpg": {
+      "sha256": "e7084b2c8505f863b0d19aeca7afc3be30fa7abd82294f99dd21b984e7c8d92c",
+      "bytes": 135344
+    },
+    "evidence/videos/llm_fundation/final16-scenes/changelog.md": {
+      "sha256": "c561c91a81f5838ae14fdd012cc126b118da9474b863d621d9c49fd370774ac8",
+      "bytes": 4710
+    },
+    "node-proportions/samples.jpg": {
+      "sha256": "35c24d7d88f9f8844d44a7269b00f74dac14434f8a09ad841bcb1e55b1c61406",
+      "bytes": 173615
+    },
+    "stair-payoff/samples.jpg": {
+      "sha256": "073cea45544f78c8788ea05903e62a5bb118ac63f2f9e08f82a184b64752f2c1",
+      "bytes": 123790
+    },
+    "sum-continuity/samples.jpg": {
+      "sha256": "5f24e5c0938c2a3bb42245b17297fcab86ef601636ce53ddd75fbe795e6affe7",
+      "bytes": 105157
+    },
+    "evidence/videos/llm_fundation/final15-scenes/changelog.md": {
+      "sha256": "a09ec2d5a240b4660d4a93f9ae4efa78235b98d515067b76df8f73ba44c7f400",
+      "bytes": 5705
+    },
+    "intentional-hold/samples.jpg": {
+      "sha256": "736f7ca3bddbca3c990c3b757b841fdbe456c436fc49599ace239965f4f592fe",
+      "bytes": 134270
+    },
+    "word-progression/before.mp4": {
+      "sha256": "30a9cce5547cad3dedf47fccd17b305e94af25ae4170aaae54bf5a4f3b981a2d",
+      "bytes": 1026225
+    },
+    "word-progression/after.mp4": {
+      "sha256": "e6253c3d8d8cf59ceb0e6868b94e04af6db3f600ac13ad63de0c84da8619c95d",
+      "bytes": 1057966
+    },
+    "token-padding/before.mp4": {
+      "sha256": "06732ec45329ec85813ca4b383f1a7492a4c7cae287860e85e026dc61994777f",
+      "bytes": 794440
+    },
+    "token-padding/after.mp4": {
+      "sha256": "6b6ab8e8b7c2d4a77f357e866bd0cd595dc33ffdbf9b44074fab92a105b4872b",
+      "bytes": 719579
+    },
+    "token-lifecycle/before.mp4": {
+      "sha256": "f0d7dd3a303417b622fa7cc0ab71e1d76eee02aa20de97e84a8dd45d42e5e4df",
+      "bytes": 716164
+    },
+    "token-lifecycle/after.mp4": {
+      "sha256": "ece37eb20f9c7326c3f1997e4e4d7f8d5362294b8e3a61a7e372fe74b54179c6",
+      "bytes": 669123
+    },
+    "node-proportions/before.mp4": {
+      "sha256": "6e5d26f0e5f8fc36bdb73a7d23ab7105e7c8868aab871256248491d34f9365c0",
+      "bytes": 1439364
+    },
+    "node-proportions/after.mp4": {
+      "sha256": "3f2753dcc5a85a543d87f3616d81b7cde0ef8b9d5c575cb3a65075dd9ab39d57",
+      "bytes": 1501268
+    },
+    "stair-payoff/before.mp4": {
+      "sha256": "a9f5e1fe2d2a20fbb1cd8eb766e40c6fd20c51fcd0923162ef175c3459337447",
+      "bytes": 805132
+    },
+    "stair-payoff/after.mp4": {
+      "sha256": "57ed981c4ef1b5054c2f4ccdad2ac54e4719fac62ea95ce1acb1dffaf461f0af",
+      "bytes": 1718046
+    },
+    "sum-continuity/before.mp4": {
+      "sha256": "dd4600e2c0b127553607f196386450891dc5f7586879207117694b017e8383ca",
+      "bytes": 388131
+    },
+    "sum-continuity/after.mp4": {
+      "sha256": "a658395fe372f525ee16b2cba0dd48323d807a9e8d7601d09ec9e55147944638",
+      "bytes": 484241
+    },
+    "intentional-hold/before.mp4": {
+      "sha256": "eae9d585cb88da8c771aa7f7f61439ed575d7c5e6ff8addfa699a8dd7ac352a7",
+      "bytes": 470010
+    },
+    "intentional-hold/after.mp4": {
+      "sha256": "d9b7621b51fe0facf8f62c8713b1872d6f49855fabfca04ccc11448a9cc001e1",
+      "bytes": 481488
+    }
+  }
+}

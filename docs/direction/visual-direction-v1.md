@@ -4,6 +4,10 @@ Status: primeira camada implementada. Referência aprovada pelo usuário:
 `videos/llm_fundation/master.mp4`, identificada em `reference-v1.json`.
 A aprovação deste vídeo não implica aprovação automática de outro render.
 
+O [catálogo inicial de pares](golden-v1/README.md) contém seis regressões visuais
+localizadas e um controle positivo, com recortes, hashes e um comparador. A seleção
+usa frames amostrados e registros históricos; não substitui revisão audiovisual.
+
 ## Princípios e critérios de revisão
 
 | ID | Princípio | Evidência exigida na revisão |

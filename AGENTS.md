@@ -14,6 +14,9 @@ PERSIST / TRANSFORM / EXIT de cada unidade visual. Aplique os contratos
 `ScenePlan.direction` de token, proporção e processamento quando pertinentes;
 registre na revisão quando não forem aplicáveis. Use
 `examples/direction-contract/plan.json` e `docs/direction/review-template.md`.
+Consulte `docs/direction/golden-v1/README.md` e o comparador `index.html` dessa
+pasta para exemplos anteriores/corrigidos. Registre os IDs pertinentes na revisão;
+o controle positivo de pausa não deve virar uma regra de movimento obrigatório.
 
 Ao mudar componentes, runtime ou validadores, execute
 `rtk proxy .venv/bin/pytest tests/test_direction_contracts.py -q` e as regressões
