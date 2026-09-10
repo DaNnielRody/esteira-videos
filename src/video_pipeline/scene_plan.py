@@ -6,7 +6,9 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from video_pipeline.direction_contracts import DirectionContract
 from video_pipeline.expectations import SceneExpectations
+from video_pipeline.reference_catalog import ReferenceTopic
 from video_pipeline.theme import DEFAULT_VIDEO_THEME, ColorRole, VideoTheme
 
 
@@ -71,6 +73,7 @@ class Beat(BaseModel):
     formula: str | None = None
     movement: str | None = None
     min_read_seconds: float | None = Field(default=None, ge=0.0)
+    framing: Literal["contained", "camera_reveal", "camera_focus"] = "contained"
 
     @field_validator("action", "region", "movement")
     @classmethod
@@ -100,6 +103,19 @@ class Beat(BaseModel):
                 raise ValueError("beat duration_seconds must match its interval")
         if self.text is not None and self.formula is not None:
             raise ValueError("beat cannot declare both text and formula")
+        return self
+
+    @model_validator(mode="after")
+    def _framing_permission_has_temporal_contract(self) -> Beat:
+        """Require an explicit object and interval for camera framing exceptions."""
+
+        if self.framing != "contained":
+            if not self.objects:
+                raise ValueError("camera framing permission requires beat objects")
+            if self.start_seconds is None or self.end_seconds is None:
+                raise ValueError(
+                    "camera framing permission requires start_seconds and end_seconds"
+                )
         return self
 
     @property
@@ -183,6 +199,7 @@ class ScenePlan(BaseModel):
     start_seconds: float | None = Field(default=None, ge=0.0)
     end_seconds: float | None = Field(default=None, gt=0.0)
     theme: VideoTheme = Field(default_factory=lambda: DEFAULT_VIDEO_THEME)
+    topics: list[ReferenceTopic] = Field(default_factory=list, max_length=4)
     capabilities: list[str] = Field(default_factory=list, max_length=32)
     objects: list[VisualObject] = Field(default_factory=list, max_length=256)
     beats: list[Beat] = Field(default_factory=list, max_length=256)
@@ -190,6 +207,14 @@ class ScenePlan(BaseModel):
     expectations: SceneExpectations | None = None
     continuity_in: ContinuityPlan | None = None
     continuity_out: ContinuityPlan | None = None
+    direction: DirectionContract | None = None
+
+    @field_validator("topics")
+    @classmethod
+    def _topics_are_unique(cls, value: list[ReferenceTopic]) -> list[ReferenceTopic]:
+        if len(value) != len(set(value)):
+            raise ValueError("topics must be unique")
+        return value
 
     @field_validator("objective")
     @classmethod
@@ -241,6 +266,8 @@ class ScenePlan(BaseModel):
             if abs(interval - self.duration_seconds) > 1e-6:
                 raise ValueError("scene duration must match its narration interval")
         object_ids = {item.id for item in self.objects}
+        if self.direction is not None:
+            self.direction.validate_references(object_ids, self.duration_seconds)
         for beat in self.beats:
             unknown = set(beat.objects) - object_ids
             if unknown:

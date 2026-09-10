@@ -1,0 +1,219 @@
+{
+  "schema_version": "visual.scene-plan/1",
+  "id": "direction-example",
+  "scene_name": "DirectionExampleScene",
+  "objective": "A token enters a model, processing finishes, then output appears.",
+  "duration_seconds": 4.0,
+  "narration_text": null,
+  "start_seconds": null,
+  "end_seconds": null,
+  "theme": {
+    "id": "production",
+    "palette": {
+      "primary": "#4CC9F0",
+      "secondary": "#4361EE",
+      "accent": "#F72585",
+      "success": "#80ED99",
+      "warning": "#FFD166",
+      "text": "#F8FAFC",
+      "muted": "#94A3B8",
+      "background": "#0B1020"
+    },
+    "font_families": {
+      "title": "JetBrains Mono",
+      "body": "JetBrains Mono",
+      "label": "JetBrains Mono",
+      "formula": "Computer Modern"
+    },
+    "font_sizes": {
+      "title": 48,
+      "body": 32,
+      "label": 26,
+      "formula": 40
+    },
+    "stroke_widths": {
+      "thin": 1.0,
+      "normal": 2.0,
+      "emphasis": 4.0
+    },
+    "safe_area": {
+      "left": 0.08,
+      "right": 0.92,
+      "top": 0.08,
+      "bottom": 0.92
+    },
+    "min_spacing": 0.18,
+    "resolution": [
+      854,
+      480
+    ],
+    "fps": 15,
+    "animation_durations": {
+      "create": 0.8,
+      "transform": 1.2,
+      "emphasis": 0.6,
+      "fade": 0.5
+    },
+    "min_read_duration": 1.2,
+    "transition_presets": {
+      "default": {
+        "enter": "fade",
+        "exit": "fade",
+        "duration_seconds": 0.5
+      },
+      "hard_cut": {
+        "enter": "none",
+        "exit": "none",
+        "duration_seconds": 0.1
+      }
+    },
+    "regions": {
+      "left": {
+        "left": 0.08,
+        "top": 0.08,
+        "right": 0.38,
+        "bottom": 0.92
+      },
+      "center": {
+        "left": 0.3,
+        "top": 0.08,
+        "right": 0.7,
+        "bottom": 0.92
+      },
+      "right": {
+        "left": 0.62,
+        "top": 0.08,
+        "right": 0.92,
+        "bottom": 0.92
+      },
+      "top": {
+        "left": 0.08,
+        "top": 0.08,
+        "right": 0.92,
+        "bottom": 0.38
+      },
+      "middle": {
+        "left": 0.08,
+        "top": 0.3,
+        "right": 0.92,
+        "bottom": 0.7
+      },
+      "bottom": {
+        "left": 0.08,
+        "top": 0.62,
+        "right": 0.92,
+        "bottom": 0.92
+      }
+    }
+  },
+  "topics": [],
+  "capabilities": [],
+  "objects": [
+    {
+      "id": "text",
+      "kind": "diagram",
+      "color_role": null,
+      "semantic_role": null,
+      "region": null,
+      "text": null,
+      "formula": null,
+      "group_id": null,
+      "required": false,
+      "visible": true,
+      "z_index": 0,
+      "overlap_policy": "forbidden",
+      "min_width": null,
+      "min_height": null
+    },
+    {
+      "id": "box",
+      "kind": "diagram",
+      "color_role": null,
+      "semantic_role": null,
+      "region": null,
+      "text": null,
+      "formula": null,
+      "group_id": null,
+      "required": false,
+      "visible": true,
+      "z_index": 0,
+      "overlap_policy": "forbidden",
+      "min_width": null,
+      "min_height": null
+    },
+    {
+      "id": "model",
+      "kind": "diagram",
+      "color_role": null,
+      "semantic_role": null,
+      "region": null,
+      "text": null,
+      "formula": null,
+      "group_id": null,
+      "required": false,
+      "visible": true,
+      "z_index": 0,
+      "overlap_policy": "forbidden",
+      "min_width": null,
+      "min_height": null
+    },
+    {
+      "id": "output",
+      "kind": "diagram",
+      "color_role": null,
+      "semantic_role": null,
+      "region": null,
+      "text": null,
+      "formula": null,
+      "group_id": null,
+      "required": false,
+      "visible": true,
+      "z_index": 0,
+      "overlap_policy": "forbidden",
+      "min_width": null,
+      "min_height": null
+    }
+  ],
+  "beats": [],
+  "layout": {
+    "object_regions": {},
+    "minimum_spacing": null,
+    "max_text_lines": 3,
+    "max_content_density": 0.65,
+    "allow_background_overlap": true
+  },
+  "expectations": null,
+  "continuity_in": null,
+  "continuity_out": null,
+  "direction": {
+    "schema_version": "visual.direction/1",
+    "tokens": [
+      {
+        "start_seconds": 0.0,
+        "end_seconds": 2.0,
+        "text_id": "text",
+        "container_id": "box",
+        "padding": 0.005
+      }
+    ],
+    "aspects": [
+      {
+        "start_seconds": 0.0,
+        "end_seconds": 2.0,
+        "object_id": "model",
+        "expected_ratio": 1.0,
+        "relative_tolerance": 0.02
+      }
+    ],
+    "processing": [
+      {
+        "start_seconds": 1.0,
+        "end_seconds": 2.0,
+        "model_id": "model",
+        "output_id": "output",
+        "animation": "Indicate",
+        "output_by_seconds": 3.0
+      }
+    ]
+  }
+}

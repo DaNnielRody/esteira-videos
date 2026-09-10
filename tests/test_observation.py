@@ -396,3 +396,114 @@ def test_unreadable_media_returns_a_structured_sensor_failure(tmp_path: Path) ->
     assert result.failure is not None
     assert result.failure.code == "duration_unavailable"
     assert "missing.mp4" in result.failure.detail
+
+
+def test_scene_observer_samples_a_requested_checkpoint_frame(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A logical checkpoint gets pixel evidence from that rendered instant.
+
+    The old uniform twelve-frame grid sampled 11.5667s for an 11.7333s
+    checkpoint.  That frame was still the preceding transition, so a blue
+    book contour could be assigned to the newly shown white word.  The public
+    observer contract must allow the pipeline to request the checkpoint frame.
+    """
+
+    _require_contract()
+    import video_pipeline.observation as observation_module
+
+    source = tmp_path / "scene.mp4"
+    source.write_bytes(b"probeable media")
+    fake = _CheckpointFFmpeg()
+    monkeypatch.setattr(observation_module, "_duration_seconds", lambda _path: 20.0)
+    # The real implementation obtains this from ffprobe.  Keep this test at
+    # the ffmpeg boundary while pinning the deterministic synthetic stream.
+    monkeypatch.setattr(
+        observation_module,
+        "_video_frame_rate",
+        lambda _path: 30.0,
+        raising=False,
+    )
+
+    result = SceneObserver(ffmpeg_run=fake).observe(
+        source,
+        tmp_path / "frames",
+        sample_times=(11.7333333333,),
+    )
+
+    assert result.failure is None
+    assert result.evidence is not None
+    assert any(
+        frame.instant_seconds == pytest.approx(11.7333333333, abs=1e-3)
+        for frame in result.evidence
+    )
+    checkpoint_frame = next(
+        frame
+        for frame in result.evidence
+        if frame.instant_seconds == pytest.approx(11.7333333333, abs=1e-3)
+    )
+    assert checkpoint_frame.shapes[0].color == "white"
+    whole_word = ObservedObject(
+        id="whole-word",
+        kind="text",
+        bbox=BoundingBox(left=0.39, top=0.375, right=0.61, bottom=0.625),
+        center_x=0.5,
+        center_y=0.5,
+        width=0.22,
+        height=0.25,
+        observed_color="#FFFFFF",
+        logical_time=11.7333333333,
+        text="INFELIZMENTE",
+    )
+    plan = ScenePlan(
+        id="checkpoint-colour",
+        scene_name="CheckpointColourScene",
+        objective="Keep the word readable.",
+        duration_seconds=20.0,
+        objects=[VisualObject(id="whole-word", kind="text", color_role="text")],
+    )
+    observed = ObservedScene(
+        scene_id="checkpoint-colour",
+        scene_name="CheckpointColourScene",
+        initial_state=[whole_word],
+        final_state=[whole_word],
+        frames=result.evidence,
+    )
+    assert not any(finding.code == "LOW_CONTRAST" for finding in check_contrast(plan, observed))
+    filter_expression = fake.argv[fake.argv.index("-vf") + 1]
+    assert r"eq(n\,352)" in filter_expression
+
+
+class _CheckpointFFmpeg:
+    """Write deterministic evidence for the public observer boundary."""
+
+    def __init__(self) -> None:
+        self.argv: list[str] = []
+
+    def __call__(
+        self,
+        argv: list[str],
+        *,
+        capture_output: bool,
+        text: bool,
+        check: bool,
+        timeout: float,
+    ) -> object:
+        del capture_output, text, check, timeout
+        self.argv = list(argv)
+        output_pattern = Path(argv[-1])
+        for name, colour in (
+            ("frame-001.png", (27, 53, 79, 255)),
+            ("frame-002.png", (248, 250, 252, 255)),
+        ):
+            image = _blank()
+            ImageDraw.Draw(image).rectangle([170, 90, 258, 150], fill=colour)
+            image.save(output_pattern.parent / name)
+
+        class Completed:
+            returncode = 0
+            stdout = ""
+            stderr = "pts_time:0.0000\npts_time:11.7333\n"
+
+        return Completed()

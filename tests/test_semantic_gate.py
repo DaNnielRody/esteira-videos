@@ -318,3 +318,123 @@ def test_semantic_gate_audit_contract() -> None:
 
     assert callable(globals().get("test_valid_mp4_showing_the_wrong_scene_is_not_success"))
     assert callable(globals().get("test_the_loop_corrects_a_semantic_failure"))
+
+
+def test_animation_arguments_are_not_mistaken_for_visible_targets(tmp_path: Path) -> None:
+    code = """
+from manim import *
+class ExampleScene(Scene):
+    def construct(self):
+        p = {'accent': RED}
+        point = Dot()
+        path = Line(LEFT, RIGHT)
+        layers = [Circle(), Circle()]
+        self.add(point)
+        self.play(MoveAlongPath(point, path))
+        self.play(Indicate(point, color=p['accent']))
+        self.play(*[FadeIn(layer) for layer in layers])
+"""
+    result = _pipeline(ScriptedProvider([code]), tmp_path).render(
+        SceneSpec(id="example", scene_name="ExampleScene", description="Move a point"),
+        max_attempts=1,
+    )
+    assert result.state.value == "success"
+
+
+def test_transform_target_still_cannot_be_animated_as_the_source(tmp_path: Path) -> None:
+    code = """
+from manim import *
+class ExampleScene(Scene):
+    def construct(self):
+        a = Circle()
+        b = Square()
+        self.play(Create(a))
+        self.play(Transform(a, b))
+        self.play(b.animate.shift(RIGHT))
+"""
+    result = _pipeline(ScriptedProvider([code]), tmp_path).render(
+        SceneSpec(id="example", scene_name="ExampleScene", description="Move the square"),
+        max_attempts=1,
+    )
+    assert result.state.value == "attempts_exhausted"
+
+
+@pytest.mark.parametrize(
+    "body",
+    [
+        "self.show(a)\n        self.play(a.animate.shift(RIGHT))",
+        "self.play(a.animate.shift(RIGHT))",
+        (
+            "self.play(Create(a))\n        self.play(TransformFromCopy(a,b))\n"
+            "        self.play(b.animate.shift(RIGHT))"
+        ),
+    ],
+)
+def test_dynamic_introductions_are_not_proven_stale_transform_targets(
+    tmp_path: Path, body: str
+) -> None:
+    code = (
+        "from manim import *\nclass ExampleScene(Scene):\n    def construct(self):\n"
+        "        a=Circle()\n        b=Square()\n        "
+    ) + body
+    result = _pipeline(ScriptedProvider([code]), tmp_path).render(
+        SceneSpec(id="example", scene_name="ExampleScene", description="Introduce then move"),
+        max_attempts=1,
+    )
+    assert result.state.value == "success"
+
+
+def test_text_pixel_sampling_uses_changed_valid_checkpoints(tmp_path: Path) -> None:
+    from video_pipeline.observation import SceneObserver
+
+    label = {
+        "id": "label",
+        "text": "A",
+        "visible": True,
+        "bbox": {"left": 0.1, "top": 0.2, "right": 0.3, "bottom": 0.4},
+    }
+    anonymous = {**label, "id": None, "text": "B"}
+    changed = {**label, "text": "C"}
+
+    class CheckpointRunner(RecordingRunner):
+        def run(self, scene_path: Path, media_dir: Path) -> RenderResult:
+            result = super().run(scene_path, media_dir)
+            (media_dir / "visual-facts.json").write_text(
+                json.dumps(
+                    {
+                        "checkpoints": [
+                            {"instant_seconds": 0.4, "objects": [label, anonymous]},
+                            {"instant_seconds": 0.8, "objects": [anonymous, label]},
+                            {"instant_seconds": 1.2, "objects": [changed, anonymous]},
+                            {"instant_seconds": 1.4, "objects": [{**label, "bbox": None}]},
+                        ],
+                    }
+                )
+            )
+            return result
+
+    class SamplingObserver(SceneObserver):
+        def __init__(self) -> None:
+            self.requested_times: tuple[float, ...] = ()
+
+        def observe(
+            self,
+            mp4_path: Path,
+            frames_dir: Path,
+            *,
+            sample_times: tuple[float, ...] = (),
+        ) -> ObservationResult:
+            self.requested_times = sample_times
+            return ScriptedObserver().observe(mp4_path, frames_dir)
+
+    observer = SamplingObserver()
+    result = RenderPipeline(
+        provider=ScriptedProvider([GOOD_CODE]),
+        runner=CheckpointRunner(),
+        validator=AcceptingValidator(),
+        observer=observer,
+        output_root=tmp_path / "runs",
+    ).render(_spec(), max_attempts=1)
+
+    assert result.state.value == "success"
+    assert observer.requested_times == (0.4, 1.2)

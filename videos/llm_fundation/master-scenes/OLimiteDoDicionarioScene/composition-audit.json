@@ -1,0 +1,1210 @@
+{
+  "method": "Clipped visible root envelopes in camera coordinates; estimate, not ink area or semantic identification. Thin hero typography, first GPT, spatial distance and empty question hold require narrative review.",
+  "beats": [
+    {
+      "beat": "beat-2.1",
+      "seconds": 2.1,
+      "camera_width": 12.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5859,
+          "height_fraction": 0.599,
+          "envelope_area_fraction": 0.351
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-2.1",
+      "seconds": 4.1,
+      "camera_width": 12.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5469,
+          "height_fraction": 0.559,
+          "envelope_area_fraction": 0.3057
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1219,
+          "height_fraction": 0.3799,
+          "envelope_area_fraction": 0.0463
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-5.24",
+      "seconds": 5.233,
+      "camera_width": 12.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5469,
+          "height_fraction": 0.559,
+          "envelope_area_fraction": 0.3057
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1219,
+          "height_fraction": 0.3799,
+          "envelope_area_fraction": 0.0463
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-5.24",
+      "seconds": 6.033,
+      "camera_width": 12.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5469,
+          "height_fraction": 0.559,
+          "envelope_area_fraction": 0.3057
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1219,
+          "height_fraction": 0.3794,
+          "envelope_area_fraction": 0.0462
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-9.5",
+      "seconds": 9.5,
+      "camera_width": 12.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5469,
+          "height_fraction": 0.559,
+          "envelope_area_fraction": 0.3057
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1219,
+          "height_fraction": 0.3794,
+          "envelope_area_fraction": 0.0462
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-9.5",
+      "seconds": 11.3,
+      "camera_width": 12.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5469,
+          "height_fraction": 0.559,
+          "envelope_area_fraction": 0.3057
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1219,
+          "height_fraction": 0.3794,
+          "envelope_area_fraction": 0.0462
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1499,
+          "height_fraction": 0.2715,
+          "envelope_area_fraction": 0.0407
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-12.1",
+      "seconds": 12.1,
+      "camera_width": 12.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5469,
+          "height_fraction": 0.559,
+          "envelope_area_fraction": 0.3057
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1219,
+          "height_fraction": 0.3794,
+          "envelope_area_fraction": 0.0462
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1499,
+          "height_fraction": 0.2715,
+          "envelope_area_fraction": 0.0407
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-12.1",
+      "seconds": 12.9,
+      "camera_width": 12.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5469,
+          "height_fraction": 0.559,
+          "envelope_area_fraction": 0.3057
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1352,
+          "height_fraction": 0.3794,
+          "envelope_area_fraction": 0.0513
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1499,
+          "height_fraction": 0.2715,
+          "envelope_area_fraction": 0.0407
+        },
+        {
+          "type": "Line",
+          "text": null,
+          "width_fraction": 0.1914,
+          "height_fraction": 0.0486,
+          "envelope_area_fraction": 0.0093
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-21",
+      "seconds": 20.967,
+      "camera_width": 12.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5469,
+          "height_fraction": 0.559,
+          "envelope_area_fraction": 0.3057
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1162,
+          "height_fraction": 0.3794,
+          "envelope_area_fraction": 0.0441
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1499,
+          "height_fraction": 0.2715,
+          "envelope_area_fraction": 0.0407
+        },
+        {
+          "type": "Line",
+          "text": null,
+          "width_fraction": 0.1914,
+          "height_fraction": 0.0486,
+          "envelope_area_fraction": 0.0093
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-21",
+      "seconds": 21.967,
+      "camera_width": 12.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5469,
+          "height_fraction": 0.559,
+          "envelope_area_fraction": 0.3057
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1162,
+          "height_fraction": 0.3794,
+          "envelope_area_fraction": 0.0441
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1499,
+          "height_fraction": 0.2715,
+          "envelope_area_fraction": 0.0407
+        },
+        {
+          "type": "Text",
+          "text": "ornitorrinco",
+          "width_fraction": 0.3195,
+          "height_fraction": 0.0607,
+          "envelope_area_fraction": 0.0194
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-22.1",
+      "seconds": 22.067,
+      "camera_width": 12.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5469,
+          "height_fraction": 0.559,
+          "envelope_area_fraction": 0.3057
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1162,
+          "height_fraction": 0.3794,
+          "envelope_area_fraction": 0.0441
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1499,
+          "height_fraction": 0.2715,
+          "envelope_area_fraction": 0.0407
+        },
+        {
+          "type": "Text",
+          "text": "ornitorrinco",
+          "width_fraction": 0.3195,
+          "height_fraction": 0.0607,
+          "envelope_area_fraction": 0.0194
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-22.1",
+      "seconds": 22.567,
+      "camera_width": 12.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5469,
+          "height_fraction": 0.559,
+          "envelope_area_fraction": 0.3057
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1162,
+          "height_fraction": 0.3794,
+          "envelope_area_fraction": 0.0441
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1499,
+          "height_fraction": 0.2715,
+          "envelope_area_fraction": 0.0407
+        },
+        {
+          "type": "Text",
+          "text": "ornitorrinco",
+          "width_fraction": 0.1689,
+          "height_fraction": 0.0642,
+          "envelope_area_fraction": 0.0108
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-25.0",
+      "seconds": 24.967,
+      "camera_width": 12.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5469,
+          "height_fraction": 0.559,
+          "envelope_area_fraction": 0.3057
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1162,
+          "height_fraction": 0.3794,
+          "envelope_area_fraction": 0.0441
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1499,
+          "height_fraction": 0.2715,
+          "envelope_area_fraction": 0.0407
+        },
+        {
+          "type": "Text",
+          "text": "ornitorrinco",
+          "width_fraction": 0.1689,
+          "height_fraction": 0.0642,
+          "envelope_area_fraction": 0.0108
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-25.0",
+      "seconds": 25.233,
+      "camera_width": 12.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5469,
+          "height_fraction": 0.559,
+          "envelope_area_fraction": 0.3057
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1162,
+          "height_fraction": 0.3794,
+          "envelope_area_fraction": 0.0441
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1499,
+          "height_fraction": 0.2715,
+          "envelope_area_fraction": 0.0407
+        },
+        {
+          "type": "Text",
+          "text": "ornitorrinco",
+          "width_fraction": 0.1689,
+          "height_fraction": 0.0642,
+          "envelope_area_fraction": 0.0108
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-29.4",
+      "seconds": 29.367,
+      "camera_width": 12.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5469,
+          "height_fraction": 0.559,
+          "envelope_area_fraction": 0.3057
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1162,
+          "height_fraction": 0.3791,
+          "envelope_area_fraction": 0.0441
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1499,
+          "height_fraction": 0.2715,
+          "envelope_area_fraction": 0.0407
+        },
+        {
+          "type": "Text",
+          "text": "ornitorrinco",
+          "width_fraction": 0.2891,
+          "height_fraction": 0.0549,
+          "envelope_area_fraction": 0.0159
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-29.4",
+      "seconds": 30.967,
+      "camera_width": 9.4,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.4787,
+          "height_fraction": 0.578,
+          "envelope_area_fraction": 0.2767
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.383,
+          "height_fraction": 0.2704,
+          "envelope_area_fraction": 0.1036
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1582,
+          "height_fraction": 0.3604,
+          "envelope_area_fraction": 0.057
+        },
+        {
+          "type": "Line",
+          "text": null,
+          "width_fraction": 0.2606,
+          "height_fraction": 0.0319,
+          "envelope_area_fraction": 0.0083
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-33",
+      "seconds": 32.967,
+      "camera_width": 9.4,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.4787,
+          "height_fraction": 0.578,
+          "envelope_area_fraction": 0.2767
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.383,
+          "height_fraction": 0.2704,
+          "envelope_area_fraction": 0.1036
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1582,
+          "height_fraction": 0.3604,
+          "envelope_area_fraction": 0.057
+        },
+        {
+          "type": "Line",
+          "text": null,
+          "width_fraction": 0.2606,
+          "height_fraction": 0.0319,
+          "envelope_area_fraction": 0.0083
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-33",
+      "seconds": 34.167,
+      "camera_width": 9.4,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.4787,
+          "height_fraction": 0.578,
+          "envelope_area_fraction": 0.2767
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.383,
+          "height_fraction": 0.2704,
+          "envelope_area_fraction": 0.1036
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1582,
+          "height_fraction": 0.3604,
+          "envelope_area_fraction": 0.057
+        },
+        {
+          "type": "Text",
+          "text": "desconhecido",
+          "width_fraction": 0.3129,
+          "height_fraction": 0.0662,
+          "envelope_area_fraction": 0.0207
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-36",
+      "seconds": 35.967,
+      "camera_width": 9.4,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.4787,
+          "height_fraction": 0.578,
+          "envelope_area_fraction": 0.2767
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.383,
+          "height_fraction": 0.2704,
+          "envelope_area_fraction": 0.1036
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1582,
+          "height_fraction": 0.3604,
+          "envelope_area_fraction": 0.057
+        },
+        {
+          "type": "Text",
+          "text": "desconhecido",
+          "width_fraction": 0.3129,
+          "height_fraction": 0.0662,
+          "envelope_area_fraction": 0.0207
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-36",
+      "seconds": 37.567,
+      "camera_width": 12.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5469,
+          "height_fraction": 0.559,
+          "envelope_area_fraction": 0.3057
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1162,
+          "height_fraction": 0.3791,
+          "envelope_area_fraction": 0.0441
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-38.0",
+      "seconds": 37.967,
+      "camera_width": 12.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5469,
+          "height_fraction": 0.559,
+          "envelope_area_fraction": 0.3057
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1162,
+          "height_fraction": 0.3791,
+          "envelope_area_fraction": 0.0441
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-38.0",
+      "seconds": 38.767,
+      "camera_width": 12.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5469,
+          "height_fraction": 0.559,
+          "envelope_area_fraction": 0.3057
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1162,
+          "height_fraction": 0.3791,
+          "envelope_area_fraction": 0.0441
+        },
+        {
+          "type": "Text",
+          "text": "palavrarara",
+          "width_fraction": 0.319,
+          "height_fraction": 0.0702,
+          "envelope_area_fraction": 0.0224
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-40.02",
+      "seconds": 40.0,
+      "camera_width": 12.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5469,
+          "height_fraction": 0.559,
+          "envelope_area_fraction": 0.3057
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1162,
+          "height_fraction": 0.3791,
+          "envelope_area_fraction": 0.0441
+        },
+        {
+          "type": "Text",
+          "text": "palavrarara",
+          "width_fraction": 0.319,
+          "height_fraction": 0.0702,
+          "envelope_area_fraction": 0.0224
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-40.02",
+      "seconds": 40.867,
+      "camera_width": 12.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5469,
+          "height_fraction": 0.559,
+          "envelope_area_fraction": 0.3057
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1162,
+          "height_fraction": 0.3791,
+          "envelope_area_fraction": 0.0441
+        },
+        {
+          "type": "Text",
+          "text": "nomenovo",
+          "width_fraction": 0.2371,
+          "height_fraction": 0.0439,
+          "envelope_area_fraction": 0.0104
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-41.2",
+      "seconds": 41.167,
+      "camera_width": 12.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5469,
+          "height_fraction": 0.559,
+          "envelope_area_fraction": 0.3057
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1162,
+          "height_fraction": 0.3791,
+          "envelope_area_fraction": 0.0441
+        },
+        {
+          "type": "Text",
+          "text": "nomenovo",
+          "width_fraction": 0.2371,
+          "height_fraction": 0.0439,
+          "envelope_area_fraction": 0.0104
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-41.2",
+      "seconds": 42.033,
+      "camera_width": 12.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5469,
+          "height_fraction": 0.559,
+          "envelope_area_fraction": 0.3057
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1162,
+          "height_fraction": 0.3791,
+          "envelope_area_fraction": 0.0441
+        },
+        {
+          "type": "Text",
+          "text": "variação",
+          "width_fraction": 0.2114,
+          "height_fraction": 0.0758,
+          "envelope_area_fraction": 0.016
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-42.5",
+      "seconds": 42.467,
+      "camera_width": 12.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5469,
+          "height_fraction": 0.559,
+          "envelope_area_fraction": 0.3057
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1162,
+          "height_fraction": 0.3791,
+          "envelope_area_fraction": 0.0441
+        },
+        {
+          "type": "Text",
+          "text": "variação",
+          "width_fraction": 0.2114,
+          "height_fraction": 0.0758,
+          "envelope_area_fraction": 0.016
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-42.5",
+      "seconds": 43.333,
+      "camera_width": 12.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5469,
+          "height_fraction": 0.559,
+          "envelope_area_fraction": 0.3057
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1162,
+          "height_fraction": 0.3791,
+          "envelope_area_fraction": 0.0441
+        },
+        {
+          "type": "Text",
+          "text": "cringe",
+          "width_fraction": 0.1554,
+          "height_fraction": 0.0738,
+          "envelope_area_fraction": 0.0115
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-43.5",
+      "seconds": 43.467,
+      "camera_width": 12.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5469,
+          "height_fraction": 0.559,
+          "envelope_area_fraction": 0.3057
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1162,
+          "height_fraction": 0.3791,
+          "envelope_area_fraction": 0.0441
+        },
+        {
+          "type": "Text",
+          "text": "cringe",
+          "width_fraction": 0.1554,
+          "height_fraction": 0.0738,
+          "envelope_area_fraction": 0.0115
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-43.5",
+      "seconds": 44.067,
+      "camera_width": 12.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5469,
+          "height_fraction": 0.559,
+          "envelope_area_fraction": 0.3057
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1162,
+          "height_fraction": 0.3791,
+          "envelope_area_fraction": 0.0441
+        },
+        {
+          "type": "Line",
+          "text": null,
+          "width_fraction": 0.1914,
+          "height_fraction": 0.0486,
+          "envelope_area_fraction": 0.0093
+        },
+        {
+          "type": "Text",
+          "text": "cringe",
+          "width_fraction": 0.1327,
+          "height_fraction": 0.0664,
+          "envelope_area_fraction": 0.0088
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-49.7",
+      "seconds": 49.7,
+      "camera_width": 12.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5469,
+          "height_fraction": 0.559,
+          "envelope_area_fraction": 0.3057
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1162,
+          "height_fraction": 0.3792,
+          "envelope_area_fraction": 0.0441
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-49.7",
+      "seconds": 50.7,
+      "camera_width": 12.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5469,
+          "height_fraction": 0.559,
+          "envelope_area_fraction": 0.3057
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-50.9",
+      "seconds": 50.9,
+      "camera_width": 12.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5469,
+          "height_fraction": 0.559,
+          "envelope_area_fraction": 0.3057
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-50.9",
+      "seconds": 52.3,
+      "camera_width": 12.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5469,
+          "height_fraction": 0.559,
+          "envelope_area_fraction": 0.3057
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-52.59",
+      "seconds": 52.567,
+      "camera_width": 12.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5469,
+          "height_fraction": 0.559,
+          "envelope_area_fraction": 0.3057
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-52.59",
+      "seconds": 53.867,
+      "camera_width": 12.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5469,
+          "height_fraction": 0.559,
+          "envelope_area_fraction": 0.3057
+        },
+        {
+          "type": "Text",
+          "text": "PRECISADECORAR",
+          "width_fraction": 0.3468,
+          "height_fraction": 0.0551,
+          "envelope_area_fraction": 0.0191
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-54.21",
+      "seconds": 54.2,
+      "camera_width": 12.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5469,
+          "height_fraction": 0.559,
+          "envelope_area_fraction": 0.3057
+        },
+        {
+          "type": "Text",
+          "text": "PRECISADECORAR",
+          "width_fraction": 0.3468,
+          "height_fraction": 0.0551,
+          "envelope_area_fraction": 0.0191
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-54.21",
+      "seconds": 55.5,
+      "camera_width": 12.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5469,
+          "height_fraction": 0.559,
+          "envelope_area_fraction": 0.3057
+        },
+        {
+          "type": "Text",
+          "text": "PALAVRAINTEIRA",
+          "width_fraction": 0.7578,
+          "height_fraction": 0.108,
+          "envelope_area_fraction": 0.0819
+        },
+        {
+          "type": "Text",
+          "text": "PRECISADECORAR",
+          "width_fraction": 0.3468,
+          "height_fraction": 0.0551,
+          "envelope_area_fraction": 0.0191
+        },
+        {
+          "type": "Text",
+          "text": "?",
+          "width_fraction": 0.0277,
+          "height_fraction": 0.102,
+          "envelope_area_fraction": 0.0028
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-55.55",
+      "seconds": 55.533,
+      "camera_width": 12.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5469,
+          "height_fraction": 0.559,
+          "envelope_area_fraction": 0.3057
+        },
+        {
+          "type": "Text",
+          "text": "PALAVRAINTEIRA",
+          "width_fraction": 0.7578,
+          "height_fraction": 0.108,
+          "envelope_area_fraction": 0.0819
+        },
+        {
+          "type": "Text",
+          "text": "PRECISADECORAR",
+          "width_fraction": 0.3468,
+          "height_fraction": 0.0551,
+          "envelope_area_fraction": 0.0191
+        },
+        {
+          "type": "Text",
+          "text": "?",
+          "width_fraction": 0.0277,
+          "height_fraction": 0.102,
+          "envelope_area_fraction": 0.0028
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-55.55",
+      "seconds": 56.233,
+      "camera_width": 12.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5469,
+          "height_fraction": 0.559,
+          "envelope_area_fraction": 0.3057
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.7938,
+          "height_fraction": 0.1719,
+          "envelope_area_fraction": 0.1365
+        },
+        {
+          "type": "Text",
+          "text": "PALAVRAINTEIRA",
+          "width_fraction": 0.7578,
+          "height_fraction": 0.108,
+          "envelope_area_fraction": 0.0819
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-56.4",
+      "seconds": 56.4,
+      "camera_width": 12.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5469,
+          "height_fraction": 0.559,
+          "envelope_area_fraction": 0.3057
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.7938,
+          "height_fraction": 0.1719,
+          "envelope_area_fraction": 0.1365
+        },
+        {
+          "type": "Text",
+          "text": "PALAVRAINTEIRA",
+          "width_fraction": 0.7578,
+          "height_fraction": 0.108,
+          "envelope_area_fraction": 0.0819
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-56.4",
+      "seconds": 57.0,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.8228,
+          "height_fraction": 0.1782,
+          "envelope_area_fraction": 0.1466
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.3516,
+          "height_fraction": 0.3594,
+          "envelope_area_fraction": 0.1264
+        },
+        {
+          "type": "Text",
+          "text": "INFELIZMENTE",
+          "width_fraction": 0.7806,
+          "height_fraction": 0.148,
+          "envelope_area_fraction": 0.1155
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "final",
+      "seconds": 57.433,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "Text",
+          "text": "INFELIZMENTE",
+          "width_fraction": 0.7806,
+          "height_fraction": 0.148,
+          "envelope_area_fraction": 0.1155
+        }
+      ],
+      "below_30_percent": true
+    }
+  ]
+}

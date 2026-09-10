@@ -233,3 +233,32 @@ def test_pipeline_plan_reaches_manins_child_scene_through_subprocess_environment
 
     assert result.state.value == "success"
     assert runner.child_plan_id == "subprocess-plan"
+
+
+def test_pipeline_persists_runtime_binding_separately_from_original_ollama_response(
+    tmp_path: Path,
+) -> None:
+    from test_provider import RecordingOpener
+
+    from video_pipeline.provider import OllamaProvider
+
+    original = ("from manim import *\nclass BoundScene(Scene):\n"
+        "    def construct(self):\n        self.wait(2)\n")
+    payload = {"response": original}
+    provider = OllamaProvider(opener=RecordingOpener([payload, {"response": ""}]))
+    plan = ScenePlan(id="visual", scene_name="BoundScene", objective="Pause", duration_seconds=2.0)
+    result = RenderPipeline(
+        provider=provider,
+        runner=_Runner(),
+        validator=_Validator(),
+        observer=_Observer(),
+        output_root=tmp_path / "runs",
+        id_factory=lambda: "bound-run",
+    ).render(
+        SceneSpec(id="visual", scene_name="BoundScene", description="Pause", plan=plan),
+        max_attempts=1,
+    )
+    artifact = json.loads((result.run_path / "attempt-01" / "response.json").read_text())
+    assert artifact["raw_response"] == payload
+    assert artifact["normalization"] == {"kind": "visual_runtime_binding", "version": 1}
+    assert "class BoundScene(VisualScene)" in artifact["code"]

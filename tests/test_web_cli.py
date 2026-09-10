@@ -63,3 +63,26 @@ def test_cli_web_handles_ctrl_c_without_error_output(
 
     assert main(["web", "--port", "8766"]) == 0
     assert capsys.readouterr().out == ""
+
+
+def test_web_can_use_authored_candidates_through_the_real_pipeline(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from video_pipeline.cli import main
+    from video_pipeline.provider import ProviderRequest
+
+    source = tmp_path / "candidates" / "ExampleScene" / "scene.py"
+    source.parent.mkdir(parents=True)
+    source.write_text("class ExampleScene: pass\n")
+
+    def inspect_serve(service: object, *, host: str, port: int) -> None:
+        pipeline = service.pipeline_factory("authored-run")
+        result = pipeline.provider.generate(
+            ProviderRequest(scene_name="ExampleScene", description="example")
+        )
+        assert result.code == source.read_text()
+        assert result.raw_response["provider"] == "authored_source"
+
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr("video_pipeline.web.serve", inspect_serve)
+    assert main(["web", "--authored-sources", str(source.parent.parent)]) == 0

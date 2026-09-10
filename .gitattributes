@@ -1,0 +1,13 @@
+# Approved reference binaries; source, reports and manifests remain ordinary Git.
+# Preserve frozen/vendor bytes, including original whitespace and CRLF licenses.
+videos/llm_fundation/master-scenes/** -text -whitespace linguist-vendored
+assets/fonts/** -text -whitespace linguist-vendored
+videos/llm_fundation/master.mp4 filter=lfs diff=lfs merge=lfs -text
+videos/llm_fundation/master-scenes/**/*.png filter=lfs diff=lfs merge=lfs -text
+videos/llm_fundation/master-scenes/**/*.jpg filter=lfs diff=lfs merge=lfs -text
+videos/llm_fundation/master-scenes/**/*.jpeg filter=lfs diff=lfs merge=lfs -text
+videos/llm_fundation/master-scenes/**/*.ttf filter=lfs diff=lfs merge=lfs -text
+videos/llm_fundation/master-scenes/**/*.zip filter=lfs diff=lfs merge=lfs -text
+videos/llm_fundation/master-scenes/_assets/*.html filter=lfs diff=lfs merge=lfs -text
+videos/llm_fundation/master-scenes/_assets/*.js filter=lfs diff=lfs merge=lfs -text
+assets/fonts/**/*.ttf filter=lfs diff=lfs merge=lfs -text

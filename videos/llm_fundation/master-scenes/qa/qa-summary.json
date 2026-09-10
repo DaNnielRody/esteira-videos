@@ -1,0 +1,65 @@
+{
+  "asymmetric_model_margins": [
+    {
+      "output": "O cachorro buscou\na bola.",
+      "left_margin_fraction": 0.055084745762711926
+    },
+    {
+      "output": "4",
+      "left_margin_fraction": 0.055084745762711926
+    }
+  ],
+  "processing_order_passed": true,
+  "assistant_alignment": {
+    "timestamp": 595,
+    "window_ink_center_x": 959.5,
+    "window_left": 600,
+    "window_right": 1319,
+    "title_ink_center_x": 959.5,
+    "logo_ink_center_x": 959.5,
+    "prompt_ink_center_x": 959.5
+  },
+  "close_node_ratios": {
+    "450": [
+      1.024390243902439,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.024390243902439,
+      0.9523809523809523,
+      1.0,
+      1.0,
+      1.0,
+      0.9761904761904762,
+      1.0,
+      1.024390243902439,
+      1.024390243902439,
+      1.024390243902439,
+      1.0,
+      1.024390243902439,
+      1.0,
+      1.0
+    ],
+    "471": [
+      1.0384615384615385,
+      1.0,
+      0.9285714285714286,
+      1.0384615384615385,
+      1.0,
+      1.0,
+      1.0384615384615385,
+      1.0,
+      0.9629629629629629
+    ]
+  },
+  "node_mask_note": "O componente amarelo parcial em 449,5s é sobreposto pelo pulso verde; o recorte confirma oclusão de cor, não deformação geométrica.",
+  "freeze_occurrences": 73,
+  "dead_frames_identified": 0,
+  "temporal_samples": 671,
+  "review_limit": "Revisão temporal por sequências a 10 fps, snapshots e análise dos frames decodificados. Não houve reprodução audiovisual integral em velocidade normal.",
+  "tests": "tests/test_visual_foundation.py: 7 passed",
+  "baseline_final16_preserved": true
+}

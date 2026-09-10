@@ -6,6 +6,8 @@ import hashlib
 import json
 from pathlib import Path
 
+import pytest
+
 from video_pipeline.cli import main
 from video_pipeline.project import Project
 from video_pipeline.scene_plan import ScenePlan
@@ -108,9 +110,7 @@ def test_init_explicit_timestamps_create_confirmed_timeline_and_plans(
     )
     assert loaded_project.status == "timeline_confirmed"
 
-    timeline = Timeline.model_validate_json(
-        (project / "timeline.json").read_text(encoding="utf-8")
-    )
+    timeline = Timeline.model_validate_json((project / "timeline.json").read_text(encoding="utf-8"))
     assert timeline.status == "confirmed"
     assert timeline.method == "explicit_timestamp"
     assert timeline.duration_seconds == 10.0
@@ -146,3 +146,31 @@ def test_init_explicit_timestamps_create_confirmed_timeline_and_plans(
         assert plan.duration_seconds == segment.target_duration_seconds
         assert plan.objective == segment.objective
         assert plan.theme == loaded_project.theme
+
+
+@pytest.mark.parametrize(
+    "topics",
+    [
+        "unknown",
+        "transformers,",
+        "transformers, transformers",
+        "linear_algebra, calculus, neural_networks, transformers, probability",
+    ],
+)
+def test_script_rejects_invalid_reference_topics(topics: str) -> None:
+    from video_pipeline.timeline import parse_heading_sections
+
+    with pytest.raises(ValueError):
+        parse_heading_sections(f"# Cena\n@topics: {topics}\nTexto narrado.")
+
+
+def test_reference_topics_are_optional_per_scene_and_not_narration() -> None:
+    from video_pipeline.timeline import parse_heading_sections
+
+    scenes = parse_heading_sections(
+        "# Rede\n@topics: neural_networks\nVeja a rede.\n\n# Final\nAté a próxima."
+    )
+    assert scenes is not None
+    assert scenes[0].topics == ("neural_networks",)
+    assert scenes[0].narration_text == "Veja a rede."
+    assert scenes[1].topics == ()

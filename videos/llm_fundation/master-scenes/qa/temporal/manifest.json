@@ -1,0 +1,219 @@
+[
+  {
+    "file": "book-open-00.jpg",
+    "scene": "OQueCriouOChatGPTScene",
+    "start": 44.0,
+    "sample_interval_seconds": 0.1,
+    "frames": 24
+  },
+  {
+    "file": "book-open-01.jpg",
+    "scene": "OQueCriouOChatGPTScene",
+    "start": 46.4,
+    "sample_interval_seconds": 0.1,
+    "frames": 21
+  },
+  {
+    "file": "first-word-00.jpg",
+    "scene": "OLimiteDoDicionarioScene",
+    "start": 0.0,
+    "sample_interval_seconds": 0.1,
+    "frames": 24
+  },
+  {
+    "file": "first-word-01.jpg",
+    "scene": "OLimiteDoDicionarioScene",
+    "start": 2.4,
+    "sample_interval_seconds": 0.1,
+    "frames": 3
+  },
+  {
+    "file": "model-left-summary-00.jpg",
+    "scene": "AEscalaDosGPTsScene",
+    "start": 69.0,
+    "sample_interval_seconds": 0.1,
+    "frames": 24
+  },
+  {
+    "file": "model-left-summary-01.jpg",
+    "scene": "AEscalaDosGPTsScene",
+    "start": 71.4,
+    "sample_interval_seconds": 0.1,
+    "frames": 24
+  },
+  {
+    "file": "model-left-summary-02.jpg",
+    "scene": "AEscalaDosGPTsScene",
+    "start": 73.8,
+    "sample_interval_seconds": 0.1,
+    "frames": 7
+  },
+  {
+    "file": "persona-00.jpg",
+    "scene": "AEscalaDosGPTsScene",
+    "start": 75.5,
+    "sample_interval_seconds": 0.1,
+    "frames": 24
+  },
+  {
+    "file": "persona-01.jpg",
+    "scene": "AEscalaDosGPTsScene",
+    "start": 77.9,
+    "sample_interval_seconds": 0.1,
+    "frames": 24
+  },
+  {
+    "file": "persona-02.jpg",
+    "scene": "AEscalaDosGPTsScene",
+    "start": 80.3,
+    "sample_interval_seconds": 0.1,
+    "frames": 22
+  },
+  {
+    "file": "payoff-00.jpg",
+    "scene": "AEscalaDosGPTsScene",
+    "start": 95.2,
+    "sample_interval_seconds": 0.1,
+    "frames": 24
+  },
+  {
+    "file": "payoff-01.jpg",
+    "scene": "AEscalaDosGPTsScene",
+    "start": 97.60000000000001,
+    "sample_interval_seconds": 0.1,
+    "frames": 24
+  },
+  {
+    "file": "payoff-02.jpg",
+    "scene": "AEscalaDosGPTsScene",
+    "start": 100.0,
+    "sample_interval_seconds": 0.1,
+    "frames": 15
+  },
+  {
+    "file": "assistant-00.jpg",
+    "scene": "PosTreinamentoEChatGPTScene",
+    "start": 58.3,
+    "sample_interval_seconds": 0.1,
+    "frames": 24
+  },
+  {
+    "file": "assistant-01.jpg",
+    "scene": "PosTreinamentoEChatGPTScene",
+    "start": 60.699999999999996,
+    "sample_interval_seconds": 0.1,
+    "frames": 23
+  },
+  {
+    "file": "callbacks-00.jpg",
+    "scene": "AEscadaEAPerguntaScene",
+    "start": 25.2,
+    "sample_interval_seconds": 0.1,
+    "frames": 24
+  },
+  {
+    "file": "callbacks-01.jpg",
+    "scene": "AEscadaEAPerguntaScene",
+    "start": 27.599999999999998,
+    "sample_interval_seconds": 0.1,
+    "frames": 24
+  },
+  {
+    "file": "callbacks-02.jpg",
+    "scene": "AEscadaEAPerguntaScene",
+    "start": 30.0,
+    "sample_interval_seconds": 0.1,
+    "frames": 24
+  },
+  {
+    "file": "callbacks-03.jpg",
+    "scene": "AEscadaEAPerguntaScene",
+    "start": 32.4,
+    "sample_interval_seconds": 0.1,
+    "frames": 24
+  },
+  {
+    "file": "callbacks-04.jpg",
+    "scene": "AEscadaEAPerguntaScene",
+    "start": 34.8,
+    "sample_interval_seconds": 0.1,
+    "frames": 24
+  },
+  {
+    "file": "callbacks-05.jpg",
+    "scene": "AEscadaEAPerguntaScene",
+    "start": 37.2,
+    "sample_interval_seconds": 0.1,
+    "frames": 24
+  },
+  {
+    "file": "callbacks-06.jpg",
+    "scene": "AEscadaEAPerguntaScene",
+    "start": 39.599999999999994,
+    "sample_interval_seconds": 0.1,
+    "frames": 24
+  },
+  {
+    "file": "callbacks-07.jpg",
+    "scene": "AEscadaEAPerguntaScene",
+    "start": 42.0,
+    "sample_interval_seconds": 0.1,
+    "frames": 24
+  },
+  {
+    "file": "callbacks-08.jpg",
+    "scene": "AEscadaEAPerguntaScene",
+    "start": 44.4,
+    "sample_interval_seconds": 0.1,
+    "frames": 24
+  },
+  {
+    "file": "callbacks-09.jpg",
+    "scene": "AEscadaEAPerguntaScene",
+    "start": 46.8,
+    "sample_interval_seconds": 0.1,
+    "frames": 23
+  },
+  {
+    "file": "conclusion-00.jpg",
+    "scene": "ANovaFinalizacaoScene",
+    "start": 0.0,
+    "sample_interval_seconds": 0.1,
+    "frames": 24
+  },
+  {
+    "file": "conclusion-01.jpg",
+    "scene": "ANovaFinalizacaoScene",
+    "start": 2.4,
+    "sample_interval_seconds": 0.1,
+    "frames": 24
+  },
+  {
+    "file": "conclusion-02.jpg",
+    "scene": "ANovaFinalizacaoScene",
+    "start": 4.8,
+    "sample_interval_seconds": 0.1,
+    "frames": 24
+  },
+  {
+    "file": "conclusion-03.jpg",
+    "scene": "ANovaFinalizacaoScene",
+    "start": 7.199999999999999,
+    "sample_interval_seconds": 0.1,
+    "frames": 24
+  },
+  {
+    "file": "conclusion-04.jpg",
+    "scene": "ANovaFinalizacaoScene",
+    "start": 9.6,
+    "sample_interval_seconds": 0.1,
+    "frames": 24
+  },
+  {
+    "file": "conclusion-05.jpg",
+    "scene": "ANovaFinalizacaoScene",
+    "start": 12.0,
+    "sample_interval_seconds": 0.1,
+    "frames": 5
+  }
+]

@@ -1,0 +1,16 @@
+[
+  {
+    "scene": "OLimiteDoDicionarioScene",
+    "frames_checked": 261,
+    "token_frames_checked": 0,
+    "min_token_padding": 100,
+    "errors": []
+  },
+  {
+    "scene": "ModeloBaseNaoEAssistenteScene",
+    "frames_checked": 156,
+    "token_frames_checked": 0,
+    "min_token_padding": 100,
+    "errors": []
+  }
+]

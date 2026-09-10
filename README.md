@@ -117,6 +117,43 @@ com fallback proporcional quando necessário.
 
 ## Estrutura persistida
 
+### Fontes autorais validadas
+
+`render --authored-sources <pasta>` lê `<pasta>/<SceneName>/scene.py` pelo
+`AuthoredSourceProvider`. O código passa pelo mesmo pipeline de renderização,
+críticos, normalização, composição e aceitação utilizado com Ollama. A origem e
+o SHA-256 ficam registrados; esse modo não faz inferência nem atribui o código
+ao Qwen. `web --authored-sources <pasta>` usa o mesmo provider na interface.
+
+Para iniciar uma nova execução após alterar planos ou fontes, use
+`render --new-run`. Sem essa opção, a retomada preserva e reutiliza as cenas
+prontas do run interrompido. Os runs anteriores permanecem como evidência.
+
+Todas as cenas dentro da tolerância de correção passam pela normalização do
+perfil de mídia, mesmo quando a duração já está correta: resolução, fps,
+formato de pixels e base de tempo precisam coincidir antes da concatenação.
+O relógio das animações acompanha os frames efetivamente renderizados.
+
+A composição usa AAC a 192 kb/s explicitamente. Isso não restaura áudio já
+saturado na entrada: preparações de narração devem preservar a decodificação
+em ponto flutuante até o tratamento de picos e verificar também o áudio
+decodificado da exportação. O exemplo `llm_fundation` inclui essa verificação
+na evidência da revisão de sincronização e áudio.
+
+A coleção [videos/llm_fundation](videos/llm_fundation/README.md) publica o master
+aprovado e suas fontes/assets. Os binários usam Git LFS: após clonar, execute
+`git lfs install --local` e `git lfs pull`. Para conferir o pacote, execute
+`.venv/bin/python scripts/verify_direction_reference.py`.
+
+A [especificação de direção v1](docs/direction/visual-direction-v1.md) registra
+os 15 princípios e os contratos opcionais de token, proporções e ordem de
+processamento, integrados ao gate. Há um
+[plano de exemplo](examples/direction-contract/plan.json) e um
+[modelo de revisão](docs/direction/review-template.md).
+Essa referência aprovada ainda não é um golden set de regressões narrativas:
+as versões intermediárias permanecem locais e precisam ser alinhadas e rotuladas.
+Ela também não entra automaticamente no catálogo few-shot enviado ao modelo.
+
 Um projeto audiovisual canônico contém:
 
 ```text
@@ -224,3 +261,34 @@ stale polling guard, reload/restart e retry de draft interrompido sem Ollama,
 Manim, FFmpeg ou ffprobe. O teste é pulado somente quando `/usr/bin/firefox`
 ou `/snap/bin/geckodriver` não existem ou não são executáveis; falhas de setup
 depois dessa verificação fazem o teste falhar.
+
+### Geração local em CPU
+
+O timeout HTTP do Ollama é de 120 segundos por padrão. Para máquinas em que
+o Qwen precisa de mais tempo, configure um valor finito e positivo em segundos:
+
+```sh
+VIDEO_PIPELINE_OLLAMA_TIMEOUT=900 video-pipeline web
+```
+
+O roteiro pode selecionar os exemplos locais de animação por cena, com
+`@topics: neural_networks, transformers` antes do texto narrado. São aceitos
+até quatro tópicos distintos do catálogo (`linear_algebra`, `calculus`,
+`neural_networks`, `machine_learning`, `transformers`, `probability`,
+`fourier`, `convolution`). A omissão preserva o comportamento sem exemplos.
+A janela de contexto do Ollama é explicitamente 16.384 tokens, para acomodar
+roteiro, contratos e código de correção. Use `VIDEO_PIPELINE_OLLAMA_NUM_CTX`
+para ajustá-la à capacidade do modelo local.
+A seleção é persistida no plano e no request de cada tentativa; não representa
+uma garantia de qualidade visual do vídeo gerado.
+
+Nas cenas com plano, o adaptador de código vincula a classe solicitada ao
+`VisualScene` e injeta o import do runtime. O corpo das animações é preservado;
+`response.json` guarda a resposta original do Ollama, o código efetivo e a marca
+`normalization: {kind: visual_runtime_binding, version: 1}`. O runtime expõe
+`self.theme`, derivado do tema autoral do plano. Essa adaptação não corrige
+geometria, conteúdo, duração ou qualidade da animação.
+
+A retomada de falha/interrupção recupera o último par completo de código e
+diagnóstico da cena, sem reiniciar a geração sem contexto. A normalização de
+duração respeita a precisão de um quadro na taxa de quadros configurada.

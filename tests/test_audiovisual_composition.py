@@ -77,6 +77,33 @@ class FakeFinalValidator:
         return result
 
 
+@pytest.mark.parametrize("codec", ["aac", "alac"])
+def test_composer_requests_high_quality_aac_without_lossy_options_for_alac(
+    tmp_path: Path, codec: str
+) -> None:
+    """Narration AAC gets 192 kb/s; lossless audio retains its own codec contract."""
+    scene = tmp_path / "scene.mp4"
+    narration = tmp_path / "narration.wav"
+    scene.write_bytes(b"SCENE")
+    narration.write_bytes(b"AUDIO")
+    ffmpeg = FakeFFmpeg(returncode=0)
+    result = FFmpegComposer(subprocess_run=ffmpeg).compose(
+        [scene],
+        narration,
+        tmp_path / "final.mp4",
+        expected_duration_seconds=10,
+        profile=CompositionProfile(audio_codec=codec),
+        validator=FakeFinalValidator(valid=True),
+    )
+    assert result.exit_code == 0
+    arguments = ffmpeg.calls[0][0]
+    if codec == "aac":
+        assert "-b:a" in arguments
+        assert arguments[arguments.index("-b:a") + 1] == "192k"
+    else:
+        assert "-b:a" not in arguments
+
+
 def test_composition_scenes_list_preserves_previous_file_on_replace_failure(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
