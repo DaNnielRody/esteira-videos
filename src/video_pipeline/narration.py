@@ -37,6 +37,11 @@ class SpeechSpan:
     beat_ids: tuple[str, ...] = ()
     emphasize: bool = False
 
+    @property
+    def can_convert(self) -> bool:
+        """Retain very short articulations/noises instead of amplifying codec delay."""
+        return self.end_sample - self.start_sample >= round(0.3 * SAMPLE_RATE)
+
     def to_document(self) -> dict[str, object]:
         return {
             "start_seconds": self.start_sample / SAMPLE_RATE,
@@ -44,6 +49,7 @@ class SpeechSpan:
             "scene_id": self.scene_id,
             "beat_ids": list(self.beat_ids),
             "emphasize": self.emphasize,
+            "conversion": "voice_changer" if self.can_convert else "preserve_short_source",
         }
 
 
@@ -56,8 +62,10 @@ class NarrationPlan:
         return {
             "schema_version": "narration-plan/1",
             "duration_seconds": len(self.samples) / SAMPLE_RATE,
-            "request_count": len(self.spans),
-            "conversion_seconds": sum(span.end_sample - span.start_sample for span in self.spans)
+            "request_count": sum(span.can_convert for span in self.spans),
+            "conversion_seconds": sum(
+                span.end_sample - span.start_sample for span in self.spans if span.can_convert
+            )
             / SAMPLE_RATE,
             "spans": [span.to_document() for span in self.spans],
             "review_required": True,
@@ -245,6 +253,15 @@ class NarrationEnhancer:
             staging = Path(directory)
             for index, span in enumerate(plan.spans):
                 original = plan.samples[span.start_sample : span.end_sample]
+                if not span.can_convert:
+                    phrases.append(
+                        {
+                            **span.to_document(),
+                            "converted": False,
+                            "reason": "preserve_short_source",
+                        }
+                    )
+                    continue
                 phrase_settings = settings
                 if span.emphasize:
                     phrase_settings = VoiceSettings(
@@ -268,6 +285,8 @@ class NarrationEnhancer:
                     raise ValueError(
                         "converted phrase timing drift exceeds 5%; candidate not published"
                     )
+                end_padding_samples = 0
+                end_trim_samples = 0
                 if len(samples) != len(original):
                     result = subprocess.run(
                         [
@@ -294,8 +313,11 @@ class NarrationEnhancer:
                     if result.returncode or not result.stdout or len(result.stdout) % 4:
                         raise ValueError("phrase timing normalization failed")
                     samples = np.frombuffer(result.stdout, dtype="<f4").copy()
-                    if not np.isfinite(samples).all() or abs(len(samples) - len(original)) > 480:
+                    residual = len(samples) - len(original)
+                    if not np.isfinite(samples).all() or residual > 480 or residual < -2880:
                         raise ValueError("phrase normalization would trim speech")
+                    end_padding_samples = max(0, -residual)
+                    end_trim_samples = max(0, residual)
                     samples = np.pad(samples, (0, max(0, len(original) - len(samples))))[
                         : len(original)
                     ]
@@ -307,6 +329,9 @@ class NarrationEnhancer:
                         "timing_adjusted": ratio != 1,
                         "audio": f"phrase-{index + 1:04d}.mp3",
                         "settings": phrase_settings.to_document(),
+                        "converted": True,
+                        "end_padding_seconds": end_padding_samples / SAMPLE_RATE,
+                        "end_trim_seconds": end_trim_samples / SAMPLE_RATE,
                     }
                 )
             if hashlib.sha256(source.read_bytes()).hexdigest() != source_hash:

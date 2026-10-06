@@ -62,12 +62,16 @@ Comece com um trecho curto antes de converter a narração inteira.
 Janelas de energia de 10 ms localizam fala; pausas de aproximadamente 350 ms
 separam requisições, com margens de 60 ms. A detecção é heurística: pode incluir
 respirações ou falas baixas. Pausas menores ficam dentro do trecho convertido.
+Intervalos menores que 300 ms ficam preservados no áudio original, sem requisição
+paga; não são descartados nem classificados automaticamente como respiração.
 Fala contínua acima de nove minutos é rejeitada, sem cortar frases arbitrariamente.
 
 A fala convertida volta ao mesmo intervalo de amostras. Diferenças pequenas
 de duração são ajustadas com `atempo`, preservando pitch. Drift maior que 5%,
 resposta vazia, não finita ou silenciosa e normalização que exigiria aparar
-mais de 10 ms bloqueiam a publicação. O áudio original, projeto, timeline,
+mais de 10 ms bloqueiam a publicação. Um déficit de até 60 ms do normalizador
+é completado com silêncio, sem aparar conteúdo. Padding e trim residuais são
+registrados no relatório. O áudio original, projeto, timeline,
 runs anteriores e vídeo aprovado permanecem preservados.
 
 Com `--project`, cada trecho registra cenas e beats temporizados sobrepostos.
@@ -81,8 +85,9 @@ Voice Changer preserva a entrega emocional da entrada. Aumentar `style` pode
 acentuar características da voz, mas não garante tornar uma fala neutra animada.
 Duração e pausas preservadas não comprovam alinhamento de palavras, conteúdo,
 identidade vocal ou aprovação artística. O relatório exige revisão com narração
-e transições. Na narração atual, o plano identifica 222 requisições e cerca de
-616,87 segundos enviados; confira o volume offline antes de consumir créditos.
+e transições. Na narração atual, o plano identifica 222 intervalos, dos quais
+219 são convertidos, e cerca de 616,38 segundos enviados; confira o volume
+offline antes de consumir créditos.
 
 Não há retry automático de operações pagas. Falhas não publicam candidatos e
 descartam temporários; uma nova execução começa do zero. Trechos brutos ficam

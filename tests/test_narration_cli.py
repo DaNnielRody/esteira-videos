@@ -244,9 +244,11 @@ def test_bad_wav_is_reported_without_traceback_or_ffmpeg_details(
     assert "private decoder detail" not in output
 
 
+@pytest.mark.parametrize("normalized_count", [53760, 52748])
 def test_small_duration_drift_is_adjusted_without_shifting_pauses(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
+    normalized_count: int,
 ) -> None:
     source = tmp_path / "speech.wav"
     source.write_bytes(audio_bytes([0] * 48000 + [4000] * 48000 + [0] * 48000))
@@ -265,7 +267,7 @@ def test_small_duration_drift_is_adjusted_without_shifting_pauses(
         filters = args[args.index("-af") + 1]
         assert float(filters.removeprefix("atempo=")) == pytest.approx(55000 / 53760)
         return subprocess.CompletedProcess(
-            args, 0, np.full(53760, 0.25, dtype="<f4").tobytes(), b""
+            args, 0, np.full(normalized_count, 0.25, dtype="<f4").tobytes(), b""
         )
 
     monkeypatch.setattr("subprocess.run", run)
@@ -279,6 +281,36 @@ def test_small_duration_drift_is_adjusted_without_shifting_pauses(
     assert np.all(values[105000:] == 0)
     report = json.loads((output / "report.json").read_text())
     assert report["phrases"][0]["timing_adjusted"] is True
+
+
+def test_tiny_source_spans_are_preserved_without_paid_conversion(tmp_path: Path) -> None:
+    source = tmp_path / "speech.wav"
+    source.write_bytes(
+        audio_bytes([0] * 48000 + [4000] * 48000 + [0] * 48000 + [4000] * 1920 + [0] * 48000)
+    )
+    calls: list[str] = []
+
+    class Provider:
+        def convert(
+            self,
+            audio: bytes,
+            *,
+            voice_id: str,
+            settings: VoiceSettings,
+        ) -> bytes:
+            calls.append(voice_id)
+            return audio_bytes([8000] * 53760)
+
+    output = tmp_path / "candidate"
+    NarrationEnhancer(Provider()).enhance(source, output, voice_id="ownedVoice")
+    with wave.open(str(output / "narration.wav"), "rb") as audio:
+        values = np.frombuffer(audio.readframes(audio.getnframes()), dtype="<i2")
+    assert len(calls) == 1
+    assert values[70000] == 8000
+    assert values[145000] == 4000
+    report = json.loads((output / "report.json").read_text())
+    assert report["request_count"] == 1
+    assert report["phrases"][1]["converted"] is False
 
 
 def test_clone_reports_provider_reason_without_exposing_body_or_key(
