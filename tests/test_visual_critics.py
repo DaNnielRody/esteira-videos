@@ -651,3 +651,87 @@ def test_coherence_reports_wrong_sequence_and_missing_movement() -> None:
     )
     movement_findings = check_plan_coherence(movement_plan, stationary_observed)
     assert any(finding.code == "BEAT_MOVEMENT_MISSING" for finding in movement_findings)
+
+
+def test_contrast_does_not_use_another_instant_at_the_same_position() -> None:
+    label = _object(logical_time=4.0, top=0.4, bottom=0.6)
+    dark = ObservedShape(
+        kind="polygon",
+        color="grey",
+        center_x=0.5,
+        center_y=0.5,
+        area_fraction=0.01,
+        extent=0.7,
+        observed_rgb=(30, 30, 30),
+    )
+    white = ObservedShape(
+        kind="polygon",
+        color="white",
+        center_x=0.5,
+        center_y=0.5,
+        area_fraction=0.01,
+        extent=0.7,
+        observed_rgb=(248, 250, 252),
+    )
+    frames = [FrameObservation(index=i, shapes=[dark], instant_seconds=float(i)) for i in range(4)]
+    frames.append(FrameObservation(index=4, shapes=[white], instant_seconds=4.0))
+    observed = _observed(label).model_copy(update={"frames": frames})
+    assert not any(f.code == "LOW_CONTRAST" for f in check_contrast(_plan(), observed))
+
+
+def test_contrast_does_not_assign_an_oversized_container_to_text() -> None:
+    """A browser outline must not stand in for text inside its content area."""
+
+    label = _object(
+        left=0.4703945,
+        right=0.7790999,
+        top=0.5484722,
+        bottom=0.5962897,
+        logical_time=1.0,
+    )
+    browser_outline = ObservedShape(
+        kind="polygon",
+        color="blue",
+        center_x=0.5482,
+        center_y=0.5847,
+        area_fraction=0.10439,
+        extent=0.7271,
+        observed_rgb=(95, 197, 228),
+    )
+    observed = _observed(label).model_copy(
+        update={
+            "frames": [
+                FrameObservation(index=0, shapes=[browser_outline], instant_seconds=1.0)
+            ]
+        }
+    )
+
+    findings = check_contrast(_plan(), observed)
+
+    assert not any(f.code == "SEMANTIC_COLOR_MISMATCH" for f in findings)
+    assert any(f.code == "PIXEL_COLOR_UNMATCHED" for f in findings)
+
+    wrong_glyph = ObservedShape(
+        kind="polygon",
+        color="red",
+        center_x=0.6247,
+        center_y=0.5724,
+        area_fraction=0.003,
+        extent=0.7,
+        observed_rgb=(200, 0, 0),
+    )
+    observed_with_wrong_glyph = observed.model_copy(
+        update={
+            "frames": [
+                FrameObservation(
+                    index=0,
+                    shapes=[browser_outline, wrong_glyph],
+                    instant_seconds=1.0,
+                )
+            ]
+        }
+    )
+
+    strict_findings = check_contrast(_plan(), observed_with_wrong_glyph)
+
+    assert any(f.code == "SEMANTIC_COLOR_MISMATCH" for f in strict_findings)

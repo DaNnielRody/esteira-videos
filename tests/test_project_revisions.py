@@ -6,8 +6,11 @@ import hashlib
 import importlib
 import json
 import os
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import asdict, is_dataclass
+from multiprocessing import get_context
 from pathlib import Path
+from typing import Protocol
 
 import pytest
 from test_project_lifecycle import _initialize_confirmed_project
@@ -136,6 +139,17 @@ def _assert_index_only_pointer(project_root: Path, expected: str) -> dict[str, o
     assert document["schema_version"] == "project.ui-revision-index/1"
     assert document["current_revision_id"] == expected
     return document
+
+
+class _ProcessResultQueue(Protocol):
+    def put(self, value: int) -> None:
+        ...
+
+
+def _recover_in_process(project_root: str, results: _ProcessResultQueue) -> None:
+    from video_pipeline.revisions import RevisionStore
+
+    results.put(len(RevisionStore(Path(project_root)).recover_interrupted()))
 
 
 def test_terminal_jobs_create_typed_complete_revisions_and_minimal_index(
@@ -355,6 +369,134 @@ def test_checkout_preserves_later_revision_and_branch_uses_selected_parent(
     )
 
 
+def test_checkout_rejects_failure_revision_without_moving_pointer(
+    tmp_path: Path,
+) -> None:
+    store_type, _, _, _ = _require_revision_contract()
+    project_root = _project(tmp_path)
+    store = _store(store_type, project_root)
+    success = _publish(
+        store,
+        job_id="job-checkout-success",
+        run_id="run-checkout-success",
+        status="success",
+    )
+    failure = _publish(
+        store,
+        job_id="job-checkout-failure",
+        run_id="run-checkout-failure",
+        status="failure",
+        messages=["diagnostic is inspectable"],
+    )
+    assert _document(success)["revision_id"] == "v001"
+    assert _document(failure)["revision_id"] == "v002"
+    assert _assert_index_only_pointer(project_root, "v002")
+
+    with pytest.raises(ValueError, match="successful"):
+        store.checkout("v002")
+
+    assert _assert_index_only_pointer(project_root, "v002")
+
+
+def test_recovery_and_retry_enter_the_same_mutation_lock(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    store_type, _, _, _ = _require_revision_contract()
+    project_root = _project(tmp_path)
+    store = _store(store_type, project_root)
+    store.start_working(  # type: ignore[attr-defined]
+        project_id=PROJECT_ID,
+        job_id="job-lock-source",
+        run_id="run-lock-source",
+        status="running",
+        base_package_hashes=dict(BASE_PACKAGE_HASHES),
+    )
+    entered = 0
+    original_lock = store._mutation_lock  # type: ignore[attr-defined]
+
+    class _ObservedLock:
+        def __enter__(self) -> None:
+            nonlocal entered
+            entered += 1
+
+        def __exit__(self, *_args: object) -> None:
+            return None
+
+    def observed_lock() -> _ObservedLock:
+        return _ObservedLock()
+
+    monkeypatch.setattr(store, "_mutation_lock", observed_lock)
+    store.recover_interrupted()  # type: ignore[attr-defined]
+    store.retry(  # type: ignore[attr-defined]
+        "job-lock-source",
+        new_job_id="job-lock-retry",
+    )
+    assert entered == 2
+    monkeypatch.setattr(store, "_mutation_lock", original_lock)
+
+
+def test_concurrent_recovery_has_one_winner_and_no_duplicate_interruption(
+    tmp_path: Path,
+) -> None:
+    store_type, _, _, _ = _require_revision_contract()
+    project_root = _project(tmp_path)
+    store = _store(store_type, project_root)
+    store.start_working(  # type: ignore[attr-defined]
+        project_id=PROJECT_ID,
+        job_id="job-concurrent-recovery",
+        run_id="run-concurrent-recovery",
+        status="running",
+        base_package_hashes=dict(BASE_PACKAGE_HASHES),
+    )
+    stores = [_store(store_type, project_root), _store(store_type, project_root)]
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        results = list(executor.map(lambda candidate: candidate.recover_interrupted(), stores))
+
+    assert sorted(len(result) for result in results) == [0, 1]
+    assert _json_document(
+        project_root / "ui" / "working" / "job-concurrent-recovery.json"
+    )["status"] == "interrupted"
+
+
+def test_process_recovery_has_one_winner_and_bounded_join(
+    tmp_path: Path,
+) -> None:
+    store_type, _, _, _ = _require_revision_contract()
+    project_root = _project(tmp_path)
+    store = _store(store_type, project_root)
+    store.start_working(  # type: ignore[attr-defined]
+        project_id=PROJECT_ID,
+        job_id="job-process-recovery",
+        run_id="run-process-recovery",
+        status="running",
+        base_package_hashes=dict(BASE_PACKAGE_HASHES),
+    )
+    context = get_context("spawn")
+    results = context.Queue()
+    processes = [
+        context.Process(
+            target=_recover_in_process,
+            args=(str(project_root), results),
+        )
+        for _ in range(2)
+    ]
+    try:
+        for process in processes:
+            process.start()
+        recovered_counts = [results.get(timeout=5) for _ in processes]
+        assert sorted(recovered_counts) == [0, 1]
+    finally:
+        for process in processes:
+            process.join(timeout=5)
+        assert all(process.exitcode == 0 for process in processes)
+        results.close()
+        results.join_thread()
+    assert _json_document(
+        project_root / "ui" / "working" / "job-process-recovery.json"
+    )["status"] == "interrupted"
+
+
 def test_restart_recovers_working_job_and_requires_explicit_retry_for_revision(
     tmp_path: Path,
 ) -> None:
@@ -443,7 +585,7 @@ def test_restart_recovers_working_job_and_requires_explicit_retry_for_revision(
     terminal_retry = _publish(
         restarted_store,
         job_id="job-a-retry",
-        run_id="run-a-retry",
+        run_id="run-job-a-retry",
         status="success",
         correction="retry this scene",
         messages=["retry completed"],
@@ -672,3 +814,87 @@ def test_terminal_publication_rolls_back_revision_when_index_replace_fails(
     assert _document(retried)["revision_id"] == "v002"
     assert _revision_snapshot(project_root)["v001.json"] == revisions_before["v001.json"]
     assert _assert_index_only_pointer(project_root, "v002")["current_revision_id"] == "v002"
+
+
+def test_terminal_manifest_keeps_working_draft_parent_after_checkout_changes(
+    tmp_path: Path,
+) -> None:
+    """A terminal job keeps the checkout captured when its draft started."""
+
+    store_type, revision_type, _, draft_type = _require_revision_contract()
+    project_root = _project(tmp_path)
+    store = _store(store_type, project_root)
+
+    first = _publish(
+        store,
+        job_id="job-lineage-first",
+        run_id="run-lineage-first",
+        status="success",
+    )
+    assert isinstance(first, revision_type)
+    draft = store.start_working(  # type: ignore[attr-defined]
+        project_id=PROJECT_ID,
+        job_id="job-lineage-running",
+        run_id="run-lineage-running",
+        status="running",
+        base_package_hashes=dict(BASE_PACKAGE_HASHES),
+    )
+    assert isinstance(draft, draft_type)
+    assert _document(draft)["parent_revision_id"] == "v001"
+
+    later = _publish(
+        store,
+        job_id="job-lineage-later",
+        run_id="run-lineage-later",
+        status="success",
+    )
+    assert isinstance(later, revision_type)
+    assert _document(later)["revision_id"] == "v002"
+    store.checkout("v002")
+
+    terminal = _publish(
+        store,
+        job_id="job-lineage-running",
+        run_id="run-lineage-running",
+        status="success",
+    )
+    assert isinstance(terminal, revision_type)
+    assert _document(terminal)["revision_id"] == "v003"
+    assert _document(terminal)["parent_revision_id"] == "v001"
+
+
+def test_concurrent_terminal_publication_is_idempotent_and_atomic(
+    tmp_path: Path,
+) -> None:
+    """Concurrent completion of one job produces one immutable revision."""
+
+    from concurrent.futures import ThreadPoolExecutor
+
+    store_type, revision_type, _, _ = _require_revision_contract()
+    project_root = _project(tmp_path)
+    store = _store(store_type, project_root)
+    store.start_working(  # type: ignore[attr-defined]
+        project_id=PROJECT_ID,
+        job_id="job-concurrent",
+        run_id="run-concurrent",
+        status="running",
+        base_package_hashes=dict(BASE_PACKAGE_HASHES),
+    )
+
+    def publish() -> object:
+        return _publish(
+            store,
+            job_id="job-concurrent",
+            run_id="run-concurrent",
+            status="success",
+        )
+
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        results = list(executor.map(lambda _: publish(), range(8)))
+
+    assert all(isinstance(result, revision_type) for result in results)
+    assert { _document(result)["revision_id"] for result in results } == {"v001"}
+    assert [path.name for path in (project_root / "ui" / "revisions").glob("*.json")] == [
+        "v001.json"
+    ]
+    assert _assert_index_only_pointer(project_root, "v001")["current_revision_id"] == "v001"

@@ -1,0 +1,4496 @@
+{
+  "method": "Clipped visible root envelopes in camera coordinates; estimate, not ink area or semantic identification. Thin hero typography, first GPT, spatial distance and empty question hold require narrative review.",
+  "beats": [
+    {
+      "beat": "beat-0.94",
+      "seconds": 0.933,
+      "camera_width": 14.222,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.7805,
+          "height_fraction": 0.148,
+          "envelope_area_fraction": 0.1155
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-0.94",
+      "seconds": 1.833,
+      "camera_width": 14.222,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.8114,
+          "height_fraction": 0.203,
+          "envelope_area_fraction": 0.1647
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.7805,
+          "height_fraction": 0.148,
+          "envelope_area_fraction": 0.1155
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-1.9",
+      "seconds": 1.867,
+      "camera_width": 14.222,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.8114,
+          "height_fraction": 0.203,
+          "envelope_area_fraction": 0.1647
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.7805,
+          "height_fraction": 0.148,
+          "envelope_area_fraction": 0.1155
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-1.9",
+      "seconds": 3.767,
+      "camera_width": 13.4,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.8612,
+          "height_fraction": 0.2154,
+          "envelope_area_fraction": 0.1855
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8284,
+          "height_fraction": 0.1571,
+          "envelope_area_fraction": 0.1301
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-4.9",
+      "seconds": 4.9,
+      "camera_width": 13.4,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.8612,
+          "height_fraction": 0.2154,
+          "envelope_area_fraction": 0.1855
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8284,
+          "height_fraction": 0.1571,
+          "envelope_area_fraction": 0.1301
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-4.9",
+      "seconds": 5.3,
+      "camera_width": 13.4,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.8612,
+          "height_fraction": 0.2154,
+          "envelope_area_fraction": 0.1855
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8582,
+          "height_fraction": 0.1627,
+          "envelope_area_fraction": 0.1396
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-5.3",
+      "seconds": 5.3,
+      "camera_width": 13.4,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.8612,
+          "height_fraction": 0.2154,
+          "envelope_area_fraction": 0.1855
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8582,
+          "height_fraction": 0.1627,
+          "envelope_area_fraction": 0.1396
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-5.3",
+      "seconds": 6.7,
+      "camera_width": 13.4,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.8612,
+          "height_fraction": 0.2154,
+          "envelope_area_fraction": 0.1855
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8582,
+          "height_fraction": 0.1627,
+          "envelope_area_fraction": 0.1396
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-7.25",
+      "seconds": 7.233,
+      "camera_width": 13.4,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.8612,
+          "height_fraction": 0.2154,
+          "envelope_area_fraction": 0.1855
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8582,
+          "height_fraction": 0.1627,
+          "envelope_area_fraction": 0.1396
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-7.25",
+      "seconds": 9.133,
+      "camera_width": 13.4,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.8612,
+          "height_fraction": 0.2154,
+          "envelope_area_fraction": 0.1855
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8582,
+          "height_fraction": 0.1627,
+          "envelope_area_fraction": 0.1396
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-9.15",
+      "seconds": 9.167,
+      "camera_width": 13.4,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.8612,
+          "height_fraction": 0.2154,
+          "envelope_area_fraction": 0.1855
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8582,
+          "height_fraction": 0.1627,
+          "envelope_area_fraction": 0.1396
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-9.15",
+      "seconds": 9.633,
+      "camera_width": 13.4,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.8612,
+          "height_fraction": 0.2154,
+          "envelope_area_fraction": 0.1855
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8582,
+          "height_fraction": 0.1627,
+          "envelope_area_fraction": 0.1396
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-9.62",
+      "seconds": 9.633,
+      "camera_width": 13.4,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.8612,
+          "height_fraction": 0.2154,
+          "envelope_area_fraction": 0.1855
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8582,
+          "height_fraction": 0.1627,
+          "envelope_area_fraction": 0.1396
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-9.62",
+      "seconds": 10.133,
+      "camera_width": 13.4,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.8612,
+          "height_fraction": 0.2154,
+          "envelope_area_fraction": 0.1855
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8582,
+          "height_fraction": 0.1627,
+          "envelope_area_fraction": 0.1396
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3637,
+          "height_fraction": 0.1893,
+          "envelope_area_fraction": 0.0688
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3607,
+          "height_fraction": 0.1893,
+          "envelope_area_fraction": 0.0683
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-10.25",
+      "seconds": 10.233,
+      "camera_width": 13.4,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.8612,
+          "height_fraction": 0.2154,
+          "envelope_area_fraction": 0.1855
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8582,
+          "height_fraction": 0.1627,
+          "envelope_area_fraction": 0.1396
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3637,
+          "height_fraction": 0.1893,
+          "envelope_area_fraction": 0.0688
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3607,
+          "height_fraction": 0.1893,
+          "envelope_area_fraction": 0.0683
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-10.25",
+      "seconds": 10.7,
+      "camera_width": 13.4,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.8612,
+          "height_fraction": 0.2154,
+          "envelope_area_fraction": 0.1855
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8582,
+          "height_fraction": 0.1627,
+          "envelope_area_fraction": 0.1396
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-10.96",
+      "seconds": 10.933,
+      "camera_width": 13.4,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.8612,
+          "height_fraction": 0.2154,
+          "envelope_area_fraction": 0.1855
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8582,
+          "height_fraction": 0.1627,
+          "envelope_area_fraction": 0.1396
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-10.96",
+      "seconds": 11.333,
+      "camera_width": 13.4,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8582,
+          "height_fraction": 0.1627,
+          "envelope_area_fraction": 0.1396
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.139,
+          "height_fraction": 0.1891,
+          "envelope_area_fraction": 0.0263
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-11.95",
+      "seconds": 11.933,
+      "camera_width": 13.4,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8582,
+          "height_fraction": 0.1627,
+          "envelope_area_fraction": 0.1396
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.139,
+          "height_fraction": 0.1891,
+          "envelope_area_fraction": 0.0263
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-11.95",
+      "seconds": 12.333,
+      "camera_width": 13.4,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8582,
+          "height_fraction": 0.1627,
+          "envelope_area_fraction": 0.1396
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3607,
+          "height_fraction": 0.1893,
+          "envelope_area_fraction": 0.0683
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.139,
+          "height_fraction": 0.1891,
+          "envelope_area_fraction": 0.0263
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-13.22",
+      "seconds": 13.2,
+      "camera_width": 13.4,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8582,
+          "height_fraction": 0.1627,
+          "envelope_area_fraction": 0.1396
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3607,
+          "height_fraction": 0.1893,
+          "envelope_area_fraction": 0.0683
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.139,
+          "height_fraction": 0.1891,
+          "envelope_area_fraction": 0.0263
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-13.22",
+      "seconds": 13.6,
+      "camera_width": 13.4,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8582,
+          "height_fraction": 0.1627,
+          "envelope_area_fraction": 0.1396
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3637,
+          "height_fraction": 0.1893,
+          "envelope_area_fraction": 0.0688
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3607,
+          "height_fraction": 0.1893,
+          "envelope_area_fraction": 0.0683
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.139,
+          "height_fraction": 0.1891,
+          "envelope_area_fraction": 0.0263
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-14.62",
+      "seconds": 14.733,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8087,
+          "height_fraction": 0.1533,
+          "envelope_area_fraction": 0.124
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3427,
+          "height_fraction": 0.1783,
+          "envelope_area_fraction": 0.0611
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3399,
+          "height_fraction": 0.1783,
+          "envelope_area_fraction": 0.0606
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.1309,
+          "height_fraction": 0.1782,
+          "envelope_area_fraction": 0.0233
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-14.62",
+      "seconds": 15.133,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8087,
+          "height_fraction": 0.1533,
+          "envelope_area_fraction": 0.124
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3427,
+          "height_fraction": 0.1783,
+          "envelope_area_fraction": 0.0611
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3399,
+          "height_fraction": 0.1783,
+          "envelope_area_fraction": 0.0606
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.1309,
+          "height_fraction": 0.1782,
+          "envelope_area_fraction": 0.0233
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-15.05",
+      "seconds": 15.133,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8087,
+          "height_fraction": 0.1533,
+          "envelope_area_fraction": 0.124
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3427,
+          "height_fraction": 0.1783,
+          "envelope_area_fraction": 0.0611
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3399,
+          "height_fraction": 0.1783,
+          "envelope_area_fraction": 0.0606
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.1309,
+          "height_fraction": 0.1782,
+          "envelope_area_fraction": 0.0233
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-15.05",
+      "seconds": 16.133,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8768,
+          "height_fraction": 0.1533,
+          "envelope_area_fraction": 0.1345
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-18.05",
+      "seconds": 18.033,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8768,
+          "height_fraction": 0.1533,
+          "envelope_area_fraction": 0.1345
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-18.05",
+      "seconds": 18.833,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8768,
+          "height_fraction": 0.1533,
+          "envelope_area_fraction": 0.1345
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3497,
+          "height_fraction": 0.1908,
+          "envelope_area_fraction": 0.0667
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3469,
+          "height_fraction": 0.1908,
+          "envelope_area_fraction": 0.0662
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.138,
+          "height_fraction": 0.1907,
+          "envelope_area_fraction": 0.0263
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-20.36",
+      "seconds": 20.333,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8768,
+          "height_fraction": 0.1533,
+          "envelope_area_fraction": 0.1345
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3497,
+          "height_fraction": 0.1908,
+          "envelope_area_fraction": 0.0667
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3469,
+          "height_fraction": 0.1908,
+          "envelope_area_fraction": 0.0662
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.138,
+          "height_fraction": 0.1907,
+          "envelope_area_fraction": 0.0263
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-20.36",
+      "seconds": 21.333,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.9823,
+          "height_fraction": 0.1533,
+          "envelope_area_fraction": 0.1506
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3497,
+          "height_fraction": 0.1908,
+          "envelope_area_fraction": 0.0667
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3469,
+          "height_fraction": 0.1908,
+          "envelope_area_fraction": 0.0662
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.138,
+          "height_fraction": 0.1907,
+          "envelope_area_fraction": 0.0263
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-21.59",
+      "seconds": 21.567,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.9823,
+          "height_fraction": 0.1533,
+          "envelope_area_fraction": 0.1506
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3497,
+          "height_fraction": 0.1908,
+          "envelope_area_fraction": 0.0667
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3469,
+          "height_fraction": 0.1908,
+          "envelope_area_fraction": 0.0662
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.138,
+          "height_fraction": 0.1907,
+          "envelope_area_fraction": 0.0263
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-21.59",
+      "seconds": 22.367,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.9823,
+          "height_fraction": 0.1533,
+          "envelope_area_fraction": 0.1506
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3497,
+          "height_fraction": 0.1908,
+          "envelope_area_fraction": 0.0667
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3469,
+          "height_fraction": 0.1908,
+          "envelope_area_fraction": 0.0662
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.138,
+          "height_fraction": 0.1907,
+          "envelope_area_fraction": 0.0263
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-22.28",
+      "seconds": 22.367,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.9823,
+          "height_fraction": 0.1533,
+          "envelope_area_fraction": 0.1506
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3497,
+          "height_fraction": 0.1908,
+          "envelope_area_fraction": 0.0667
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3469,
+          "height_fraction": 0.1908,
+          "envelope_area_fraction": 0.0662
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.138,
+          "height_fraction": 0.1907,
+          "envelope_area_fraction": 0.0263
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-22.28",
+      "seconds": 23.067,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.9823,
+          "height_fraction": 0.1533,
+          "envelope_area_fraction": 0.1506
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3497,
+          "height_fraction": 0.1908,
+          "envelope_area_fraction": 0.0667
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3469,
+          "height_fraction": 0.1908,
+          "envelope_area_fraction": 0.0662
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.138,
+          "height_fraction": 0.1907,
+          "envelope_area_fraction": 0.0263
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-23.72",
+      "seconds": 23.7,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.9823,
+          "height_fraction": 0.1533,
+          "envelope_area_fraction": 0.1506
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3497,
+          "height_fraction": 0.1908,
+          "envelope_area_fraction": 0.0667
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3469,
+          "height_fraction": 0.1908,
+          "envelope_area_fraction": 0.0662
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.138,
+          "height_fraction": 0.1907,
+          "envelope_area_fraction": 0.0263
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-23.72",
+      "seconds": 24.2,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8979,
+          "height_fraction": 0.1908,
+          "envelope_area_fraction": 0.1714
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.9823,
+          "height_fraction": 0.1533,
+          "envelope_area_fraction": 0.1506
+        },
+        {
+          "type": "Text",
+          "text": "token",
+          "width_fraction": 0.1163,
+          "height_fraction": 0.0514,
+          "envelope_area_fraction": 0.006
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-25.28",
+      "seconds": 25.267,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8979,
+          "height_fraction": 0.1908,
+          "envelope_area_fraction": 0.1714
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.9823,
+          "height_fraction": 0.1533,
+          "envelope_area_fraction": 0.1506
+        },
+        {
+          "type": "Text",
+          "text": "token",
+          "width_fraction": 0.1163,
+          "height_fraction": 0.0514,
+          "envelope_area_fraction": 0.006
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-25.28",
+      "seconds": 26.467,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.3094,
+          "height_fraction": 0.0483,
+          "envelope_area_fraction": 0.0149
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.2391,
+          "height_fraction": 0.0508,
+          "envelope_area_fraction": 0.0122
+        },
+        {
+          "type": "Text",
+          "text": "token",
+          "width_fraction": 0.1163,
+          "height_fraction": 0.0514,
+          "envelope_area_fraction": 0.006
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-28.2",
+      "seconds": 28.167,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.3094,
+          "height_fraction": 0.0483,
+          "envelope_area_fraction": 0.0149
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.2391,
+          "height_fraction": 0.0508,
+          "envelope_area_fraction": 0.0122
+        },
+        {
+          "type": "Text",
+          "text": "token",
+          "width_fraction": 0.1163,
+          "height_fraction": 0.0514,
+          "envelope_area_fraction": 0.006
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-28.2",
+      "seconds": 28.867,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1026,
+          "height_fraction": 0.0483,
+          "envelope_area_fraction": 0.005
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1035,
+          "height_fraction": 0.0483,
+          "envelope_area_fraction": 0.005
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-28.9",
+      "seconds": 28.9,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1026,
+          "height_fraction": 0.0483,
+          "envelope_area_fraction": 0.005
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1035,
+          "height_fraction": 0.0483,
+          "envelope_area_fraction": 0.005
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-28.9",
+      "seconds": 30.4,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "Text",
+          "text": "CrieoGTA6",
+          "width_fraction": 0.7595,
+          "height_fraction": 0.1508,
+          "envelope_area_fraction": 0.1145
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1026,
+          "height_fraction": 0.0483,
+          "envelope_area_fraction": 0.005
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1035,
+          "height_fraction": 0.0483,
+          "envelope_area_fraction": 0.005
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-30.91",
+      "seconds": 30.9,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.7595,
+          "height_fraction": 0.1508,
+          "envelope_area_fraction": 0.1145
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1026,
+          "height_fraction": 0.0483,
+          "envelope_area_fraction": 0.005
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1035,
+          "height_fraction": 0.0483,
+          "envelope_area_fraction": 0.005
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-30.91",
+      "seconds": 32.4,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8087,
+          "height_fraction": 0.1838,
+          "envelope_area_fraction": 0.1487
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-32.45",
+      "seconds": 32.433,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8087,
+          "height_fraction": 0.1838,
+          "envelope_area_fraction": 0.1487
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-32.45",
+      "seconds": 33.333,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8087,
+          "height_fraction": 0.1838,
+          "envelope_area_fraction": 0.1487
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3181,
+          "height_fraction": 0.2289,
+          "envelope_area_fraction": 0.0728
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-35.06",
+      "seconds": 35.033,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8087,
+          "height_fraction": 0.1838,
+          "envelope_area_fraction": 0.1487
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3181,
+          "height_fraction": 0.2289,
+          "envelope_area_fraction": 0.0728
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-35.06",
+      "seconds": 35.533,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8087,
+          "height_fraction": 0.1838,
+          "envelope_area_fraction": 0.1487
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3181,
+          "height_fraction": 0.2289,
+          "envelope_area_fraction": 0.0728
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-35.8",
+      "seconds": 35.767,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8087,
+          "height_fraction": 0.1838,
+          "envelope_area_fraction": 0.1487
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3181,
+          "height_fraction": 0.2289,
+          "envelope_area_fraction": 0.0728
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-35.8",
+      "seconds": 36.267,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8087,
+          "height_fraction": 0.1838,
+          "envelope_area_fraction": 0.1487
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3181,
+          "height_fraction": 0.2289,
+          "envelope_area_fraction": 0.0728
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-39.16",
+      "seconds": 39.133,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8087,
+          "height_fraction": 0.1838,
+          "envelope_area_fraction": 0.1487
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3181,
+          "height_fraction": 0.2289,
+          "envelope_area_fraction": 0.0728
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-39.16",
+      "seconds": 39.933,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.77,
+          "height_fraction": 0.1838,
+          "envelope_area_fraction": 0.1416
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3181,
+          "height_fraction": 0.2289,
+          "envelope_area_fraction": 0.0728
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-40.15",
+      "seconds": 40.133,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.77,
+          "height_fraction": 0.1838,
+          "envelope_area_fraction": 0.1416
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3181,
+          "height_fraction": 0.2289,
+          "envelope_area_fraction": 0.0728
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-40.15",
+      "seconds": 41.133,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.7806,
+          "height_fraction": 0.1838,
+          "envelope_area_fraction": 0.1435
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3181,
+          "height_fraction": 0.2289,
+          "envelope_area_fraction": 0.0728
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-44.6",
+      "seconds": 44.567,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.7806,
+          "height_fraction": 0.1838,
+          "envelope_area_fraction": 0.1435
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3181,
+          "height_fraction": 0.2289,
+          "envelope_area_fraction": 0.0728
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-44.6",
+      "seconds": 45.467,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.7806,
+          "height_fraction": 0.1838,
+          "envelope_area_fraction": 0.1435
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.3648,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0804
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3181,
+          "height_fraction": 0.2289,
+          "envelope_area_fraction": 0.0728
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-48.19",
+      "seconds": 48.167,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.7806,
+          "height_fraction": 0.1838,
+          "envelope_area_fraction": 0.1435
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.3648,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0804
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3181,
+          "height_fraction": 0.2289,
+          "envelope_area_fraction": 0.0728
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-48.19",
+      "seconds": 48.967,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.7806,
+          "height_fraction": 0.1838,
+          "envelope_area_fraction": 0.1435
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.3648,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0804
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3181,
+          "height_fraction": 0.2289,
+          "envelope_area_fraction": 0.0728
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-53.24",
+      "seconds": 53.233,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.7806,
+          "height_fraction": 0.1838,
+          "envelope_area_fraction": 0.1435
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.3648,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0804
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3181,
+          "height_fraction": 0.2289,
+          "envelope_area_fraction": 0.0728
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-53.24",
+      "seconds": 54.533,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0818,
+          "height_fraction": 0.1773,
+          "envelope_area_fraction": 0.0145
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-54.9",
+      "seconds": 54.9,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0818,
+          "height_fraction": 0.1773,
+          "envelope_area_fraction": 0.0145
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-54.9",
+      "seconds": 56.7,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "Text",
+          "text": "CACHORRO",
+          "width_fraction": 0.7595,
+          "height_fraction": 0.2236,
+          "envelope_area_fraction": 0.1698
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0818,
+          "height_fraction": 0.1773,
+          "envelope_area_fraction": 0.0145
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-57.0",
+      "seconds": 57.0,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "Text",
+          "text": "CACHORRO",
+          "width_fraction": 0.7595,
+          "height_fraction": 0.2236,
+          "envelope_area_fraction": 0.1698
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0818,
+          "height_fraction": 0.1773,
+          "envelope_area_fraction": 0.0145
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-57.0",
+      "seconds": 57.8,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.2391,
+          "height_fraction": 0.2813,
+          "envelope_area_fraction": 0.0673
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "Text",
+          "text": "CACHORRO",
+          "width_fraction": 0.3516,
+          "height_fraction": 0.1035,
+          "envelope_area_fraction": 0.0364
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-58.15",
+      "seconds": 58.133,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.2391,
+          "height_fraction": 0.2813,
+          "envelope_area_fraction": 0.0673
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "Text",
+          "text": "CACHORRO",
+          "width_fraction": 0.3516,
+          "height_fraction": 0.1035,
+          "envelope_area_fraction": 0.0364
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-58.15",
+      "seconds": 58.833,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.2391,
+          "height_fraction": 0.2813,
+          "envelope_area_fraction": 0.0673
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "Text",
+          "text": "CACHORRO",
+          "width_fraction": 0.3516,
+          "height_fraction": 0.1035,
+          "envelope_area_fraction": 0.0364
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-59.0",
+      "seconds": 59.0,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.2391,
+          "height_fraction": 0.2813,
+          "envelope_area_fraction": 0.0673
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "Text",
+          "text": "CACHORRO",
+          "width_fraction": 0.3516,
+          "height_fraction": 0.1035,
+          "envelope_area_fraction": 0.0364
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-59.0",
+      "seconds": 59.3,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.2391,
+          "height_fraction": 0.2813,
+          "envelope_area_fraction": 0.0673
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "Text",
+          "text": "CACHORRO",
+          "width_fraction": 0.3516,
+          "height_fraction": 0.1035,
+          "envelope_area_fraction": 0.0364
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-60.4",
+      "seconds": 60.4,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.2391,
+          "height_fraction": 0.2813,
+          "envelope_area_fraction": 0.0673
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "Text",
+          "text": "CACHORRO",
+          "width_fraction": 0.3516,
+          "height_fraction": 0.1035,
+          "envelope_area_fraction": 0.0364
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-60.4",
+      "seconds": 61.2,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.2391,
+          "height_fraction": 0.2813,
+          "envelope_area_fraction": 0.0673
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3797,
+          "height_fraction": 0.1535,
+          "envelope_area_fraction": 0.0583
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "Text",
+          "text": "CACHORRO",
+          "width_fraction": 0.3516,
+          "height_fraction": 0.1035,
+          "envelope_area_fraction": 0.0364
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-62.88",
+      "seconds": 62.867,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.2391,
+          "height_fraction": 0.2813,
+          "envelope_area_fraction": 0.0673
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3797,
+          "height_fraction": 0.1535,
+          "envelope_area_fraction": 0.0583
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "Text",
+          "text": "CACHORRO",
+          "width_fraction": 0.3516,
+          "height_fraction": 0.1035,
+          "envelope_area_fraction": 0.0364
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-62.88",
+      "seconds": 64.067,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.2391,
+          "height_fraction": 0.2813,
+          "envelope_area_fraction": 0.0673
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3797,
+          "height_fraction": 0.1535,
+          "envelope_area_fraction": 0.0583
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "Text",
+          "text": "CACHORRO",
+          "width_fraction": 0.3516,
+          "height_fraction": 0.1035,
+          "envelope_area_fraction": 0.0364
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-65.0",
+      "seconds": 65.0,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.2391,
+          "height_fraction": 0.2813,
+          "envelope_area_fraction": 0.0673
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3797,
+          "height_fraction": 0.1535,
+          "envelope_area_fraction": 0.0583
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "Text",
+          "text": "CACHORRO",
+          "width_fraction": 0.3516,
+          "height_fraction": 0.1035,
+          "envelope_area_fraction": 0.0364
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-65.0",
+      "seconds": 65.8,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.2391,
+          "height_fraction": 0.2813,
+          "envelope_area_fraction": 0.0673
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3797,
+          "height_fraction": 0.1535,
+          "envelope_area_fraction": 0.0583
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "Text",
+          "text": "CACHORRO",
+          "width_fraction": 0.3516,
+          "height_fraction": 0.1035,
+          "envelope_area_fraction": 0.0364
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-66.4",
+      "seconds": 66.4,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.2391,
+          "height_fraction": 0.2813,
+          "envelope_area_fraction": 0.0673
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3797,
+          "height_fraction": 0.1535,
+          "envelope_area_fraction": 0.0583
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "Text",
+          "text": "CACHORRO",
+          "width_fraction": 0.3516,
+          "height_fraction": 0.1035,
+          "envelope_area_fraction": 0.0364
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-66.4",
+      "seconds": 67.0,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.2391,
+          "height_fraction": 0.2813,
+          "envelope_area_fraction": 0.0673
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "Text",
+          "text": "CACHORRO",
+          "width_fraction": 0.3516,
+          "height_fraction": 0.1035,
+          "envelope_area_fraction": 0.0364
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-67.52",
+      "seconds": 67.5,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.2391,
+          "height_fraction": 0.2813,
+          "envelope_area_fraction": 0.0673
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "Text",
+          "text": "CACHORRO",
+          "width_fraction": 0.3516,
+          "height_fraction": 0.1035,
+          "envelope_area_fraction": 0.0364
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-67.52",
+      "seconds": 69.3,
+      "camera_width": 8.0,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.4506,
+          "height_fraction": 0.2173,
+          "envelope_area_fraction": 0.0979
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.1321,
+          "height_fraction": 0.3916,
+          "envelope_area_fraction": 0.0517
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.1454,
+          "height_fraction": 0.3151,
+          "envelope_area_fraction": 0.0458
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-71.34",
+      "seconds": 71.333,
+      "camera_width": 8.0,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.4506,
+          "height_fraction": 0.2173,
+          "envelope_area_fraction": 0.0979
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.1321,
+          "height_fraction": 0.3916,
+          "envelope_area_fraction": 0.0517
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.1454,
+          "height_fraction": 0.3151,
+          "envelope_area_fraction": 0.0458
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-71.34",
+      "seconds": 73.333,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.7173,
+          "height_fraction": 0.7597,
+          "envelope_area_fraction": 0.5449
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.0472,
+          "height_fraction": 0.6562,
+          "envelope_area_fraction": 0.031
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-74.82",
+      "seconds": 74.8,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.7173,
+          "height_fraction": 0.7597,
+          "envelope_area_fraction": 0.5449
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.0377,
+          "height_fraction": 0.6562,
+          "envelope_area_fraction": 0.0247
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-74.82",
+      "seconds": 76.2,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.7173,
+          "height_fraction": 0.7597,
+          "envelope_area_fraction": 0.5449
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.7286,
+          "height_fraction": 0.1505,
+          "envelope_area_fraction": 0.1096
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.0377,
+          "height_fraction": 0.6562,
+          "envelope_area_fraction": 0.0247
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-76.56",
+      "seconds": 76.533,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.7286,
+          "height_fraction": 0.1505,
+          "envelope_area_fraction": 0.1096
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.7173,
+          "height_fraction": 0.1304,
+          "envelope_area_fraction": 0.0936
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.6974,
+          "height_fraction": 0.1304,
+          "envelope_area_fraction": 0.091
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.6977,
+          "height_fraction": 0.1304,
+          "envelope_area_fraction": 0.091
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-76.56",
+      "seconds": 78.533,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.7947,
+          "height_fraction": 0.1445,
+          "envelope_area_fraction": 0.1148
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0818,
+          "height_fraction": 0.1773,
+          "envelope_area_fraction": 0.0145
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-79",
+      "seconds": 79.0,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.7947,
+          "height_fraction": 0.1445,
+          "envelope_area_fraction": 0.1148
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0818,
+          "height_fraction": 0.1773,
+          "envelope_area_fraction": 0.0145
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-79",
+      "seconds": 80.2,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8087,
+          "height_fraction": 0.0849,
+          "envelope_area_fraction": 0.0687
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0818,
+          "height_fraction": 0.1773,
+          "envelope_area_fraction": 0.0145
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-80.56",
+      "seconds": 80.533,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8087,
+          "height_fraction": 0.0849,
+          "envelope_area_fraction": 0.0687
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0818,
+          "height_fraction": 0.1773,
+          "envelope_area_fraction": 0.0145
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-80.56",
+      "seconds": 81.933,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8087,
+          "height_fraction": 0.0849,
+          "envelope_area_fraction": 0.0687
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0818,
+          "height_fraction": 0.1773,
+          "envelope_area_fraction": 0.0145
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-82.9",
+      "seconds": 82.9,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8087,
+          "height_fraction": 0.0849,
+          "envelope_area_fraction": 0.0687
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0818,
+          "height_fraction": 0.1773,
+          "envelope_area_fraction": 0.0145
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-82.9",
+      "seconds": 84.3,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8087,
+          "height_fraction": 0.0849,
+          "envelope_area_fraction": 0.0687
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0818,
+          "height_fraction": 0.1773,
+          "envelope_area_fraction": 0.0145
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-85.78",
+      "seconds": 85.767,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8087,
+          "height_fraction": 0.0849,
+          "envelope_area_fraction": 0.0687
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0818,
+          "height_fraction": 0.1773,
+          "envelope_area_fraction": 0.0145
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-85.78",
+      "seconds": 87.167,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8087,
+          "height_fraction": 0.0849,
+          "envelope_area_fraction": 0.0687
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0818,
+          "height_fraction": 0.1773,
+          "envelope_area_fraction": 0.0145
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-88.12",
+      "seconds": 88.1,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8087,
+          "height_fraction": 0.0849,
+          "envelope_area_fraction": 0.0687
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0818,
+          "height_fraction": 0.1773,
+          "envelope_area_fraction": 0.0145
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-88.12",
+      "seconds": 89.5,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8087,
+          "height_fraction": 0.0849,
+          "envelope_area_fraction": 0.0687
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0818,
+          "height_fraction": 0.1773,
+          "envelope_area_fraction": 0.0145
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-91.82",
+      "seconds": 91.833,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.7854,
+          "height_fraction": 0.0849,
+          "envelope_area_fraction": 0.0667
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0818,
+          "height_fraction": 0.1773,
+          "envelope_area_fraction": 0.0145
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-91.82",
+      "seconds": 93.333,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.7854,
+          "height_fraction": 0.0849,
+          "envelope_area_fraction": 0.0667
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0818,
+          "height_fraction": 0.1773,
+          "envelope_area_fraction": 0.0145
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-93.6",
+      "seconds": 93.6,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.7854,
+          "height_fraction": 0.0849,
+          "envelope_area_fraction": 0.0667
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0818,
+          "height_fraction": 0.1773,
+          "envelope_area_fraction": 0.0145
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-93.6",
+      "seconds": 95.4,
+      "camera_width": 22.5,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.4964,
+          "height_fraction": 0.0537,
+          "envelope_area_fraction": 0.0266
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.1541,
+          "height_fraction": 0.1392,
+          "envelope_area_fraction": 0.0215
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0545,
+          "height_fraction": 0.1377,
+          "envelope_area_fraction": 0.0075
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0517,
+          "height_fraction": 0.112,
+          "envelope_area_fraction": 0.0058
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-96.0",
+      "seconds": 96.0,
+      "camera_width": 22.5,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.4964,
+          "height_fraction": 0.0537,
+          "envelope_area_fraction": 0.0266
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.1541,
+          "height_fraction": 0.1392,
+          "envelope_area_fraction": 0.0215
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0545,
+          "height_fraction": 0.1377,
+          "envelope_area_fraction": 0.0075
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0517,
+          "height_fraction": 0.112,
+          "envelope_area_fraction": 0.0058
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-96.0",
+      "seconds": 96.8,
+      "camera_width": 30.0,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.3442,
+          "height_fraction": 0.0356,
+          "envelope_area_fraction": 0.0123
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.1156,
+          "height_fraction": 0.1044,
+          "envelope_area_fraction": 0.0121
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0409,
+          "height_fraction": 0.1033,
+          "envelope_area_fraction": 0.0042
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0388,
+          "height_fraction": 0.084,
+          "envelope_area_fraction": 0.0033
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-97.78",
+      "seconds": 97.767,
+      "camera_width": 30.0,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.3442,
+          "height_fraction": 0.0356,
+          "envelope_area_fraction": 0.0123
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.1156,
+          "height_fraction": 0.1044,
+          "envelope_area_fraction": 0.0121
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0409,
+          "height_fraction": 0.1033,
+          "envelope_area_fraction": 0.0042
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0388,
+          "height_fraction": 0.084,
+          "envelope_area_fraction": 0.0033
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-97.78",
+      "seconds": 98.767,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0818,
+          "height_fraction": 0.1773,
+          "envelope_area_fraction": 0.0145
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8439,
+          "height_fraction": 0.0158,
+          "envelope_area_fraction": 0.0133
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-99.16",
+      "seconds": 99.133,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0818,
+          "height_fraction": 0.1773,
+          "envelope_area_fraction": 0.0145
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.8439,
+          "height_fraction": 0.0158,
+          "envelope_area_fraction": 0.0133
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-99.16",
+      "seconds": 100.533,
+      "camera_width": 5.6,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3673,
+          "height_fraction": 0.5594,
+          "envelope_area_fraction": 0.2055
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2077,
+          "height_fraction": 0.4501,
+          "envelope_area_fraction": 0.0935
+        },
+        {
+          "type": "Text",
+          "text": "cachorro",
+          "width_fraction": 0.2757,
+          "height_fraction": 0.0784,
+          "envelope_area_fraction": 0.0216
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.0536,
+          "height_fraction": 0.001,
+          "envelope_area_fraction": 0.0001
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-101",
+      "seconds": 101.0,
+      "camera_width": 5.6,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3673,
+          "height_fraction": 0.5594,
+          "envelope_area_fraction": 0.2055
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2077,
+          "height_fraction": 0.4501,
+          "envelope_area_fraction": 0.0935
+        },
+        {
+          "type": "Text",
+          "text": "cachorro",
+          "width_fraction": 0.2757,
+          "height_fraction": 0.0784,
+          "envelope_area_fraction": 0.0216
+        },
+        {
+          "type": "Dot",
+          "text": null,
+          "width_fraction": 0.05,
+          "height_fraction": 0.0889,
+          "envelope_area_fraction": 0.0044
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-101",
+      "seconds": 102.0,
+      "camera_width": 5.6,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3673,
+          "height_fraction": 0.5594,
+          "envelope_area_fraction": 0.2055
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2077,
+          "height_fraction": 0.4501,
+          "envelope_area_fraction": 0.0935
+        },
+        {
+          "type": "Text",
+          "text": "cachorro",
+          "width_fraction": 0.2757,
+          "height_fraction": 0.0784,
+          "envelope_area_fraction": 0.0216
+        },
+        {
+          "type": "Text",
+          "text": "gato",
+          "width_fraction": 0.1635,
+          "height_fraction": 0.1094,
+          "envelope_area_fraction": 0.0179
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-103.2",
+      "seconds": 103.2,
+      "camera_width": 5.6,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.3673,
+          "height_fraction": 0.5594,
+          "envelope_area_fraction": 0.2055
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2077,
+          "height_fraction": 0.4501,
+          "envelope_area_fraction": 0.0935
+        },
+        {
+          "type": "Text",
+          "text": "cachorro",
+          "width_fraction": 0.2757,
+          "height_fraction": 0.0784,
+          "envelope_area_fraction": 0.0216
+        },
+        {
+          "type": "Text",
+          "text": "gato",
+          "width_fraction": 0.1635,
+          "height_fraction": 0.1094,
+          "envelope_area_fraction": 0.0179
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-103.2",
+      "seconds": 103.9,
+      "camera_width": 4.6,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.408,
+          "height_fraction": 0.681,
+          "envelope_area_fraction": 0.2779
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2528,
+          "height_fraction": 0.548,
+          "envelope_area_fraction": 0.1385
+        },
+        {
+          "type": "Text",
+          "text": "cachorro",
+          "width_fraction": 0.3356,
+          "height_fraction": 0.0954,
+          "envelope_area_fraction": 0.032
+        },
+        {
+          "type": "Text",
+          "text": "gato",
+          "width_fraction": 0.199,
+          "height_fraction": 0.1332,
+          "envelope_area_fraction": 0.0265
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-104.86",
+      "seconds": 104.833,
+      "camera_width": 4.6,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.408,
+          "height_fraction": 0.681,
+          "envelope_area_fraction": 0.2779
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2528,
+          "height_fraction": 0.548,
+          "envelope_area_fraction": 0.1385
+        },
+        {
+          "type": "Text",
+          "text": "cachorro",
+          "width_fraction": 0.3356,
+          "height_fraction": 0.0954,
+          "envelope_area_fraction": 0.032
+        },
+        {
+          "type": "Text",
+          "text": "gato",
+          "width_fraction": 0.199,
+          "height_fraction": 0.1332,
+          "envelope_area_fraction": 0.0265
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-104.86",
+      "seconds": 106.033,
+      "camera_width": 4.6,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.4363,
+          "height_fraction": 0.681,
+          "envelope_area_fraction": 0.2971
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2528,
+          "height_fraction": 0.548,
+          "envelope_area_fraction": 0.1385
+        },
+        {
+          "type": "Text",
+          "text": "cachorro",
+          "width_fraction": 0.3356,
+          "height_fraction": 0.0954,
+          "envelope_area_fraction": 0.032
+        },
+        {
+          "type": "Text",
+          "text": "gato",
+          "width_fraction": 0.199,
+          "height_fraction": 0.1332,
+          "envelope_area_fraction": 0.0265
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-107.48",
+      "seconds": 107.467,
+      "camera_width": 4.6,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.4363,
+          "height_fraction": 0.681,
+          "envelope_area_fraction": 0.2971
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2528,
+          "height_fraction": 0.548,
+          "envelope_area_fraction": 0.1385
+        },
+        {
+          "type": "Text",
+          "text": "cachorro",
+          "width_fraction": 0.3356,
+          "height_fraction": 0.0954,
+          "envelope_area_fraction": 0.032
+        },
+        {
+          "type": "Text",
+          "text": "gato",
+          "width_fraction": 0.199,
+          "height_fraction": 0.1332,
+          "envelope_area_fraction": 0.0265
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-107.48",
+      "seconds": 108.467,
+      "camera_width": 11.8,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2938,
+          "height_fraction": 0.2655,
+          "envelope_area_fraction": 0.078
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.104,
+          "height_fraction": 0.2626,
+          "envelope_area_fraction": 0.0273
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0986,
+          "height_fraction": 0.2136,
+          "envelope_area_fraction": 0.0211
+        },
+        {
+          "type": "Text",
+          "text": "parafuso",
+          "width_fraction": 0.1622,
+          "height_fraction": 0.0534,
+          "envelope_area_fraction": 0.0087
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-108.9",
+      "seconds": 108.9,
+      "camera_width": 11.8,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2938,
+          "height_fraction": 0.2655,
+          "envelope_area_fraction": 0.078
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.104,
+          "height_fraction": 0.2626,
+          "envelope_area_fraction": 0.0273
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0986,
+          "height_fraction": 0.2136,
+          "envelope_area_fraction": 0.0211
+        },
+        {
+          "type": "Text",
+          "text": "parafuso",
+          "width_fraction": 0.1622,
+          "height_fraction": 0.0534,
+          "envelope_area_fraction": 0.0087
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-108.9",
+      "seconds": 109.7,
+      "camera_width": 11.8,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2938,
+          "height_fraction": 0.2655,
+          "envelope_area_fraction": 0.078
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.104,
+          "height_fraction": 0.2626,
+          "envelope_area_fraction": 0.0273
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0986,
+          "height_fraction": 0.2136,
+          "envelope_area_fraction": 0.0211
+        },
+        {
+          "type": "Text",
+          "text": "parafuso",
+          "width_fraction": 0.1622,
+          "height_fraction": 0.0534,
+          "envelope_area_fraction": 0.0087
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-110.3",
+      "seconds": 110.3,
+      "camera_width": 11.8,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2938,
+          "height_fraction": 0.2655,
+          "envelope_area_fraction": 0.078
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.104,
+          "height_fraction": 0.2626,
+          "envelope_area_fraction": 0.0273
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0986,
+          "height_fraction": 0.2136,
+          "envelope_area_fraction": 0.0211
+        },
+        {
+          "type": "Text",
+          "text": "parafuso",
+          "width_fraction": 0.1622,
+          "height_fraction": 0.0534,
+          "envelope_area_fraction": 0.0087
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-110.3",
+      "seconds": 112.9,
+      "camera_width": 23.0,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.1507,
+          "height_fraction": 0.1362,
+          "envelope_area_fraction": 0.0205
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0533,
+          "height_fraction": 0.1347,
+          "envelope_area_fraction": 0.0072
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0506,
+          "height_fraction": 0.1096,
+          "envelope_area_fraction": 0.0055
+        },
+        {
+          "type": "Text",
+          "text": "parafuso",
+          "width_fraction": 0.0832,
+          "height_fraction": 0.0274,
+          "envelope_area_fraction": 0.0023
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-113",
+      "seconds": 113.0,
+      "camera_width": 23.0,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.1507,
+          "height_fraction": 0.1362,
+          "envelope_area_fraction": 0.0205
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0533,
+          "height_fraction": 0.1347,
+          "envelope_area_fraction": 0.0072
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0506,
+          "height_fraction": 0.1096,
+          "envelope_area_fraction": 0.0055
+        },
+        {
+          "type": "Text",
+          "text": "parafuso",
+          "width_fraction": 0.0832,
+          "height_fraction": 0.0274,
+          "envelope_area_fraction": 0.0023
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-113",
+      "seconds": 113.0,
+      "camera_width": 23.0,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.1507,
+          "height_fraction": 0.1362,
+          "envelope_area_fraction": 0.0205
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0533,
+          "height_fraction": 0.1347,
+          "envelope_area_fraction": 0.0072
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0506,
+          "height_fraction": 0.1096,
+          "envelope_area_fraction": 0.0055
+        },
+        {
+          "type": "Text",
+          "text": "parafuso",
+          "width_fraction": 0.0832,
+          "height_fraction": 0.0274,
+          "envelope_area_fraction": 0.0023
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-115.2",
+      "seconds": 115.2,
+      "camera_width": 23.0,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.1507,
+          "height_fraction": 0.1362,
+          "envelope_area_fraction": 0.0205
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0533,
+          "height_fraction": 0.1347,
+          "envelope_area_fraction": 0.0072
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0506,
+          "height_fraction": 0.1096,
+          "envelope_area_fraction": 0.0055
+        },
+        {
+          "type": "Text",
+          "text": "parafuso",
+          "width_fraction": 0.0832,
+          "height_fraction": 0.0274,
+          "envelope_area_fraction": 0.0023
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-115.2",
+      "seconds": 117.2,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0818,
+          "height_fraction": 0.1773,
+          "envelope_area_fraction": 0.0145
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1086,
+          "height_fraction": 0.1017,
+          "envelope_area_fraction": 0.011
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-119",
+      "seconds": 119.0,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0818,
+          "height_fraction": 0.1773,
+          "envelope_area_fraction": 0.0145
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1086,
+          "height_fraction": 0.1017,
+          "envelope_area_fraction": 0.011
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-119",
+      "seconds": 120.8,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.4923,
+          "height_fraction": 0.6413,
+          "envelope_area_fraction": 0.3157
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0818,
+          "height_fraction": 0.1773,
+          "envelope_area_fraction": 0.0145
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-121.26",
+      "seconds": 121.233,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.4923,
+          "height_fraction": 0.6413,
+          "envelope_area_fraction": 0.3157
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0818,
+          "height_fraction": 0.1773,
+          "envelope_area_fraction": 0.0145
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-121.26",
+      "seconds": 122.433,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.4923,
+          "height_fraction": 0.6413,
+          "envelope_area_fraction": 0.3157
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0818,
+          "height_fraction": 0.1773,
+          "envelope_area_fraction": 0.0145
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-123.0",
+      "seconds": 123.0,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.4923,
+          "height_fraction": 0.6413,
+          "envelope_area_fraction": 0.3157
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0818,
+          "height_fraction": 0.1773,
+          "envelope_area_fraction": 0.0145
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-123.0",
+      "seconds": 125.0,
+      "camera_width": 10.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.6481,
+          "height_fraction": 0.8444,
+          "envelope_area_fraction": 0.5473
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.321,
+          "height_fraction": 0.29,
+          "envelope_area_fraction": 0.0931
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.1136,
+          "height_fraction": 0.2869,
+          "envelope_area_fraction": 0.0326
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.1077,
+          "height_fraction": 0.2334,
+          "envelope_area_fraction": 0.0251
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-125.92",
+      "seconds": 125.9,
+      "camera_width": 10.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.6481,
+          "height_fraction": 0.8444,
+          "envelope_area_fraction": 0.5473
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.321,
+          "height_fraction": 0.29,
+          "envelope_area_fraction": 0.0931
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.1136,
+          "height_fraction": 0.2869,
+          "envelope_area_fraction": 0.0326
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.1077,
+          "height_fraction": 0.2334,
+          "envelope_area_fraction": 0.0251
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-125.92",
+      "seconds": 127.5,
+      "camera_width": 10.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.6481,
+          "height_fraction": 0.8444,
+          "envelope_area_fraction": 0.5473
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.321,
+          "height_fraction": 0.29,
+          "envelope_area_fraction": 0.0931
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.1136,
+          "height_fraction": 0.2869,
+          "envelope_area_fraction": 0.0326
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.1077,
+          "height_fraction": 0.2334,
+          "envelope_area_fraction": 0.0251
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-127.82",
+      "seconds": 127.8,
+      "camera_width": 10.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.6481,
+          "height_fraction": 0.8444,
+          "envelope_area_fraction": 0.5473
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.321,
+          "height_fraction": 0.29,
+          "envelope_area_fraction": 0.0931
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.1136,
+          "height_fraction": 0.2869,
+          "envelope_area_fraction": 0.0326
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.1077,
+          "height_fraction": 0.2334,
+          "envelope_area_fraction": 0.0251
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-127.82",
+      "seconds": 129.2,
+      "camera_width": 10.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.6481,
+          "height_fraction": 0.8444,
+          "envelope_area_fraction": 0.5473
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.321,
+          "height_fraction": 0.29,
+          "envelope_area_fraction": 0.0931
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.1136,
+          "height_fraction": 0.2869,
+          "envelope_area_fraction": 0.0326
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.1077,
+          "height_fraction": 0.2334,
+          "envelope_area_fraction": 0.0251
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-129.48",
+      "seconds": 129.467,
+      "camera_width": 10.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.6481,
+          "height_fraction": 0.8444,
+          "envelope_area_fraction": 0.5473
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.321,
+          "height_fraction": 0.29,
+          "envelope_area_fraction": 0.0931
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.1136,
+          "height_fraction": 0.2869,
+          "envelope_area_fraction": 0.0326
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.1077,
+          "height_fraction": 0.2334,
+          "envelope_area_fraction": 0.0251
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-129.48",
+      "seconds": 130.967,
+      "camera_width": 10.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.6481,
+          "height_fraction": 0.8444,
+          "envelope_area_fraction": 0.5473
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.321,
+          "height_fraction": 0.29,
+          "envelope_area_fraction": 0.0931
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.1136,
+          "height_fraction": 0.2869,
+          "envelope_area_fraction": 0.0326
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.1077,
+          "height_fraction": 0.2334,
+          "envelope_area_fraction": 0.0251
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-131.9",
+      "seconds": 131.9,
+      "camera_width": 10.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.6481,
+          "height_fraction": 0.8444,
+          "envelope_area_fraction": 0.5473
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.321,
+          "height_fraction": 0.29,
+          "envelope_area_fraction": 0.0931
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.1136,
+          "height_fraction": 0.2869,
+          "envelope_area_fraction": 0.0326
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.1077,
+          "height_fraction": 0.2334,
+          "envelope_area_fraction": 0.0251
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-131.9",
+      "seconds": 133.4,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.4923,
+          "height_fraction": 0.6413,
+          "envelope_area_fraction": 0.3157
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0818,
+          "height_fraction": 0.1773,
+          "envelope_area_fraction": 0.0145
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-134.98",
+      "seconds": 134.967,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.4923,
+          "height_fraction": 0.6413,
+          "envelope_area_fraction": 0.3157
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0818,
+          "height_fraction": 0.1773,
+          "envelope_area_fraction": 0.0145
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-134.98",
+      "seconds": 136.767,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "Text",
+          "text": "Quemensina?",
+          "width_fraction": 0.7876,
+          "height_fraction": 0.1865,
+          "envelope_area_fraction": 0.1469
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0818,
+          "height_fraction": 0.1773,
+          "envelope_area_fraction": 0.0145
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "final",
+      "seconds": 138.733,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "Text",
+          "text": "Quemensina?",
+          "width_fraction": 0.7876,
+          "height_fraction": 0.1865,
+          "envelope_area_fraction": 0.1469
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.2438,
+          "height_fraction": 0.2203,
+          "envelope_area_fraction": 0.0537
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0863,
+          "height_fraction": 0.2179,
+          "envelope_area_fraction": 0.0188
+        },
+        {
+          "type": "SurroundingRectangle",
+          "text": null,
+          "width_fraction": 0.0818,
+          "height_fraction": 0.1773,
+          "envelope_area_fraction": 0.0145
+        }
+      ],
+      "below_30_percent": true
+    }
+  ]
+}

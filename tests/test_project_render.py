@@ -376,11 +376,13 @@ def test_render_confirmed_project_runs_canonical_pipeline_with_fakes(
         "@start: 0\n"
         "@end: 4\n"
         "@objective: Introduza vetores.\n"
+        "@topics: linear_algebra\n"
         "Esta e a abertura exata.\n\n"
         "## Explicacao\n"
         "@start: 4\n"
         "@end: 10\n"
         "@objective: Explique a soma.\n"
+        "@topics: neural_networks, transformers\n"
         "Esta e a explicacao exata.\n",
         encoding="utf-8",
     )
@@ -463,6 +465,12 @@ def test_render_confirmed_project_runs_canonical_pipeline_with_fakes(
     assert project_document["render_state"] == "ready"
     assert project_document["composition_state"] == "ready"
     assert provider.states_seen == ["rendering", "rendering"]
+    assert [request.topics for request in provider.requests] == [
+        ("linear_algebra",), ("neural_networks", "transformers"),
+    ]
+    from video_pipeline.prompts import build_prompt
+    assert "Reference linear-map-basis:" in build_prompt(provider.requests[0])
+    assert "Reference neural-network-layers:" in build_prompt(provider.requests[1])
 
     assert [request.narration_text for request in provider.requests] == [
         "Esta e a abertura exata.",

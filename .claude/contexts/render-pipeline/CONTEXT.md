@@ -115,11 +115,10 @@ PROJECT/
     └── accepted/<run-id>/... snapshots imutáveis ...
 ```
 
-O manifest aceito usa o envelope comum `golden.manifest/1` com `version: 1`,
-profile explícito (`visual` ou `audiovisual`), status `accepted`, identidade,
-capacidades, hashes, composição, fatos finais e snapshots do pacote.
-Discovery, leitura e validação aplicam o mesmo dispatch por profile e falham
-para profile ausente ou desconhecido.
+O manifest aceito usa o envelope `golden.manifest/1` com `version: 1`,
+profile explícito `audiovisual`, status `accepted`, identidade, capacidades,
+hashes, composição, fatos finais e snapshots do pacote.
+Discovery, leitura e validação rejeitam profile ausente ou desconhecido.
 
 ## Módulos sob responsabilidade
 

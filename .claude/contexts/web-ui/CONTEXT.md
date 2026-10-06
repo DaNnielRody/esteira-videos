@@ -30,6 +30,10 @@ correções, mensagens e assets. Revisão não é golden.
 - Criar projeto chama `initialize_project` com título, script UTF-8 e
   `audio_asset_id`. `Timeline.status == candidate` exige ação explícita de
   `confirm_project_timeline` antes de enfileirar render.
+- O catálogo de áudio vem da raiz configurada sem expor paths. Se estiver
+  ausente ou vazio, `/api/audio` retorna `assets: []` com diagnóstico acionável,
+  a UI bloqueia a criação e orienta adicionar ao menos um arquivo de narração
+  antes de criar ou renderizar vídeo real; áudio nunca é fabricado.
 - A UI consulta `inspect_project`/`run.json` para `current_scene`,
   `action_next`, progresso, tentativas, diagnóstico e estado. Callbacks finos
   são informativos e best-effort; não substituem a evidência persistida.
@@ -85,8 +89,20 @@ correções, mensagens e assets. Revisão não é golden.
   run nunca sobrescritos; `src/video_pipeline/cli.py` é a fronteira injetável.
 - Fakes cobrem provider, subprocessos, relógio, filesystem e sensores.
   Testes de serviço provam create → confirm → render → regenerar uma cena →
-  checkout → accept; Firefox/geckodriver prova DOM, polling, stale guard,
-  playback real e proteções HTTP.
+  checkout → accept. A prova de browser real roda com `rtk .venv/bin/pytest -q
+  tests/integration/test_web_e2e.py`: ela inicia `/snap/bin/geckodriver`, abre
+  Firefox headless; `_firefox_binary()` verifica se `/usr/bin/firefox` é um
+  ELF e, quando é wrapper Snap, passa
+  `/snap/firefox/current/usr/lib/firefox/firefox` em
+  `moz:firefoxOptions.binary`. O DOM é dirigido pelo protocolo WebDriver W3C
+  usando apenas a stdlib, com `WebService` e `ThreadingHTTPServer` reais e um
+  fake somente na fronteira de `VideoPipeline`. O fluxo observado é criação,
+  confirmação, render/polling, URLs de playback final e de cena, regeneração
+  seletiva, histórico e restore/checkout, stale polling guard, reload/restart
+  com descoberta e retry de draft interrompido; não roda Ollama, Manim, FFmpeg
+  ou ffprobe. O teste só faz skip se `/usr/bin/firefox` ou
+  `/snap/bin/geckodriver` não existirem/não forem executáveis; falhas de setup
+  posteriores não são skip.
 - A composição canônica do RTL é o `PROJECT/artifacts/<run-id>/final.mp4`.
   Enquanto não houver final pronto, a UI pode tocar `normalized.mp4` reais das
   cenas, claramente rotulados como prévia das cenas.

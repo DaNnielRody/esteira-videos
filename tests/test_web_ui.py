@@ -548,6 +548,35 @@ def test_document_css_and_javascript_expose_the_accessible_three_region_workflow
     assert javascript.strip()
 
 
+def test_ui_discovers_existing_projects_and_surfaces_retryable_job_diagnostics() -> None:
+    _load_contract()
+    static_root = Path(__file__).parents[1] / "src/video_pipeline/web/static"
+    html = (static_root / "index.html").read_text(encoding="utf-8")
+    javascript = (static_root / "app.js").read_text(encoding="utf-8")
+
+    assert 'id="project-selector"' in html
+    assert 'id="open-project-button"' in html
+    assert 'id="job-list"' in html
+    assert 'id="job-count"' in html
+    assert 'request("/api/projects")' in javascript
+    assert 'request("/api/jobs")' in javascript
+    assert "/api/jobs/${job.job_id}/retry" in javascript
+    assert "diagnostics" in javascript
+    assert "openProject" in javascript
+
+
+def test_ui_explains_that_narration_is_required_when_catalog_is_empty() -> None:
+    _load_contract()
+    static_root = Path(__file__).parents[1] / "src/video_pipeline/web/static"
+    javascript = (static_root / "app.js").read_text(encoding="utf-8")
+
+    assert "Nenhuma narração configurada" in javascript
+    assert "Adicione pelo menos um arquivo de áudio" in javascript
+    assert "antes de criar ou renderizar um vídeo real" in javascript
+    assert "assets" in javascript
+    assert "createSubmit.disabled" in javascript
+
+
 def test_revision_history_is_numeric_across_the_v999_boundary(tmp_path: Path) -> None:
     _, _, RevisionStore = _load_contract()
     project_root = tmp_path / "2026_revision_order"

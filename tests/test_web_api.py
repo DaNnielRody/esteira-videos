@@ -57,11 +57,21 @@ class _FakeService:
         self.calls.append((name, values))
 
     def _missing(self, kind: str, value: str) -> None:
-        raise KeyError(f"unknown {kind} {value} {self.error_detail}")
+        from video_pipeline.web import NotFoundError
+
+        raise NotFoundError(f"unknown {kind} {value} {self.error_detail}")
 
     def list_audio(self) -> list[dict[str, object]]:
         self._record("list_audio")
         return [{"id": "audio-narration", "label": "Narration"}]
+
+    def list_projects(self) -> list[dict[str, object]]:
+        self._record("list_projects")
+        return [{"id": "fake-project", "title": "Projeto fake", "status": "ready"}]
+
+    def list_jobs(self) -> list[dict[str, object]]:
+        self._record("list_jobs")
+        return [{"job_id": "render-job", "project_id": "fake-project", "state": "queued"}]
 
     def resolve_asset(self, asset_id: str) -> tuple[Path, Path]:
         """Return the explicit root and candidate without serializing either path."""
@@ -165,6 +175,12 @@ class _FakeService:
             self._missing("job", job_id)
         return {"job_id": job_id, "state": "queued"}
 
+    def retry_job(self, job_id: str) -> dict[str, object]:
+        if job_id != "render-job":
+            self._missing("job", job_id)
+        self._record("retry_job", job_id=job_id)
+        return {"job_id": "retry-job", "state": "queued", "retry_of": job_id}
+
     def checkout_revision(
         self,
         project_id: str,
@@ -189,6 +205,39 @@ class _FakeService:
         self._record("accept_run", project_id=project_id, run_id=run_id)
         return {"project": {"id": project_id}, "run_id": run_id}
 
+
+class _EmptyAudioService(_FakeService):
+    """Expose the public boundary used when no narration is configured."""
+
+    def list_audio(self) -> list[dict[str, object]]:
+        self._record("list_audio")
+        return []
+
+
+class _TypedErrorService(_FakeService):
+    """Raise one public typed error while keeping the HTTP seam otherwise real."""
+
+    def __init__(self, error: ValueError) -> None:
+        super().__init__()
+        self.error = error
+
+    def inspect(self, project_id: str) -> dict[str, object]:
+        del project_id
+        raise self.error
+
+    def confirm_timeline(self, project_id: str) -> dict[str, object]:
+        del project_id
+        raise self.error
+
+    def enqueue_render(
+        self,
+        project_id: str,
+        *,
+        max_attempts: int = 3,
+        retry_of: str | None = None,
+    ) -> dict[str, object]:
+        del project_id, max_attempts, retry_of
+        raise self.error
 
 @dataclass(frozen=True)
 class _MutationCase:
@@ -239,6 +288,33 @@ def _load_http_contract() -> tuple[
     ):
         pytest.fail(CONTRACT_MISSING, pytrace=False)
     return create_server, serve, QueueFullError
+
+
+def _load_typed_error_contract() -> tuple[type[ValueError], ...]:
+    """Import the four public HTTP error categories through their API."""
+
+    try:
+        from video_pipeline.web import (
+            NotFoundError,
+            QueueFullError,
+            RequestValidationError,
+            StateConflictError,
+        )
+    except (ImportError, ModuleNotFoundError) as exc:  # pragma: no cover - RED seam
+        pytest.fail(f"{CONTRACT_MISSING}: {exc}", pytrace=False)
+    error_types = (
+        NotFoundError,
+        StateConflictError,
+        QueueFullError,
+        RequestValidationError,
+    )
+    if (
+        not all(isinstance(error_type, type) for error_type in error_types)
+        or not all(issubclass(error_type, ValueError) for error_type in error_types)
+        or len(set(error_types)) != len(error_types)
+    ):
+        pytest.fail(CONTRACT_MISSING, pytrace=False)
+    return error_types
 
 
 @contextmanager
@@ -522,6 +598,27 @@ def test_options_preflight_never_emits_cors_header(tmp_path: Path) -> None:
         _assert_safe_error(body, token=token, tmp_path=tmp_path)
 
 
+def test_unsupported_http_methods_return_safe_json_405(
+    tmp_path: Path,
+) -> None:
+    token = "method-csrf-token"
+    service = _FakeService(error_detail=f"{tmp_path}/private traceback")
+
+    with _running_server(service, csrf_token_factory=_TokenFactory(token)) as (_, port):
+        headers = {"Host": f"127.0.0.1:{port}"}
+        for method in ("PUT", "PATCH", "DELETE", "TRACE", "CONNECT"):
+            status, response_headers, body = _request(
+                port,
+                method,
+                "/api/projects/fake-project",
+                headers=headers,
+            )
+            assert status == 405
+            _assert_no_cors(response_headers)
+            _assert_json_api(response_headers)
+            _assert_safe_error(body, token=token, tmp_path=tmp_path)
+
+
 def test_read_routes_return_service_documents_without_paths_or_cors(
     tmp_path: Path,
 ) -> None:
@@ -564,6 +661,33 @@ def test_read_routes_return_service_documents_without_paths_or_cors(
             _assert_safe_response(body, tmp_path=tmp_path)
             assert json.loads(body) == expected_payload
             assert service.calls[-1][0] == expected_call
+
+
+def test_empty_audio_catalog_returns_actionable_path_free_diagnostic(
+    tmp_path: Path,
+) -> None:
+    service = _EmptyAudioService(error_detail=str(tmp_path / "private.txt"))
+
+    with _running_server(service, csrf_token_factory=_TokenFactory("audio-token")) as (_, port):
+        status, headers, body = _request(
+            port,
+            "GET",
+            "/api/audio",
+            headers={"Host": f"127.0.0.1:{port}"},
+        )
+
+    assert status == 200
+    _assert_json_api(headers)
+    payload = json.loads(body)
+    assert payload["assets"] == []
+    diagnostic = payload["diagnostic"]
+    assert isinstance(diagnostic, str)
+    assert "narração" in diagnostic.lower()
+    assert "arquivo" in diagnostic.lower()
+    assert "criar" in diagnostic.lower()
+    assert "renderizar" in diagnostic.lower()
+    assert str(tmp_path) not in json.dumps(payload, ensure_ascii=False)
+    assert service.calls == [("list_audio", {})]
 
 
 def test_mutation_routes_delegate_public_service_methods_and_statuses(
@@ -636,7 +760,7 @@ def test_mutation_routes_delegate_public_service_methods_and_statuses(
                 headers=_mutation_headers(port, token),
                 body=_json_body(case.payload),
             )
-            _assert_expected_status(status, case.expected_status)
+            assert status == case.expected_status, case.name
             _assert_no_cors(headers)
             _assert_json_api(headers)
             _assert_safe_response(body, tmp_path=tmp_path)
@@ -773,6 +897,67 @@ def test_mutation_errors_are_statused_and_sanitized(
     assert [name for name, _ in service.calls] == ["enqueue_render", "enqueue_render"]
 
 
+@pytest.mark.parametrize(
+    ("exception_index", "method", "path", "payload", "expected_status"),
+    (
+        (0, "GET", "/api/projects/fake-project", None, 404),
+        (1, "POST", "/api/projects/fake-project/timeline/confirm", {}, 409),
+        (2, "POST", "/api/projects/fake-project/render", {"max_attempts": 3}, 429),
+        (3, "POST", "/api/projects/fake-project/render", {"max_attempts": 3}, 422),
+    ),
+)
+@pytest.mark.parametrize(
+    "message",
+    (
+        "confirmed but not found; queue full; only a ready state",
+        "unknown validation text that says conflict and queue",
+    ),
+)
+def test_typed_http_errors_ignore_misleading_messages(
+    tmp_path: Path,
+    exception_index: int,
+    method: str,
+    path: str,
+    payload: dict[str, object] | None,
+    expected_status: int,
+    message: str,
+) -> None:
+    error_types = _load_typed_error_contract()
+    service = _TypedErrorService(error_types[exception_index](message))
+    token = "typed-error-csrf-token"
+    body = _json_body(payload) if payload is not None else None
+    headers = (
+        _mutation_headers(0, token)
+        if method == "POST"
+        else {"Host": "127.0.0.1:0"}
+    )
+
+    with _running_server(service, csrf_token_factory=_TokenFactory(token)) as (_, port):
+        if method == "POST":
+            headers = _mutation_headers(port, token)
+        else:
+            headers = {"Host": f"127.0.0.1:{port}"}
+        status, response_headers, response_body = _request(
+            port,
+            method,
+            path,
+            headers=headers,
+            body=body,
+        )
+
+    assert status == expected_status
+    _assert_json_api(response_headers)
+    _assert_safe_error(response_body, token=token, tmp_path=tmp_path)
+
+
+def test_public_http_error_types_are_distinct_and_queue_name_is_stable() -> None:
+    error_types = _load_typed_error_contract()
+    from video_pipeline.web import QueueFullError
+
+    assert len({type(message("x")) for message in error_types}) == 4
+    assert QueueFullError.__name__ == "QueueFullError"
+
+
 def test_unknown_ids_and_routes_return_not_found_without_leaks(
     tmp_path: Path,
 ) -> None:
@@ -800,6 +985,59 @@ def test_unknown_ids_and_routes_return_not_found_without_leaks(
             _assert_safe_error(body, token=token, tmp_path=tmp_path)
 
     assert [name for name, _ in service.calls] == ["inspect", "get_job"]
+
+
+def test_collection_routes_and_generic_retry_delegate_path_free_service_contract(
+    tmp_path: Path,
+) -> None:
+    token = "collection-route-csrf-token"
+    service = _FakeService(
+        error_detail=f"{tmp_path / 'private.txt'} {FILE_SENTINEL} {token}"
+    )
+
+    with _running_server(service, csrf_token_factory=_TokenFactory(token)) as (_, port):
+        for path, expected, call in (
+            (
+                "/api/projects",
+                [{"id": "fake-project", "title": "Projeto fake", "status": "ready"}],
+                "list_projects",
+            ),
+            (
+                "/api/jobs",
+                [{"job_id": "render-job", "project_id": "fake-project", "state": "queued"}],
+                "list_jobs",
+            ),
+        ):
+            status, headers, body = _request(
+                port,
+                "GET",
+                path,
+                headers={"Host": f"127.0.0.1:{port}"},
+            )
+            assert status == 200
+            _assert_no_cors(headers)
+            _assert_json_api(headers)
+            _assert_safe_response(body, tmp_path=tmp_path)
+            assert json.loads(body) == expected
+            assert service.calls[-1][0] == call
+
+        status, headers, body = _request(
+            port,
+            "POST",
+            "/api/jobs/render-job/retry",
+            headers=_mutation_headers(port, token),
+            body=_json_body({}),
+        )
+        assert status == 202
+        _assert_no_cors(headers)
+        _assert_json_api(headers)
+        _assert_safe_response(body, tmp_path=tmp_path)
+        assert json.loads(body) == {
+            "job_id": "retry-job",
+            "state": "queued",
+            "retry_of": "render-job",
+        }
+        assert service.calls[-1] == ("retry_job", {"job_id": "render-job"})
 
 
 def test_assets_are_strictly_root_relative_and_support_full_single_range_and_head(

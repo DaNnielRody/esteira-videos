@@ -197,9 +197,11 @@ def _poll_job_success(
 @pytest.mark.integration
 def test_real_web_flow_covers_render_revision_checkout_accept_and_preview(
     tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    monkeypatch.syspath_prepend(str(Path(__file__).resolve().parents[1]))
     web_service_type, service_limits_type, _ = _load_web_contract()
-    from tests.test_project_render import (
+    from test_project_render import (
         FakeComposer,
         FakeFinalValidator,
         FakeManimRunner,
@@ -209,11 +211,12 @@ def test_real_web_flow_covers_render_revision_checkout_accept_and_preview(
         FakeRawValidator,
         FakeTemporalNormalizer,
     )
-    from tests.test_web_service import (
+    from test_web_service import (
         EmptySilenceDetector,
         FakeAudioProbe,
         _make_audio_root,
     )
+
     from video_pipeline.project import Project
     from video_pipeline.revisions import RevisionStore
     from video_pipeline.timeline import Timeline

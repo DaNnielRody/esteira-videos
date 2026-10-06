@@ -23,6 +23,7 @@ from test_project_render import (
 from video_pipeline.cli import main
 from video_pipeline.golden import accept_project, validate_golden_project
 from video_pipeline.project import inspect_project
+from video_pipeline.provider import ProviderRequest, ProviderResponse
 from video_pipeline.scene_plan import ScenePlan
 from video_pipeline.video import VideoPipeline
 
@@ -70,6 +71,21 @@ def _pipeline(
         id_factory=lambda: run_id,
     )
     return pipeline, provider, runner
+
+
+class _FailOnceProvider(FakeProvider):
+    """Fail the first selective request so the run can be resumed by the CLI."""
+
+    def __init__(self, project_json: Path) -> None:
+        super().__init__(project_json)
+        self.fail_next = True
+
+    def generate(self, request: ProviderRequest) -> ProviderResponse:
+        if self.fail_next:
+            self.fail_next = False
+            self.requests.append(request)
+            raise RuntimeError("planned selective provider failure")
+        return super().generate(request)
 
 
 def _ready_base_run(
@@ -138,6 +154,85 @@ def _ready_base_run(
     base_pipeline, _, _ = _pipeline(project_json, "run-001")
     assert base_pipeline.render(project_json, max_attempts=1).state == "ready"
     return project_json, project_document, project / "artifacts" / "run-001"
+
+
+def test_cli_resume_of_failed_selective_run_preserves_editorial_correction(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    project_json, _, _ = _ready_base_run(tmp_path)
+    correction = "Use uma seta azul mais espessa"
+    provider = _FailOnceProvider(project_json)
+    runner = FakeManimRunner()
+    normalized_validator = FakeNormalizedValidator()
+    normalizer = FakeTemporalNormalizer(normalized_validator)
+    raw_validator = FakeRawValidator()
+    observer = FakeObserver()
+    final_validator = FakeFinalValidator()
+    composer = FakeComposer()
+
+    assert (
+        main(
+            [
+                "render",
+                str(project_json),
+                "--max-attempts",
+                "1",
+                "--scene",
+                "abertura",
+                "--base-run",
+                "run-001",
+                "--correction",
+                correction,
+            ],
+            provider=provider,
+            runner=runner,
+            validator=raw_validator,
+            observer=observer,
+            temporal_normalizer=normalizer,
+            normalized_validator=normalized_validator,
+            final_validator=final_validator,
+            composer=composer,
+            id_factory=lambda: "run-002",
+        )
+        == 1
+    )
+    assert "ERROR" in capsys.readouterr().out
+
+    project = project_json.parent
+    run_json = project / "artifacts" / "run-002" / "run.json"
+    failed_run = json.loads(run_json.read_text(encoding="utf-8"))
+    assert failed_run["state"] == "failed"
+    assert failed_run["base_run_id"] == "run-001"
+    assert failed_run["selected_scene_id"] == "abertura"
+    assert failed_run["correction"] == correction
+
+    def no_new_run() -> str:
+        raise AssertionError("resume must not allocate a new run")
+
+    assert (
+        main(
+            ["render", str(project_json), "--max-attempts", "1"],
+            provider=provider,
+            runner=runner,
+            validator=raw_validator,
+            observer=observer,
+            temporal_normalizer=normalizer,
+            normalized_validator=normalized_validator,
+            final_validator=final_validator,
+            composer=composer,
+            id_factory=no_new_run,
+        )
+        == 0
+    )
+    assert "READY" in capsys.readouterr().out
+
+    assert len(provider.requests) == 2
+    assert correction in provider.requests[-1].description
+    resumed_run = json.loads(run_json.read_text(encoding="utf-8"))
+    assert resumed_run["state"] == "ready"
+    assert resumed_run["selected_scene_id"] == "abertura"
+    assert resumed_run["correction"] == correction
 
 
 def test_regenerates_one_scene_from_ready_run_without_mutating_base(

@@ -41,6 +41,10 @@ operação, não um novo editor ou renderer.
 - O formulário inicial envia título, roteiro e `audio_asset_id`; a resposta
   mostra o `PROJECT` e a timeline candidata. “Confirmar timeline” é uma ação
   explícita antes de qualquer render.
+- O catálogo de áudio é configurado no host. Quando não há nenhum arquivo de
+  narração, `GET /api/audio` devolve `assets: []` com diagnóstico acionável e
+  a UI bloqueia a criação, pedindo que o operador adicione uma narração antes
+  de criar ou renderizar vídeo real; nenhum áudio é sintetizado ou inventado.
 - “Gerar prévia” enfileira um job FIFO. A UI consulta o estado durável de
   `inspect_project`/`run.json` e anuncia as transições finas sem inventar uma
   fase que o run não registrou.
@@ -77,7 +81,17 @@ mensagens de progresso, correção e diagnóstico.
 - A atualização atrasada de polling não pode substituir uma revisão/job mais
   novo; cada resposta é protegida por um token de job/revisão vigente.
 - Firefox/geckodriver cobre criação, confirmação, polling, correção seletiva,
-  playback do `final.mp4`, restore e stale guard.
+  playback do `final.mp4`, restore, stale guard e retry após restart. A
+  evidência é reproduzível com `rtk .venv/bin/pytest -q
+  tests/integration/test_web_e2e.py`: o teste dirige Firefox headless real pelo
+  `/snap/bin/geckodriver`. `_firefox_binary()` verifica se `/usr/bin/firefox`
+  é um ELF; sendo wrapper Snap, passa
+  `/snap/firefox/current/usr/lib/firefox/firefox` em
+  `moz:firefoxOptions.binary`. O teste sobe `WebService`/`ThreadingHTTPServer`
+  reais e injeta apenas um fake na fronteira de `VideoPipeline`; não executa
+  Ollama, Manim, FFmpeg ou ffprobe. Skip ocorre somente se
+  `/usr/bin/firefox` ou `/snap/bin/geckodriver` não existirem ou não forem
+  executáveis; falhas posteriores de setup são falhas do teste.
 
 ## Implemented boundary
 

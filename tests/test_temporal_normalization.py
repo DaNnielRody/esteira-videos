@@ -147,3 +147,53 @@ def test_scene_temporal_normalization_is_deterministic_and_auditable(
     assert log["stderr"] == "FFMPEG_STDERR_SENTINEL"
     assert log["exit_code"] == 0
     assert log["elapsed_seconds"] == result.elapsed_seconds
+
+
+@pytest.mark.parametrize(
+    "measured,status", [(4.733333, "normalized"), (4.8, "normalized"), (4.9, "failed")]
+)
+def test_narration_boundary_between_frames_allows_only_one_frame_of_quantization(
+    tmp_path: Path,
+    measured: float,
+    status: str,
+) -> None:
+    raw = tmp_path / "raw.mp4"
+    raw.write_bytes(b"raw")
+    result = normalize_scene(
+        raw,
+        normalized_path=tmp_path / "normalized.mp4",
+        observed_duration_seconds=4.8,
+        target_duration_seconds=4.75,
+        target_resolution=(854, 480),
+        target_fps=15,
+        target_timebase=90_000,
+        target_pixel_format="yuv420p",
+        ffmpeg_run=FakeFFmpeg(raw),
+        validator=FakeValidator(measured),
+        tolerances=TemporalTolerances(acceptance_seconds=0.0, correction_limit_seconds=0.2),
+    )
+    assert result.status == status
+    assert result.validated_duration_seconds == measured
+
+
+def test_matching_duration_still_normalizes_the_media_timebase(tmp_path: Path) -> None:
+    raw = tmp_path / "raw.mp4"
+    raw.write_bytes(b"raw")
+    output = tmp_path / "normalized.mp4"
+    process = FakeFFmpeg(raw)
+    result = normalize_scene(
+        raw,
+        normalized_path=output,
+        observed_duration_seconds=5.0,
+        target_duration_seconds=5.0,
+        target_resolution=(854, 480),
+        target_fps=30,
+        target_timebase=90000,
+        target_pixel_format="yuv420p",
+        ffmpeg_run=process,
+        validator=FakeValidator(5.0),
+    )
+    assert result.normalized_path == output
+    assert result.status == "normalized"
+    argv = process.calls[0][0]
+    assert argv[argv.index("-video_track_timescale") + 1] == "90000"

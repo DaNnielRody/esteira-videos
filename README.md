@@ -55,6 +55,21 @@ Ela só serve arquivos estáticos empacotados e MP4s referenciados por IDs opaco
 paths do host não entram no HTML nem no JSON público. Para aceitar um golden,
 declare ao menos uma `@capabilities` suportada em cada cena do roteiro.
 
+O catálogo de áudio é uma dependência operacional: se estiver ausente ou vazio,
+`GET /api/audio` e a UI informam que é preciso adicionar pelo menos um arquivo
+de narração antes de criar ou renderizar um vídeo real. A aplicação não fabrica
+áudio nem usa um placeholder silencioso.
+
+O estado da sessão web persiste dentro de cada projeto em `ui/`: manifests
+imutáveis `revisions/vNNN.json`, um ponteiro mutável em `index.json` e drafts
+recuperáveis em `working/`. Um render sempre cria/preserva um run em
+`artifacts/<run-id>/` e publica uma revisão quando termina; uma interrupção é
+recuperada como `interrupted` e só continua após um retry explícito. `checkout`
+altera apenas o ponteiro da revisão selecionada, sem apagar histórico, runs ou
+golden. `render` e `regenerate` produzem candidatos revisáveis e nunca publicam
+golden; `accept` é a única operação que chama a aceitação canônica e promove o
+run pronto para `golden/`.
+
 ## Roteiro UTF-8 e timeline determinística
 
 `--script` recebe um arquivo UTF-8. O conteúdo narrado depois dos metadados é
@@ -80,7 +95,7 @@ Agora a soma é explicada passo a passo.
 ```
 
 `@capabilities` é opcional e aceita IDs separados por vírgulas na ordem
-autoral. Cada ID precisa existir no registry visual e estar marcado como
+autoral. Cada ID precisa existir no registry de capacidades e estar marcado como
 `supported`; IDs desconhecidos ou ainda não suportados são erro. Se uma cena
 declarar capabilities, todas as cenas do roteiro devem declarar uma lista
 (não há default global nem herança entre cenas). Roteiros sem nenhuma
@@ -101,6 +116,43 @@ separados por linhas em branco como cenas e segue o mesmo caminho de candidate,
 com fallback proporcional quando necessário.
 
 ## Estrutura persistida
+
+### Fontes autorais validadas
+
+`render --authored-sources <pasta>` lê `<pasta>/<SceneName>/scene.py` pelo
+`AuthoredSourceProvider`. O código passa pelo mesmo pipeline de renderização,
+críticos, normalização, composição e aceitação utilizado com Ollama. A origem e
+o SHA-256 ficam registrados; esse modo não faz inferência nem atribui o código
+ao Qwen. `web --authored-sources <pasta>` usa o mesmo provider na interface.
+
+Para iniciar uma nova execução após alterar planos ou fontes, use
+`render --new-run`. Sem essa opção, a retomada preserva e reutiliza as cenas
+prontas do run interrompido. Os runs anteriores permanecem como evidência.
+
+Todas as cenas dentro da tolerância de correção passam pela normalização do
+perfil de mídia, mesmo quando a duração já está correta: resolução, fps,
+formato de pixels e base de tempo precisam coincidir antes da concatenação.
+O relógio das animações acompanha os frames efetivamente renderizados.
+
+A composição usa AAC a 192 kb/s explicitamente. Isso não restaura áudio já
+saturado na entrada: preparações de narração devem preservar a decodificação
+em ponto flutuante até o tratamento de picos e verificar também o áudio
+decodificado da exportação. O exemplo `llm_fundation` inclui essa verificação
+na evidência da revisão de sincronização e áudio.
+
+A coleção [videos/llm_fundation](videos/llm_fundation/README.md) publica o master
+aprovado e suas fontes/assets. Os binários usam Git LFS: após clonar, execute
+`git lfs install --local` e `git lfs pull`. Para conferir o pacote, execute
+`.venv/bin/python scripts/verify_direction_reference.py`.
+
+A [especificação de direção v1](docs/direction/visual-direction-v1.md) registra
+os 15 princípios e os contratos opcionais de token, proporções e ordem de
+processamento, integrados ao gate. Há um
+[plano de exemplo](examples/direction-contract/plan.json) e um
+[modelo de revisão](docs/direction/review-template.md).
+Essa referência aprovada ainda não é um golden set de regressões narrativas:
+as versões intermediárias permanecem locais e precisam ser alinhadas e rotuladas.
+Ela também não entra automaticamente no catálogo few-shot enviado ao modelo.
 
 Um projeto audiovisual canônico contém:
 
@@ -133,8 +185,8 @@ projects/2026_vetores/
 O render escreve candidatos dentro do próprio run. `accept` valida hashes,
 paths, timeline, pacote de cena, composição e fatos finais antes de publicar
 fontes e documentos permanentes em uma transação lógica. O manifest usa o
-envelope comum `golden.manifest/1`, com `version: 1`, `profile: visual` ou
-`profile: audiovisual`, `status: accepted`, identidade do projeto e
+envelope `golden.manifest/1`, com `version: 1`, `profile: audiovisual`,
+`status: accepted`, identidade do projeto e
 capacidades. A validação do golden é model-free: lê snapshots e arquivos,
 recalcula hashes e não executa provider, cena ou mídia.
 
@@ -184,10 +236,59 @@ ffprobe e sensores por fakes; não fazem inferência, rede ou download.
 ```
 
 O sandbox executa apenas testes não-integração, Ruff e mypy no núcleo tipado.
-Integrações reais, modelos, rede e mídia ficam fora dos gates locais seguros.
+O comando bare `rtk .venv/bin/mypy` usa exatamente os mesmos 13 módulos
+mantidos pelo sandbox, definidos em `pyproject.toml`; os demais módulos e testes
+atravessam JSON/mídia, subprocessos ou adapters dinâmicos e são cobertos por
+Ruff e testes comportamentais. Integrações reais, modelos, rede e mídia ficam
+fora dos gates locais seguros.
 
-O contrato do browser usa Firefox/geckodriver e pode ser executado isoladamente:
+Os testes locais da UI usam fakes e cobrem assets, HTTP, fila, recuperação e
+revisões; não executam rede, modelo, Manim ou FFmpeg reais. A evidência de
+navegador real é opt-in e roda exatamente com:
 
 ```bash
-python -m pytest -q tests/integration/test_web_e2e.py
+rtk .venv/bin/pytest -q tests/integration/test_web_e2e.py
 ```
+
+Esse teste inicia o geckodriver real em `/snap/bin/geckodriver` e usa
+`_firefox_binary()` para verificar `/usr/bin/firefox`: se esse launcher for um
+ELF, ele é usado diretamente; se for um wrapper Snap, o teste passa o ELF
+`/snap/firefox/current/usr/lib/firefox/firefox` em `moz:firefoxOptions.binary`.
+Ele usa `WebService` e `ThreadingHTTPServer` reais. O único fake é a fronteira
+de `VideoPipeline`, que grava MP4s determinísticos para provar criação,
+confirmação, polling, URLs de playback, regeneração seletiva, histórico/checkout,
+stale polling guard, reload/restart e retry de draft interrompido sem Ollama,
+Manim, FFmpeg ou ffprobe. O teste é pulado somente quando `/usr/bin/firefox`
+ou `/snap/bin/geckodriver` não existem ou não são executáveis; falhas de setup
+depois dessa verificação fazem o teste falhar.
+
+### Geração local em CPU
+
+O timeout HTTP do Ollama é de 120 segundos por padrão. Para máquinas em que
+o Qwen precisa de mais tempo, configure um valor finito e positivo em segundos:
+
+```sh
+VIDEO_PIPELINE_OLLAMA_TIMEOUT=900 video-pipeline web
+```
+
+O roteiro pode selecionar os exemplos locais de animação por cena, com
+`@topics: neural_networks, transformers` antes do texto narrado. São aceitos
+até quatro tópicos distintos do catálogo (`linear_algebra`, `calculus`,
+`neural_networks`, `machine_learning`, `transformers`, `probability`,
+`fourier`, `convolution`). A omissão preserva o comportamento sem exemplos.
+A janela de contexto do Ollama é explicitamente 16.384 tokens, para acomodar
+roteiro, contratos e código de correção. Use `VIDEO_PIPELINE_OLLAMA_NUM_CTX`
+para ajustá-la à capacidade do modelo local.
+A seleção é persistida no plano e no request de cada tentativa; não representa
+uma garantia de qualidade visual do vídeo gerado.
+
+Nas cenas com plano, o adaptador de código vincula a classe solicitada ao
+`VisualScene` e injeta o import do runtime. O corpo das animações é preservado;
+`response.json` guarda a resposta original do Ollama, o código efetivo e a marca
+`normalization: {kind: visual_runtime_binding, version: 1}`. O runtime expõe
+`self.theme`, derivado do tema autoral do plano. Essa adaptação não corrige
+geometria, conteúdo, duração ou qualidade da animação.
+
+A retomada de falha/interrupção recupera o último par completo de código e
+diagnóstico da cena, sem reiniciar a geração sem contexto. A normalização de
+duração respeita a precisão de um quadro na taxa de quadros configurada.

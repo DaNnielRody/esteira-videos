@@ -51,7 +51,25 @@ known-first-party = ["video_pipeline"]
 "typing.cast" = { msg = "Type casts are forbidden; validate at the boundary." }
 
 [tool.mypy]
-files = ["src", "tests"]
+# Keep bare ``mypy`` aligned with the same maintained boundary as the
+# deterministic sandbox gate.  Dynamic JSON/media/provider/test seams remain
+# covered by Ruff and behavioural tests, not by an unsound global exemption.
+files = [
+  "src/video_pipeline/video.py",
+  "src/video_pipeline/pipeline.py",
+  "src/video_pipeline/prompts.py",
+  "src/video_pipeline/expectations.py",
+  "src/video_pipeline/spec.py",
+  "src/video_pipeline/theme.py",
+  "src/video_pipeline/scene_plan.py",
+  "src/video_pipeline/quality.py",
+  "src/video_pipeline/capabilities.py",
+  "src/video_pipeline/project.py",
+  "src/video_pipeline/timeline.py",
+  "src/video_pipeline/temporal.py",
+  "src/video_pipeline/validation.py",
+]
+follow_imports = "silent"
 plugins = ["pydantic.mypy"]
 python_version = "3.13"
 strict = true

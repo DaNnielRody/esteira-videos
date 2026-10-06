@@ -172,6 +172,7 @@ def test_manim_runner_uses_exact_cairo_mp4_media_and_854x480_15fps_argv(
         "-m",
         "manim",
         "render",
+        "--disable_caching",
         "--renderer",
         "cairo",
         "--format",
@@ -194,6 +195,21 @@ def test_manim_runner_uses_exact_cairo_mp4_media_and_854x480_15fps_argv(
     assert isinstance(result.elapsed_seconds, float)
     assert result.elapsed_seconds >= 0
     assert list(result.mp4_paths) == [final_mp4]
+
+
+def test_manim_runner_disables_manim_caching_for_frame_aligned_logical_time(
+    tmp_path: Path,
+) -> None:
+    """The public render command disables Manim caching for cue alignment."""
+
+    _require_contract()
+    scene_path, media_dir, _final_mp4 = _scene_and_media(tmp_path)
+    process = RecordingSubprocess(CompletedProcessFake(0, "", ""))
+
+    ManimRunner(subprocess_run=process).run(scene_path, media_dir=media_dir)
+
+    argv = process.calls[0][0]
+    assert "--disable_caching" in argv
 
 
 def test_manim_runner_preserves_traceback_and_all_nonzero_process_facts(
@@ -319,3 +335,24 @@ def test_rendering_audit_contract() -> None:
     )
 
     assert all(callable(globals().get(name)) for name in behavioral_tests)
+
+
+def test_renderer_honours_project_resolution_before_composition(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from video_pipeline.scene_plan import ScenePlan
+    from video_pipeline.theme import VideoTheme
+
+    plan = ScenePlan(
+        id="hd",
+        scene_name="HDScene",
+        objective="Render native HD",
+        duration_seconds=2.0,
+        theme=VideoTheme.production().model_copy(update={"resolution": (1920, 1080), "fps": 30}),
+    )
+    monkeypatch.setenv("VIDEO_PIPELINE_SCENE_PLAN", plan.model_dump_json())
+    process = RecordingSubprocess(CompletedProcessFake(0, "", ""))
+    ManimRunner(subprocess_run=process).run(tmp_path / "scene.py", tmp_path / "media")
+    argv = process.calls[0][0]
+    assert argv[argv.index("--resolution") + 1] == "1920,1080"
+    assert argv[argv.index("--fps") + 1] == "30"

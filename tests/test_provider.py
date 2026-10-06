@@ -174,7 +174,7 @@ def test_ollama_generate_sends_reproducible_sampling_options() -> None:
     provider.generate(_request(temperature=0.2, seed=17))
 
     body = _request_body(opener.requests[0][0])
-    assert body["options"] == {"temperature": 0.2, "seed": 17}
+    assert body["options"] == {"temperature": 0.2, "seed": 17, "num_ctx": 16384}
 
 
 def test_ollama_generate_accepts_plain_code_and_correction_context() -> None:
@@ -311,3 +311,79 @@ def test_ollama_unload_posts_explicit_keep_alive_zero() -> None:
         "stream": False,
         "keep_alive": 0,
     }
+
+
+def test_ollama_generation_timeout_can_be_configured_for_local_cpu(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("VIDEO_PIPELINE_OLLAMA_TIMEOUT", "900")
+    opener = RecordingOpener([{"response": "print('scene')"}])
+    provider = OllamaProvider(opener=opener)
+
+    assert provider.generate(_request()).code == "print('scene')"
+    assert opener.requests[0][1] == 900.0
+
+
+@pytest.mark.parametrize("value", ["0", "-1", "nan", "inf", "invalid"])
+def test_ollama_rejects_invalid_environment_timeout(
+    monkeypatch: pytest.MonkeyPatch, value: str
+) -> None:
+    monkeypatch.setenv("VIDEO_PIPELINE_OLLAMA_TIMEOUT", value)
+    with pytest.raises(ValueError, match="timeout"):
+        OllamaProvider()
+
+
+def test_explicit_ollama_timeout_overrides_environment(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("VIDEO_PIPELINE_OLLAMA_TIMEOUT", "invalid")
+    opener = RecordingOpener([{"response": "print('scene')"}])
+    provider = OllamaProvider(timeout=3.5, opener=opener)
+    provider.generate(_request())
+    assert opener.requests[0][1] == 3.5
+
+
+def test_ollama_context_window_is_configurable_for_long_correction_prompts(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("VIDEO_PIPELINE_OLLAMA_NUM_CTX", "32768")
+    opener = RecordingOpener([{"response": "print('scene')"}])
+    OllamaProvider(opener=opener).generate(_request())
+    assert _request_body(opener.requests[0][0])["options"]["num_ctx"] == 32768
+
+
+@pytest.mark.parametrize("value", ["0", "-1", "nan", "1.5", "invalid"])
+def test_ollama_rejects_invalid_context_configuration(
+    monkeypatch: pytest.MonkeyPatch,
+    value: str,
+) -> None:
+    monkeypatch.setenv("VIDEO_PIPELINE_OLLAMA_NUM_CTX", value)
+    with pytest.raises(ValueError, match="context"):
+        OllamaProvider()
+
+
+def test_narration_generation_binds_the_runtime_without_rewriting_animation_code() -> None:
+    import ast
+
+    original = (
+        "from manim import *\nclass AcceptanceScene(Scene):\n"
+        "    def construct(self):\n"
+        "        circle = Circle(color=self.theme.palette['primary'])\n"
+        "        self.play(Create(circle), run_time=3)\n"
+        "        self.play(circle.animate.shift(RIGHT), run_time=2)\n"
+    )
+    payload = {"response": original, "model": "qwen-test"}
+    response = OllamaProvider(opener=RecordingOpener([payload])).generate(
+        _request(scene_plan={"id": "acceptance"})
+    )
+    tree = ast.parse(response.code)
+    scene = next(node for node in tree.body if isinstance(node, ast.ClassDef))
+    assert isinstance(scene.bases[0], ast.Name)
+    assert scene.bases[0].id == "VisualScene"
+    assert "from video_pipeline.runtime import VisualScene" in response.code
+    original_scene = next(
+        node for node in ast.parse(original).body if isinstance(node, ast.ClassDef)
+    )
+    assert [ast.dump(node) for node in scene.body] == [
+        ast.dump(node) for node in original_scene.body
+    ]
+    assert response.raw_response == payload
+    assert response.normalization == {"kind": "visual_runtime_binding", "version": 1}

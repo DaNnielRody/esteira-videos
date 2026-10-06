@@ -5,6 +5,7 @@ from __future__ import annotations
 import math
 import re
 
+from video_pipeline.direction import check_direction
 from video_pipeline.expectations import check_expectations
 from video_pipeline.observation import ObservedShape
 from video_pipeline.quality import QualityFinding, QualityReport
@@ -47,6 +48,7 @@ def evaluate_visual_quality(
     _legibility_findings(plan, observed, active_theme, findings)
     _rhythm_findings(plan, observed, active_theme, findings)
     _coherence_findings(plan, observed, findings)
+    findings.extend(check_direction(plan, observed))
     for finding in findings:
         object.__setattr__(finding, "scene_id", plan.id)
     return QualityReport(scene_id=plan.id, attempt=attempt, findings=_deduplicate(findings))
@@ -141,6 +143,12 @@ def _safe_area_findings(
         box = item.bbox
         outside_frame = box.right <= 0 or box.left >= 1 or box.bottom <= 0 or box.top >= 1
         clipped = box.left < 0 or box.top < 0 or box.right > 1 or box.bottom > 1
+        framing_exception = _temporary_camera_framing_is_proven(plan, observed, item)
+        if framing_exception:
+            # A camera reveal/focus may intentionally carry a graphic through
+            # the frame edge.  The same object must be fully visible elsewhere
+            # in the observed journey before this exception is accepted.
+            continue
         if not item.visible or item.width <= 0 or item.height <= 0 or outside_frame:
             findings.append(
                 _finding(
@@ -203,6 +211,54 @@ def _safe_area_findings(
                     suggestion="Reduce the object's scale before rendering it.",
                 )
             )
+
+
+def _temporary_camera_framing_is_proven(
+    plan: ScenePlan,
+    observed: ObservedScene,
+    item: ObservedObject,
+) -> bool:
+    """Return whether one clipped graphic is covered by an explicit camera beat.
+
+    Camera framing permissions are intentionally narrow.  They apply only to a
+    non-text object named by a timed ``camera_reveal``/``camera_focus`` beat,
+    and only when another observation of that same object is fully enclosed in
+    the frame.  This keeps the default safe-area contract strict and prevents
+    an unobserved object from being excused by a global switch.
+    """
+
+    if _is_textual(item) or not item.visible or item.width <= 0 or item.height <= 0:
+        return False
+    box = item.bbox
+    if not (box.left < 0 or box.top < 0 or box.right > 1 or box.bottom > 1):
+        return False
+    permitted_beats = [
+        beat
+        for beat in plan.beats
+        if beat.framing in {"camera_reveal", "camera_focus"}
+        and item.id in beat.objects
+        and beat.start_seconds is not None
+        and beat.end_seconds is not None
+        and beat.start_seconds - 1e-6 <= item.logical_time <= beat.end_seconds + 1e-6
+    ]
+    if not permitted_beats:
+        return False
+    return any(
+        candidate.id == item.id
+        and abs(candidate.logical_time - item.logical_time) > 1e-6
+        and candidate.visible
+        and candidate.width > 0
+        and candidate.height > 0
+        and candidate.bbox.left >= 0
+        and candidate.bbox.top >= 0
+        and candidate.bbox.right <= 1
+        and candidate.bbox.bottom <= 1
+        and any(
+            beat.start_seconds - 1e-6 <= candidate.logical_time <= beat.end_seconds + 1e-6
+            for beat in permitted_beats
+        )
+        for candidate in _unique_objects(observed)
+    )
 
 
 def _overlap_findings(
@@ -1193,8 +1249,27 @@ def _pixel_color(
             [],
         )
     candidates: list[tuple[float, int, ObservedShape]] = []
-    for frame in observed.frames:
+    frames = observed.frames
+    timed = [
+        (abs(frame.instant_seconds - item.logical_time), frame)
+        for frame in frames
+        if frame.instant_seconds is not None
+    ]
+    if timed:
+        nearest = min(distance for distance, _frame in timed)
+        # Sparse sampling cannot prove the colour of a moving object far away
+        # in time. Report unmatched evidence instead of assigning another object.
+        frames = [
+            frame for distance, frame in timed if distance <= nearest + 1e-6 and distance <= 0.5
+        ]
+    for frame in frames:
         for shape in frame.shapes:
+            if frame.instant_seconds is not None and _is_textual(item):
+                if not (
+                    item.bbox.left - 0.01 <= shape.center_x <= item.bbox.right + 0.01
+                    and item.bbox.top - 0.01 <= shape.center_y <= item.bbox.bottom + 0.01
+                ):
+                    continue
             if not _pixel_shape_matches(item, shape):
                 continue
             distance = math.hypot(
@@ -1236,6 +1311,14 @@ def _pixel_color(
 def _pixel_shape_matches(item: ObservedObject, shape: ObservedShape) -> bool:
     item_kind = item.kind.lower()
     shape_kind = shape.kind.lower()
+    # External-contour observation can expose a surrounding browser/card
+    # outline as the only polygon near text drawn inside it.  Its filled
+    # footprint is much larger than the registered text bbox, so it is not
+    # evidence for the text's rendered colour.  Keep actual glyph contours
+    # eligible, including polygon contours used by the deterministic tests.
+    if _is_textual(item) and item.width > 0 and item.height > 0:
+        if shape.area_fraction > item.width * item.height * 4.0:
+            return False
     if item_kind == shape_kind:
         return True
     if _is_textual(item) and shape_kind in {

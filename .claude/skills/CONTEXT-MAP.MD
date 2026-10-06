@@ -75,8 +75,8 @@ publica `PROJECT/golden/`.
   `PROJECT/ui/revisions/vNNN.json`; `PROJECT/ui/index.json` é o único ponteiro
   mutável e `PROJECT/ui/working/<job-id>.json` é transitório. Revisão da UI é
   distinta de `PROJECT/golden/manifest.json` e não o promove.
-- O golden usa o envelope `golden.manifest/1`, `version: 1`, profile explícito
-  (`visual` ou `audiovisual`), status `accepted`, identidade, capacidades,
+- O golden usa o envelope `golden.manifest/1`, `version: 1`, com o único profile
+  aceito `audiovisual`, status `accepted`, identidade, capacidades,
   hashes, composição e snapshots. Não há fallback implícito de profile.
 - Discovery, leitura e validação são model-free e não executam provider,
   código visual, Manim, FFmpeg ou ffprobe.

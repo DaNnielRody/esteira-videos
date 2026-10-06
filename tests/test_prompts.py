@@ -9,7 +9,7 @@ from __future__ import annotations
 import pytest
 
 from video_pipeline.provider import ProviderRequest
-from video_pipeline.reference_catalog import SOURCE_COMMIT
+from video_pipeline.reference_catalog import REFERENCE_TOPICS, SOURCE_COMMIT
 
 try:
     from video_pipeline.prompts import build_prompt
@@ -175,3 +175,91 @@ def test_prompts_audit_contract() -> None:
 
     assert callable(globals().get("test_a_semantic_rejection_is_not_described_as_a_render_failure"))
     assert callable(globals().get("test_a_crash_still_leads_with_the_traceback_error"))
+
+
+@pytest.mark.parametrize("correction", [False, True])
+def test_generation_and_correction_explain_the_real_visual_runtime(correction: bool) -> None:
+    request = ProviderRequest(
+        scene_name="AcceptanceScene",
+        description="Move a circle along a path.",
+        previous_code="class AcceptanceScene(VisualScene): pass" if correction else None,
+        diagnostics={"stderr": "NameError: name 'VisualScene' is not defined"}
+        if correction
+        else None,
+    )
+    prompt = build_prompt(request)
+    assert "from video_pipeline.runtime import VisualScene" in prompt
+    assert "self.register_visual(mobject, object_id" in prompt
+    assert "self.checkpoint(checkpoint_id" in prompt
+    assert "Do not redefine VisualScene" in prompt
+    assert "self.scene_plan.theme.palette" in prompt
+
+
+def test_prompt_uses_mapping_access_for_the_runtime_palette() -> None:
+    prompt = build_prompt(ProviderRequest(scene_name="PaletteScene", description="Circle"))
+    assert "palette['primary']" in prompt
+    assert "palette.primary" not in prompt
+
+
+def test_required_runtime_import_follows_examples_and_rejected_code() -> None:
+    prompt = build_prompt(
+        ProviderRequest(
+            scene_name="NetworkScene",
+            description="Draw a network.",
+            topics=("neural_networks",),
+            previous_code="class NetworkScene(Scene): pass",
+            diagnostics={"stderr": "NameError: name 'VisualScene' is not defined"},
+        )
+    )
+    assert prompt.rindex("from video_pipeline.runtime import VisualScene") > prompt.index(
+        "class NetworkScene(Scene): pass"
+    )
+    assert prompt.rindex("from video_pipeline.runtime import VisualScene") > prompt.index(
+        "Reference neural-network-layers"
+    )
+
+
+@pytest.mark.parametrize("topic", REFERENCE_TOPICS)
+def test_reference_examples_use_the_same_runtime_required_of_generated_scenes(topic: str) -> None:
+    import ast
+    import re
+
+    prompt = build_prompt(
+        ProviderRequest(
+            scene_name="ExampleScene",
+            description="Draw the concept.",
+            topics=(topic,),
+        )
+    )
+    examples = re.findall(r"```python\n(.*?)```", prompt, flags=re.DOTALL)
+    assert examples
+    for example in examples:
+        parsed = ast.parse(example)
+        classes = [node for node in parsed.body if isinstance(node, ast.ClassDef)]
+        assert classes
+        assert "from video_pipeline.runtime import VisualScene" in example
+        for cls in classes:
+            assert any(
+                isinstance(base, ast.Name) and base.id == "VisualScene" for base in cls.bases
+            )
+
+
+def test_large_repeated_diagnostics_keep_timing_without_flooding_context() -> None:
+    reasons = [
+        f"TEXT_TOO_SMALL: object=label-{i}; increase text height" for i in range(1000)
+    ]
+    reasons.append("OBSERVED_DURATION_MISMATCH: actual=8; expected=48.75")
+    diagnostics = {
+        "exit_code": 0,
+        "validator_reasons": reasons,
+        "validation": {"reasons": reasons},
+    }
+    request = _request(**diagnostics)
+
+    prompt = build_prompt(request)
+
+    assert len(prompt) < 16000
+    assert "TEXT_TOO_SMALL" in prompt
+    assert "OBSERVED_DURATION_MISMATCH: actual=8; expected=48.75" in prompt
+    assert "PREVIOUS_CODE_SENTINEL" in prompt
+    assert request.diagnostics == diagnostics

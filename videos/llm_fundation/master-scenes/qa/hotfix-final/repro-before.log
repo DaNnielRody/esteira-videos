@@ -1,0 +1,18 @@
+GTA residual rectangles: 3 [('SurroundingRectangle', [-0.331943113553536, 0.0, 0.0], np.float64(1.1629832480921758)), ('SurroundingRectangle', [2.4764182165933555, 0.0, 0.0], np.float64(3.4667804241661564)), ('SurroundingRectangle', [5.316643961347079, 0.0, 0.0], np.float64(1.2267120773058409))]
+Traceback (most recent call last):
+  File "/home/dan/saas/esteira-videos/artifacts/llm-fundation-hotfix-final/qa/repro.py", line 18, in <module>
+    try:Probe().render()
+        ~~~~~~~~~~~~~~^^
+  File "/home/dan/saas/esteira-videos/artifacts/llm-fundation-hotfix-final/candidates/_support/src/video_pipeline/runtime.py", line 396, in render
+    return super().render(*args, **kwargs)
+           ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/dan/saas/esteira-videos/.venv/lib/python3.13/site-packages/manim/scene/scene.py", line 259, in render
+    self.construct()
+    ~~~~~~~~~~~~~~^^
+  File "/home/dan/saas/esteira-videos/videos/llm_fundation/master-scenes/TokensERepresentacoesScene/scene.py", line 982, in construct
+    self.at(54.9, Write(dog),duration=1.8)
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dan/saas/esteira-videos/artifacts/llm-fundation-hotfix-final/qa/repro.py", line 14, in at
+    assert not ghosts,"GTA containers survive into CACHORRO"
+           ^^^^^^^^^^
+AssertionError: GTA containers survive into CACHORRO

@@ -1,0 +1,78 @@
+{
+  "schema_version": "visual-assets/1",
+  "library": "lucide",
+  "source_url": "https://github.com/lucide-icons/lucide",
+  "source_revision": "0.468.0",
+  "license": "ISC",
+  "license_path": "LICENSE",
+  "normalization": {
+    "view_box": "0 0 24 24",
+    "fill": "none",
+    "stroke": "currentColor",
+    "stroke_linecap": "round",
+    "stroke_linejoin": "round",
+    "stroke_width": "2"
+  },
+  "assets": {
+    "thumbs-up": {
+      "category": "ui",
+      "path": "ui/thumbs-up.svg",
+      "sha256": "7353d9c388dc105406c40ac7787470e208649679da432eb7487b90a714ac0ae9"
+    },
+    "message-circle": {
+      "category": "ui",
+      "path": "ui/message-circle.svg",
+      "sha256": "09217931872cde99eeed5ccd2d29ef451c1ac0b95e6340c70aa2e49491c0e319"
+    },
+    "share-2": {
+      "category": "ui",
+      "path": "ui/share-2.svg",
+      "sha256": "a60fbdeecc128885b248681da61293082d569671b6397d4cd882be967ef94159"
+    },
+    "bell": {
+      "category": "ui",
+      "path": "ui/bell.svg",
+      "sha256": "bece743bf32101cf9a910adc761809f9c7a3eca75e408aaf6eaa5d509cce7400"
+    },
+    "mouse-pointer-2": {
+      "category": "ui",
+      "path": "ui/mouse-pointer-2.svg",
+      "sha256": "4da92fad421c3da8d2e700bd73f93b69095b53951c577b7e4f5e35f9d0715647"
+    },
+    "check": {
+      "category": "ui",
+      "path": "ui/check.svg",
+      "sha256": "810813384e57549839dac029679210aeebe1a015245ea3db3f04ea3bc2203f9d"
+    },
+    "cpu": {
+      "category": "hardware",
+      "path": "hardware/cpu.svg",
+      "sha256": "199af135cd4ffc9a04736c599004e54ad954ac4554cf143d0dcc624e39715673"
+    },
+    "server": {
+      "category": "hardware",
+      "path": "hardware/server.svg",
+      "sha256": "e8c4f808587df6c7790336fdf4e5d462d164f12f70ba3d781e0f06d3ae2dc27c"
+    },
+    "microchip": {
+      "category": "hardware",
+      "path": "hardware/microchip.svg",
+      "sha256": "a887aab7d67e736311e4cbf6e83e26ac019601f10e9a56dbf16a7e67d6545502"
+    },
+    "book-open": {
+      "category": "documents",
+      "path": "documents/book-open.svg",
+      "sha256": "dfeb37afa011eaadb6d442e1b43e001e7122a2f164b92a448030296d5d1d7775"
+    },
+    "file-text": {
+      "category": "documents",
+      "path": "documents/file-text.svg",
+      "sha256": "37d11e737fb6ef772dd0e85904e32d884d8082bbae09172651fa94de5fb0c00a"
+    },
+    "globe": {
+      "category": "documents",
+      "path": "documents/globe.svg",
+      "sha256": "7d9f1541d1d15880817da4ce8a34841723ba683fbc8659c25918f4b5091d0222"
+    }
+  }
+}

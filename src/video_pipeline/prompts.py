@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Mapping
+from dataclasses import replace
 from typing import TYPE_CHECKING
 
 from video_pipeline.reference_catalog import select_reference_examples
@@ -30,6 +31,33 @@ _BASE_INSTRUCTIONS = (
     "Do not include commentary outside the Python source."
 )
 
+_RUNTIME_INSTRUCTIONS = (
+    "Project runtime API (VisualScene is NOT exported by manim):\n"
+    "from manim import *\n"
+    "from video_pipeline.runtime import VisualScene\n"
+    "Do not redefine VisualScene or replace it with Scene.\n"
+    "The renderer supplies self.scene_plan; do not load project files yourself.\n"
+    "Set the background with self.camera.background_color = palette['background']; "
+    "self.set_background_color does not exist.\n"
+    "Use palette = self.scene_plan.theme.palette and palette['primary'], palette['secondary'], "
+    "palette['accent'], palette['text'], palette['muted'], palette['background'] for colors.\n"
+    "Register visible objects BEFORE adding/animating them: "
+    "self.register_visual(mobject, object_id, kind='circle', color_role='primary'). "
+    "mobject is the first argument and object_id is a stable string. "
+    "For text, supply text='visible content'; for formulas, formula='TeX'.\n"
+    "self.checkpoint(checkpoint_id, beat_id=None, visual_change=True) records current state; "
+    "checkpoint_id is a string. Call after meaningful changes.\n"
+    "Use planned object IDs when present; otherwise choose descriptive stable IDs. "
+    "Do not invent theme, register_object, or checkpoint API methods.\n"
+    "For a narration-led scene, all local animation and wait durations must sum to "
+    "target_duration_seconds. Local time begins at 0, not start_seconds. "
+    "Honor authored reveal times; do not fill the duration with a long static ending.\n"
+    "Draw and transform the described objects (geometry, paths, tokens, networks); "
+    "words naming an action do not depict that action. Keep objects spatially persistent "
+    "so motion explains relationships. Use short labels attached to those objects, "
+    "not paragraph slides or narration subtitles."
+)
+
 # A local 7B model drowns in a full Rich traceback.  Keep the decisive tail of
 # each stream bounded so the failing line stays inside the model's attention.
 _STREAM_TAIL_LINES = 40
@@ -49,6 +77,9 @@ _QUALITY_KEYS = ("quality_report", "quality_findings")
 
 def build_prompt(request: ProviderRequest) -> str:
     """Build the generation or correction prompt for one provider request."""
+
+    if request.diagnostics is not None:
+        request = replace(request, diagnostics=_compact_diagnostics(request.diagnostics))
 
     lines = [
         _BASE_INSTRUCTIONS,
@@ -75,6 +106,26 @@ def build_prompt(request: ProviderRequest) -> str:
                 json.dumps(request.scene_plan, ensure_ascii=False, sort_keys=True),
                 "Use VisualScene, register every planned object with its semantic ID, "
                 "and checkpoint each beat. Preserve the plan's timing and continuity.",
+                "Visual direction v1: animate relationships and conceptual changes. "
+                "Keep related beats in a shared visual environment; hand the previous "
+                "object/state to the next beat. Preserve identity while varying framing "
+                "when the explanation benefits. Assets must cause consequences. Reuse "
+                "examples when relevant; density must communicate quantity, not retain "
+                "obsolete objects. Camera movement must reveal something; intentional "
+                "holds are allowed. Questions should lead visually to their answers. "
+                "Use transformation when A becomes B. Retire obsolete geometry and "
+                "check intermediate states, not only endpoints.",
+                "When ScenePlan.direction is present, obey every declared interval in "
+                "scene-local seconds. Register token text and container separately but "
+                "animate/remove their VGroup together. tokens are fully live on "
+                "[start_seconds,end_seconds) and EXIT at end_seconds; use fresh IDs for "
+                "later tokens. padding is normalized separately by frame width/height. "
+                "aspects constrain axis-aligned geometry after camera-dimension correction. "
+                "processing requires the exact named animation on model_id over the "
+                "declared interval, then a fresh output_id by output_by_seconds. "
+                "Checkpoint at the settled start/end of each contract, at scene start "
+                "and output deadline, and at meaningful intermediate changes. "
+                "Missing evidence blocks quality; declaring a state is not observing it.",
             ]
         )
     if request.capabilities:
@@ -137,6 +188,7 @@ def build_prompt(request: ProviderRequest) -> str:
                 ]
             )
     if request.diagnostics is None:
+        lines.append(_RUNTIME_INSTRUCTIONS)
         lines.append("Return the complete Python source without commentary.")
         return "\n".join(lines)
 
@@ -162,6 +214,7 @@ def build_prompt(request: ProviderRequest) -> str:
                 "```",
             ]
         )
+    lines.append(_RUNTIME_INSTRUCTIONS)
     lines.append(_corrective_instruction(request.diagnostics, failing))
     return "\n".join(lines)
 
@@ -242,6 +295,31 @@ def build_correction_prompt(request: ProviderRequest) -> str:
     if request.previous_code is None or request.diagnostics is None:
         raise ValueError("correction prompt requires previous code and diagnostics")
     return build_prompt(request)
+
+
+def _compact_diagnostics(diagnostics: Mapping[str, object]) -> Mapping[str, object]:
+    """Keep a representative per failure type when repeated evidence floods context.
+
+    The full evidence remains in request/diagnostics artifacts. Only the model's
+    prompt is condensed; acceptance still uses the complete quality report.
+    """
+    if len(json.dumps(diagnostics, ensure_ascii=False)) <= 12000:
+        return diagnostics
+    representatives: dict[str, str] = {}
+    for reason in [*_reasons(diagnostics), *_quality_reasons(diagnostics)]:
+        code = reason.split(":", 1)[0].split(" (", 1)[0]
+        representatives.setdefault(code, reason[:600])
+    compact = {
+        key: diagnostics[key]
+        for key in ("exit_code", "timeout", "timed_out", "stderr", "stdout")
+        if key in diagnostics
+    }
+    compact["validator_reasons"] = list(representatives.values())
+    compact["evidence_note"] = (
+        "Repeated findings condensed to one example per failure type; "
+        "apply each correction to all affected objects. Full evidence is retained in artifacts."
+    )
+    return compact
 
 
 def _diagnostic_lines(

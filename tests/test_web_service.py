@@ -533,6 +533,26 @@ def test_service_rejects_more_than_twenty_headings_before_project_registration(
     _assert_no_project_residue(projects_root, "2026_web")
 
 
+def test_service_rejects_more_than_twenty_headingless_blocks_before_project_registration(
+    tmp_path: Path,
+) -> None:
+    service, projects_root, _, _ = _make_service(tmp_path)
+    overfull_script = "\n\n".join(
+        f"Bloco {index:02d}: conteúdo da cena sem heading {index}."
+        for index in range(1, 22)
+    )
+
+    with service:
+        with pytest.raises(ValueError, match="20"):
+            service.create_project(
+                title="Vinte e uma cenas sem headings",
+                script=overfull_script,
+                audio_asset_id="audio-narration",
+            )
+
+    _assert_no_project_residue(projects_root, "2026_web")
+
+
 def test_render_requires_confirmation_but_confirmation_opens_real_enqueue_boundary(
     tmp_path: Path,
 ) -> None:
@@ -1581,6 +1601,220 @@ def test_restart_ignores_terminal_draft_and_preserves_all_ui_bytes(
         restarted.close()  # type: ignore[attr-defined]
 
     assert _snapshot_files(project_root / "ui") == ui_before
+
+
+def test_project_and_job_projections_are_path_free_and_survive_restart(
+    tmp_path: Path,
+) -> None:
+    project_id = "2026_projection_recovery"
+    service, projects_root, _, _ = _make_service(tmp_path, project_id=project_id)
+    project_root = projects_root / project_id
+    try:
+        _create_confirmed_projects(service, [project_id])
+        project = Project.model_validate_json(
+            (project_root / "project.json").read_text(encoding="utf-8")
+        )
+        RevisionStore(project_root).start_working(
+            project_id=project_id,
+            job_id="job-projection-interrupted",
+            run_id="run-projection-interrupted",
+            status="running",
+            base_package_hashes=_project_package_hashes(project_root, project),
+            correction="diagnóstico de recuperação",
+            messages=["worker stopped before completion"],
+            asset_ids=["audio-narration"],
+            scene_id="abertura",
+            base_run_id="run-base",
+        )
+        RevisionStore(project_root).publish_terminal(
+            project_id=project_id,
+            job_id="job-projection-failed",
+            run_id="run-projection-failed",
+            status="failure",
+            base_package_hashes=_project_package_hashes(project_root, project),
+            messages=["validation diagnostic"],
+        )
+    finally:
+        service.close()  # type: ignore[attr-defined]
+
+    restarted, _, _, _ = _make_service(tmp_path, project_id=project_id)
+    try:
+        projects = restarted.list_projects()  # type: ignore[attr-defined]
+        jobs = restarted.list_jobs()  # type: ignore[attr-defined]
+        project_projection = next(item for item in projects if item["id"] == project_id)
+        job_projection = next(
+            item for item in jobs if item["job_id"] == "job-projection-interrupted"
+        )
+        assert project_projection["title"] == f"Projeto {project_id}"
+        assert project_projection["timeline_status"] == "confirmed"
+        assert job_projection["state"] == "interrupted"
+        assert job_projection["scene_id"] == "abertura"
+        assert job_projection["base_run_id"] == "run-base"
+        assert job_projection["correction"] == "diagnóstico de recuperação"
+        assert job_projection["diagnostics"] == ["worker stopped before completion"]
+        failed_projection = next(
+            item for item in jobs if item["job_id"] == "job-projection-failed"
+        )
+        assert failed_projection["state"] == "failure"
+        assert failed_projection["diagnostics"] == ["validation diagnostic"]
+        serialized = json.dumps([projects, jobs], ensure_ascii=False)
+        assert str(tmp_path) not in serialized
+        assert "project_path" not in serialized
+    finally:
+        restarted.close()  # type: ignore[attr-defined]
+
+
+def test_job_diagnostics_redact_unconfigured_absolute_paths(
+    tmp_path: Path,
+) -> None:
+    project_id = "2026_projection_path_redaction"
+    service, projects_root, _, _ = _make_service(tmp_path, project_id=project_id)
+    project_root = projects_root / project_id
+    private_path = "/opt/private-render/cache/failure.log"
+    try:
+        _create_confirmed_projects(service, [project_id])
+        project = Project.model_validate_json(
+            (project_root / "project.json").read_text(encoding="utf-8")
+        )
+        RevisionStore(project_root).start_working(
+            project_id=project_id,
+            job_id="job-path-diagnostic",
+            run_id="run-path-diagnostic",
+            status="running",
+            base_package_hashes=_project_package_hashes(project_root, project),
+            messages=[f"worker failed at {private_path}"],
+        )
+    finally:
+        service.close()  # type: ignore[attr-defined]
+
+    restarted, _, _, _ = _make_service(tmp_path, project_id=project_id)
+    try:
+        jobs = restarted.list_jobs()  # type: ignore[attr-defined]
+        serialized = json.dumps(jobs, ensure_ascii=False)
+        assert private_path not in serialized
+        assert "worker failed at" in serialized
+    finally:
+        restarted.close()  # type: ignore[attr-defined]
+
+
+def test_inspection_redacts_absolute_paths_from_revision_diagnostics(
+    tmp_path: Path,
+) -> None:
+    project_id = "2026_revision_path_redaction"
+    service, projects_root, _, _ = _make_service(tmp_path, project_id=project_id)
+    project_root = projects_root / project_id
+    private_path = "/opt/private-render/revisions/failure.log"
+    try:
+        _create_confirmed_projects(service, [project_id])
+        project = Project.model_validate_json(
+            (project_root / "project.json").read_text(encoding="utf-8")
+        )
+        RevisionStore(project_root).publish_terminal(
+            project_id=project_id,
+            job_id="job-revision-path",
+            run_id="run-revision-path",
+            status="failure",
+            base_package_hashes=_project_package_hashes(project_root, project),
+            correction=f"inspect {private_path}",
+            messages=[f"failed at {private_path}"],
+        )
+        projection = service.inspect(project_id)  # type: ignore[attr-defined]
+        serialized = json.dumps(projection, ensure_ascii=False)
+        assert private_path not in serialized
+        assert "failed at" in serialized
+    finally:
+        service.close()  # type: ignore[attr-defined]
+
+
+def test_generic_retry_rebuilds_selective_inputs_from_durable_working_draft(
+    tmp_path: Path,
+) -> None:
+    project_id = "2026_generic_retry"
+    bootstrap, projects_root, _, _ = _make_service(tmp_path, project_id=project_id)
+    project_root = projects_root / project_id
+    try:
+        _create_confirmed_projects(bootstrap, [project_id])
+        _mark_project_ready(project_root)
+    finally:
+        bootstrap.close()  # type: ignore[attr-defined]
+
+    project = Project.model_validate_json(
+        (project_root / "project.json").read_text(encoding="utf-8")
+    )
+    RevisionStore(project_root).start_working(
+        project_id=project_id,
+        job_id="job-generic-source",
+        run_id="run-generic-source",
+        status="running",
+        base_package_hashes=_project_package_hashes(project_root, project),
+        correction="Correção persistida",
+        scene_id="abertura",
+        base_run_id="base-ready",
+    )
+    factory = _BlockingPipelineFactory(expected_terminal=1)
+    factory.release.set()
+    service, _, _, _ = _make_service(
+        tmp_path,
+        project_id=project_id,
+        pipeline_factory=factory,
+        job_id_factory=lambda: "job-generic-retry",
+        run_id_factory=lambda: "run-generic-retry",
+    )
+    try:
+        retry = service.retry_job("job-generic-source")  # type: ignore[attr-defined]
+        terminal = service.wait_job(retry.job_id, timeout=5)  # type: ignore[attr-defined]
+        assert terminal.state == "success"  # type: ignore[attr-defined]
+        assert factory.render_calls[0]["scene"] == "abertura"
+        assert factory.render_calls[0]["base_run_id"] == "base-ready"
+        assert factory.render_calls[0]["correction"] == "Correção persistida"
+    finally:
+        service.close()  # type: ignore[attr-defined]
+
+
+def test_generic_retry_reopens_a_failed_job_after_restart(
+    tmp_path: Path,
+) -> None:
+    project_id = "2026_failed_retry"
+    failing_factory = _BlockingPipelineFactory(
+        expected_terminal=1,
+        failure_message="private failure detail",
+    )
+    service, _, _, _ = _make_service(
+        tmp_path,
+        project_id=project_id,
+        pipeline_factory=failing_factory,
+        job_id_factory=lambda: "job-failed",
+        run_id_factory=lambda: "run-failed",
+    )
+    try:
+        _create_confirmed_projects(service, [project_id])
+        failed = service.enqueue_render(project_id)  # type: ignore[attr-defined]
+        terminal = service.wait_job(_job_id(failed), timeout=5)  # type: ignore[attr-defined]
+        assert terminal.state == "failure"  # type: ignore[attr-defined]
+    finally:
+        service.close()  # type: ignore[attr-defined]
+
+    succeeding_factory = _BlockingPipelineFactory(expected_terminal=1)
+    succeeding_factory.release.set()
+    restarted, _, _, _ = _make_service(
+        tmp_path,
+        project_id=project_id,
+        pipeline_factory=succeeding_factory,
+        job_id_factory=lambda: "job-failed-retry",
+    )
+    try:
+        listed = next(
+            item
+            for item in restarted.list_jobs()  # type: ignore[attr-defined]
+            if item["job_id"] == "job-failed"
+        )
+        assert listed["state"] == "failure"
+        assert listed["diagnostics"] == ["Render failed"]
+        retry = restarted.retry_job("job-failed")  # type: ignore[attr-defined]
+        terminal_retry = restarted.wait_job(retry.job_id, timeout=5)  # type: ignore[attr-defined]
+        assert terminal_retry.state == "success"  # type: ignore[attr-defined]
+    finally:
+        restarted.close()  # type: ignore[attr-defined]
 
 
 def test_operation_state_gates_reject_without_job_draft_or_pipeline(

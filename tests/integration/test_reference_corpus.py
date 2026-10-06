@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import shutil
 from pathlib import Path
 
@@ -38,6 +39,11 @@ def test_every_qwen_reference_renders_with_manim_community(
     assert result.mp4_paths, result.stdout
     validation = RenderValidator().validate(result.mp4_paths[0])
     assert validation.valid, validation.reasons
+    facts = json.loads((tmp_path / "media" / "visual-facts.json").read_text())
+    assert facts["checkpoints"][-1]["instant_seconds"] == pytest.approx(
+        validation.duration_seconds,
+        abs=1 / 15,
+    )
 
 
 def test_reference_corpus_audit_contract() -> None:
@@ -45,3 +51,24 @@ def test_reference_corpus_audit_contract() -> None:
 
     assert len(REFERENCE_EXAMPLES) >= 8
     assert callable(globals().get("test_every_qwen_reference_renders_with_manim_community"))
+
+
+@pytest.mark.integration
+def test_runtime_clock_tracks_fractional_frame_animation_durations(tmp_path: Path) -> None:
+    source = tmp_path / "fractional.py"
+    source.write_text(
+        "from manim import Dot, RIGHT\n"
+        "from video_pipeline.runtime import VisualScene\n"
+        "class FractionalScene(VisualScene):\n"
+        "    def construct(self):\n"
+        "        dot=Dot()\n        self.add(dot)\n"
+        "        for _ in range(10):\n"
+        "            self.play(dot.animate.shift(RIGHT*.1),run_time=.11)\n"
+        "        self.checkpoint('final')\n"
+    )
+    result = ManimRunner().run(source, tmp_path / "media")
+    assert result.exit_code == 0, result.stderr
+    video = next(p for p in result.mp4_paths if "partial_movie_files" not in p.parts)
+    duration = RenderValidator().validate(video).duration_seconds
+    facts = json.loads((tmp_path / "media/visual-facts.json").read_text())
+    assert facts["checkpoints"][-1]["instant_seconds"] == pytest.approx(duration, abs=1 / 15)

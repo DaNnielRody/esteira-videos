@@ -43,14 +43,12 @@ def test_init_explicit_timestamps_create_confirmed_timeline_and_plans(
     script = tmp_path / "roteiro.md"
     script_bytes = (
         "# Abertura\n"
-        "@capabilities: basic_geometry, typography\n"
         "@start: 0\n"
         "@end: 4.000\n"
         "@objective: Mostre o vetor inicial.\n"
         "O vetor parte da origem.\n"
         "\n"
         "## Explicacao\n"
-        "@capabilities: equations\n"
         "@start: 4.000\n"
         "@end: 10.000\n"
         "@objective: Explique a decomposição.\n"
@@ -112,9 +110,7 @@ def test_init_explicit_timestamps_create_confirmed_timeline_and_plans(
     )
     assert loaded_project.status == "timeline_confirmed"
 
-    timeline = Timeline.model_validate_json(
-        (project / "timeline.json").read_text(encoding="utf-8")
-    )
+    timeline = Timeline.model_validate_json((project / "timeline.json").read_text(encoding="utf-8"))
     assert timeline.status == "confirmed"
     assert timeline.method == "explicit_timestamp"
     assert timeline.duration_seconds == 10.0
@@ -138,7 +134,6 @@ def test_init_explicit_timestamps_create_confirmed_timeline_and_plans(
         "abertura",
         "explicacao",
     ]
-    persisted_capabilities: list[list[str]] = []
     for scene, segment in zip(project_document["scenes"], timeline.segments, strict=True):
         plan_path = Path(scene["plan_path"])
         assert not plan_path.is_absolute()
@@ -151,82 +146,31 @@ def test_init_explicit_timestamps_create_confirmed_timeline_and_plans(
         assert plan.duration_seconds == segment.target_duration_seconds
         assert plan.objective == segment.objective
         assert plan.theme == loaded_project.theme
-        persisted_capabilities.append(plan.capabilities)
-    assert persisted_capabilities == [["basic_geometry", "typography"], ["equations"]]
 
 
 @pytest.mark.parametrize(
-    ("case", "expected_error"),
+    "topics",
     [
-        ("unknown_capability", "unknown visual capability"),
-        ("unsupported_capability", "not supported"),
-        ("partial", "every scene"),
+        "unknown",
+        "transformers,",
+        "transformers, transformers",
+        "linear_algebra, calculus, neural_networks, transformers, probability",
     ],
 )
-def test_init_rejects_unknown_unsupported_or_partial_capabilities(
-    tmp_path: Path,
-    capsys: pytest.CaptureFixture[str],
-    case: str,
-    expected_error: str,
-) -> None:
-    capability = {
-        "unknown_capability": "unknown_capability",
-        "unsupported_capability": "function_graphs",
-        "partial": "basic_geometry",
-    }[case]
-    second_capabilities = "" if case == "partial" else f"@capabilities: {capability}\n"
-    script = tmp_path / "roteiro.md"
-    script.write_text(
-        "# Abertura\n"
-        f"@capabilities: {capability}\n"
-        "@start: 0\n"
-        "@end: 4.000\n"
-        "@objective: Mostre o vetor inicial.\n"
-        "O vetor parte da origem.\n"
-        "\n"
-        "## Explicacao\n"
-        f"{second_capabilities}"
-        "@start: 4.000\n"
-        "@end: 10.000\n"
-        "@objective: Explique a decomposição.\n"
-        "Observe as componentes x e y.\n",
-        encoding="utf-8",
-    )
-    audio = tmp_path / "narracao.wav"
-    audio_bytes = b"deterministic fake wav bytes\x00"
-    audio.write_bytes(audio_bytes)
-    probe = FakeAudioProbe(
-        {
-            "path": "audio/narration.wav",
-            "hash": hashlib.sha256(audio_bytes).hexdigest(),
-            "container": "wav",
-            "codec": "pcm_s16le",
-            "stream": 0,
-            "sample_rate": 48_000,
-            "channels": 2,
-            "duration": 10.0,
-            "size": len(audio_bytes),
-            "probe_result": {"format": {}, "streams": []},
-        }
-    )
-    project = tmp_path / "projects" / "2026_vetores"
+def test_script_rejects_invalid_reference_topics(topics: str) -> None:
+    from video_pipeline.timeline import parse_heading_sections
 
-    assert (
-        main(
-            [
-                "init",
-                str(project),
-                "--title",
-                "Vetores",
-                "--script",
-                str(script),
-                "--audio",
-                str(audio),
-            ],
-            audio_probe=probe,
-            silence_detector=ExplodingSilenceDetector(),
-        )
-        == 1
+    with pytest.raises(ValueError):
+        parse_heading_sections(f"# Cena\n@topics: {topics}\nTexto narrado.")
+
+
+def test_reference_topics_are_optional_per_scene_and_not_narration() -> None:
+    from video_pipeline.timeline import parse_heading_sections
+
+    scenes = parse_heading_sections(
+        "# Rede\n@topics: neural_networks\nVeja a rede.\n\n# Final\nAté a próxima."
     )
-    assert expected_error in capsys.readouterr().out
-    assert not project.exists()
+    assert scenes is not None
+    assert scenes[0].topics == ("neural_networks",)
+    assert scenes[0].narration_text == "Veja a rede."
+    assert scenes[1].topics == ()

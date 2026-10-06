@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import ast
 import json
+import math
 import os
 import tempfile
 import traceback
@@ -141,6 +142,8 @@ class RenderPipeline:
         spec: SceneSpec,
         max_attempts: int = 3,
         *,
+        previous_code: str | None = None,
+        diagnostics: dict[str, object] | None = None,
         previous_scene: Mapping[str, object] | None = None,
         next_scene: Mapping[str, object] | None = None,
         on_progress: Callable[[PipelineEvent], None] | None = None,
@@ -158,8 +161,7 @@ class RenderPipeline:
         run_document = _new_run_document(run, spec, max_attempts)
         _write_json(run.path / "run.json", run_document)
 
-        previous_code: str | None = None
-        diagnostics: dict[str, object] | None = None
+        diagnostics = dict(diagnostics) if diagnostics is not None else None
         state = PipelineState.ATTEMPTING
 
         for attempt_number in range(1, max_attempts + 1):
@@ -270,6 +272,8 @@ class RenderPipeline:
                 )
 
             response_document = {"code": response.code, "raw_response": response.raw_response}
+            if response.normalization is not None:
+                response_document["normalization"] = response.normalization
             _write_json(attempt.path / "response.json", response_document)
 
             self._emit_progress(
@@ -390,9 +394,7 @@ class RenderPipeline:
                     attempt=attempt_number,
                     stage=PipelineStage.TERMINAL,
                     state=PipelineState.SENSOR_ERROR,
-                    observation=(
-                        "observed" if observation_attempted else "not_applicable"
-                    ),
+                    observation=("observed" if observation_attempted else "not_applicable"),
                 )
                 return PipelineResult(
                     state=PipelineState.SENSOR_ERROR,
@@ -432,11 +434,10 @@ class RenderPipeline:
                 diagnostics["temporal_normalization"] = temporal_document
                 _write_json(attempt.path / "diagnostics.json", diagnostics)
 
-            if (
-                temporal_normalization is not None
-                and temporal_normalization.status
-                not in {"accepted", "normalized"}
-            ):
+            if temporal_normalization is not None and temporal_normalization.status not in {
+                "accepted",
+                "normalized",
+            }:
                 error = _temporal_error(temporal_normalization)
                 terminal_state = (
                     PipelineState.CORRECTING
@@ -486,9 +487,7 @@ class RenderPipeline:
                         attempt=attempt_number,
                         stage=PipelineStage.TERMINAL,
                         state=PipelineState.ATTEMPTS_EXHAUSTED,
-                        observation=(
-                            "observed" if observation_attempted else "not_applicable"
-                        ),
+                        observation=("observed" if observation_attempted else "not_applicable"),
                     )
                     return PipelineResult(
                         state=PipelineState.ATTEMPTS_EXHAUSTED,
@@ -505,9 +504,7 @@ class RenderPipeline:
                     attempt=attempt_number,
                     stage=PipelineStage.CORRECTING,
                     state=PipelineState.CORRECTING,
-                    observation=(
-                        "observed" if observation_attempted else "not_applicable"
-                    ),
+                    observation=("observed" if observation_attempted else "not_applicable"),
                 )
                 state = PipelineState.CORRECTING
                 _set_run_state(run_document, state)
@@ -552,9 +549,7 @@ class RenderPipeline:
                     attempt=attempt_number,
                     stage=PipelineStage.TERMINAL,
                     state=PipelineState.SUCCESS,
-                    observation=(
-                        "observed" if observation_attempted else "not_applicable"
-                    ),
+                    observation=("observed" if observation_attempted else "not_applicable"),
                 )
                 return PipelineResult(
                     state=PipelineState.SUCCESS,
@@ -607,9 +602,7 @@ class RenderPipeline:
                     attempt=attempt_number,
                     stage=PipelineStage.TERMINAL,
                     state=PipelineState.ATTEMPTS_EXHAUSTED,
-                    observation=(
-                        "observed" if observation_attempted else "not_applicable"
-                    ),
+                    observation=("observed" if observation_attempted else "not_applicable"),
                 )
                 return PipelineResult(
                     state=PipelineState.ATTEMPTS_EXHAUSTED,
@@ -624,9 +617,7 @@ class RenderPipeline:
                 attempt=attempt_number,
                 stage=PipelineStage.CORRECTING,
                 state=PipelineState.CORRECTING,
-                observation=(
-                    "observed" if observation_attempted else "not_applicable"
-                ),
+                observation=("observed" if observation_attempted else "not_applicable"),
             )
             state = PipelineState.CORRECTING
             _set_run_state(run_document, state)
@@ -780,7 +771,11 @@ class RenderPipeline:
 
         if candidate is None or not validation.valid or (expectations is None and plan is None):
             return validation
-        observation = self._observe(candidate, attempt_path / "observation")
+        observation = self._observe(
+            candidate,
+            attempt_path / "observation",
+            sample_times=_text_checkpoint_times(attempt_path),
+        )
         frames = observation.evidence if observation.evidence is not None else []
         failure = observation.failure
         _write_json(
@@ -890,8 +885,16 @@ class RenderPipeline:
         self,
         candidate: Path,
         frames_dir: Path,
+        *,
+        sample_times: tuple[float, ...] = (),
     ) -> ObservationResult:
         try:
+            if sample_times and isinstance(self.observer, SceneObserver):
+                return self.observer.observe(
+                    candidate,
+                    frames_dir,
+                    sample_times=sample_times,
+                )
             return self.observer.observe(candidate, frames_dir)
         except Exception:
             return ObservationResult.failed(
@@ -959,6 +962,76 @@ class RenderPipeline:
                 _write_json(state_path, state_document)
 
 
+def _text_checkpoint_times(attempt_path: Path) -> tuple[float, ...]:
+    """Request pixel samples where registered text/formula states are shown.
+
+    The regular sensor grid is intentionally sparse.  Text can be introduced
+    between two grid frames, and assigning the preceding frame's unrelated
+    contour to that text creates a false contrast failure.  Runtime facts are
+    the authoritative logical clock, so add only checkpoints that contain a
+    readable text or formula object; this keeps memory bounded while ensuring
+    typography critics see the rendered state they judge.
+    """
+
+    facts_path = attempt_path / "media" / "visual-facts.json"
+    try:
+        document: object = json.loads(facts_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError, TypeError):
+        return ()
+    checkpoints = document.get("checkpoints") if isinstance(document, dict) else None
+    if not isinstance(checkpoints, list):
+        return ()
+    times: set[float] = set()
+    previous_signature: tuple[str, ...] = ()
+    for checkpoint in checkpoints:
+        if not isinstance(checkpoint, dict):
+            continue
+        objects = checkpoint.get("objects")
+        if not isinstance(objects, list):
+            continue
+        signatures: list[str] = []
+        for item in objects:
+            if not isinstance(item, dict) or not item.get("visible", True):
+                continue
+            if not (
+                item.get("text") is not None
+                or item.get("formula") is not None
+                or str(item.get("kind", "")).lower()
+                in {"text", "label", "caption", "title", "formula", "mathtex"}
+            ):
+                continue
+            bbox: object = item.get("bbox")
+            if not isinstance(bbox, dict):
+                continue
+            bounds: list[float] = []
+            for edge in ("left", "top", "right", "bottom"):
+                coordinate: object = bbox.get(edge)
+                if isinstance(coordinate, (int, float)) and math.isfinite(coordinate):
+                    bounds.append(round(float(coordinate), 4))
+            if len(bounds) != 4:
+                continue
+            signature_item: dict[str, object] = {
+                "id": item.get("id"),
+                "text": item.get("text"),
+                "formula": item.get("formula"),
+                "observed_color": item.get("observed_color"),
+                "bounds": bounds,
+            }
+            signatures.append(json.dumps(signature_item, ensure_ascii=False, sort_keys=True))
+        signature = tuple(sorted(signatures))
+        instant = checkpoint.get("instant_seconds")
+        if (
+            signature
+            and signature != previous_signature
+            and isinstance(instant, (int, float))
+            and math.isfinite(instant)
+            and instant >= 0
+        ):
+            times.add(float(instant))
+        previous_signature = signature
+    return tuple(sorted(times))
+
+
 # Animations that put their first mobject argument on screen.
 _INTRODUCING_ANIMATIONS = frozenset(
     {
@@ -974,7 +1047,7 @@ _INTRODUCING_ANIMATIONS = frozenset(
     }
 )
 # ``Transform(a, b)`` leaves ``a`` on screen and consumes ``b``.
-_CONSUMING_TRANSFORMS = frozenset({"Transform", "TransformFromCopy"})
+_CONSUMING_TRANSFORMS = frozenset({"Transform"})
 
 
 def _rejected(validation: ValidationResult, reasons: list[str]) -> ValidationResult:
@@ -1093,6 +1166,7 @@ def _expectations_document(
 def _frame_document(frame: FrameObservation) -> dict[str, object]:
     return {
         "index": frame.index,
+        "instant_seconds": frame.instant_seconds,
         "shapes": [
             {
                 "kind": shape.kind,
@@ -1155,14 +1229,8 @@ def _scene_semantics_reasons(code: str) -> list[str]:
 def _construct_reasons(construct: ast.FunctionDef) -> list[str]:
     """Check one ``construct`` body in statement order."""
 
-    assigned = {
-        target.id
-        for node in ast.walk(construct)
-        if isinstance(node, ast.Assign)
-        for target in node.targets
-        if isinstance(target, ast.Name)
-    }
     on_screen: set[str] = set()
+    stale_targets: set[str] = set()
     reasons: list[str] = []
     for call in sorted(
         (node for node in ast.walk(construct) if isinstance(node, ast.Call)),
@@ -1175,7 +1243,7 @@ def _construct_reasons(construct: ast.FunctionDef) -> list[str]:
         if method != "play":
             continue
         introduced, consumed = _play_targets(call)
-        for name in sorted(_referenced_names(call) & assigned):
+        for name in sorted(_animation_target_names(call) & stale_targets):
             if name in on_screen or name in introduced or name in consumed:
                 continue
             reasons.append(
@@ -1184,6 +1252,7 @@ def _construct_reasons(construct: ast.FunctionDef) -> list[str]:
                 "steps must animate `a`"
             )
         on_screen.update(introduced)
+        stale_targets.update(consumed - on_screen)
     return reasons
 
 
@@ -1211,7 +1280,9 @@ def _play_targets(call: ast.Call) -> tuple[set[str], set[str]]:
         if not isinstance(node, ast.Call) or not isinstance(node.func, ast.Name):
             continue
         name = node.func.id
-        if name in _INTRODUCING_ANIMATIONS and node.args:
+        if name in {"TransformFromCopy", "ReplacementTransform"}:
+            introduced.update(_names(node.args[1:2]))
+        elif name in _INTRODUCING_ANIMATIONS and node.args:
             introduced.update(_names(node.args[:1]))
         elif name in _CONSUMING_TRANSFORMS:
             introduced.update(_names(node.args[:1]))
@@ -1234,8 +1305,38 @@ def _target_names(nodes: list[ast.expr]) -> set[str]:
     return names
 
 
-def _referenced_names(call: ast.Call) -> set[str]:
-    return {node.id for node in ast.walk(call) if isinstance(node, ast.Name)}
+def _animation_target_names(call: ast.Call) -> set[str]:
+    """Inspect actual animation targets, never colours, paths or list containers.
+
+    This static check handles directly named mobjects. Dynamic indexing and
+    comprehensions remain the responsibility of runtime and pixel evidence.
+    """
+    names: set[str] = set()
+    animations = (
+        _INTRODUCING_ANIMATIONS
+        | _CONSUMING_TRANSFORMS
+        | {
+            "MoveAlongPath",
+            "Indicate",
+            "Rotate",
+            "MoveToTarget",
+            "ApplyMethod",
+            "Wiggle",
+            "Circumscribe",
+            "Flash",
+            "FocusOn",
+            "FadeOut",
+            "Uncreate",
+        }
+    )
+    for node in ast.walk(call):
+        if isinstance(node, ast.Attribute) and node.attr == "animate":
+            if isinstance(node.value, ast.Name):
+                names.add(node.value.id)
+        elif isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
+            if node.func.id in animations:
+                names.update(_names(node.args[:1]))
+    return names
 
 
 def _validate_max_attempts(max_attempts: int) -> None:
@@ -1315,9 +1416,7 @@ def _request_document(request: ProviderRequest) -> dict[str, object]:
         "next_scene": _json_value(request.next_scene),
         "required_objects": list(request.required_objects),
         "required_elements": list(request.required_elements),
-        "resolution": (
-            list(request.resolution) if request.resolution is not None else None
-        ),
+        "resolution": (list(request.resolution) if request.resolution is not None else None),
         "fps": request.fps,
         "prior_findings": _json_value(request.prior_findings),
     }
