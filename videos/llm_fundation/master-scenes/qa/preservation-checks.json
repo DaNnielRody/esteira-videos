@@ -1,0 +1,47 @@
+[
+  {
+    "region": "OTextoEnsinaOModeloScene",
+    "passed": true,
+    "method": "source identical except authorized font family"
+  },
+  {
+    "region": "TokensERepresentacoesScene",
+    "passed": true,
+    "method": "source identical except authorized font family"
+  },
+  {
+    "region": "Scene2017OTransformerScene",
+    "passed": true,
+    "method": "source identical except authorized font family"
+  },
+  {
+    "region": "ModeloBaseNaoEAssistenteScene",
+    "passed": true,
+    "method": "source identical except authorized font family"
+  },
+  {
+    "region": "UmaFundacaoMuitasAplicacoesScene",
+    "passed": true,
+    "method": "source identical except authorized font family"
+  },
+  {
+    "region": "ANovaFinalizacaoScene preserved suffix",
+    "passed": true,
+    "method": "source suffix identical except font"
+  },
+  {
+    "region": "OLimiteDoDicionarioScene preserved suffix",
+    "passed": true,
+    "method": "source suffix identical except font"
+  },
+  {
+    "region": "stairs + child + VOC\u00ca EST\u00c1 AQUI",
+    "passed": true,
+    "method": "source prefix identical except font"
+  },
+  {
+    "region": "GPT scaling",
+    "passed": true,
+    "method": "source prefix identical except font"
+  }
+]

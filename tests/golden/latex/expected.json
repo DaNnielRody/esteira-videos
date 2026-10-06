@@ -1,0 +1,16 @@
+{
+  "cases": [
+    {
+      "name": "exact-formula",
+      "expected_tex": "A\\mathbf{x}",
+      "candidate_tex": "A\\mathbf{x}",
+      "should_match": true
+    },
+    {
+      "name": "different-formula",
+      "expected_tex": "A\\mathbf{x}",
+      "candidate_tex": "B\\mathbf{x}",
+      "should_match": false
+    }
+  ]
+}

@@ -1,0 +1,126 @@
+{
+  "baseline": "/home/dan/saas/esteira-videos/artifacts/llm-fundation-casa-jarvis/baseline.mp4",
+  "baseline_sha256": "03aaa41d5660ebd22032eb2576eabbc5e82bc36325258511399e48e6efec2b3c",
+  "final_sha256": "7d52455e20cecb8c958bafceceb250558640e85f581b804d94bc524b8c409f33",
+  "scenes": [
+    {
+      "scene": "OQueCriouOChatGPTScene",
+      "start_frame": 0,
+      "end_frame_exclusive": 1462,
+      "frames": 1462,
+      "source_sha256": "933e9d53ea13cc0058a7de842c655868771ca7923493651374e941ae7909fd75",
+      "mode": "unchanged from baseline",
+      "sha256": "60f9c79decb5fba7e2f67c569580156801c67a1231487cc15ea2edc4f688dcb6"
+    },
+    {
+      "scene": "OLimiteDoDicionarioScene",
+      "start_frame": 1462,
+      "end_frame_exclusive": 3184,
+      "frames": 1722,
+      "source_sha256": "776946affa21d152361c67a6ac4952dd21b50ecc6fe456484cb7fb8703f051d7",
+      "mode": "CASA stagger + JARVIS reference",
+      "source_frames": 1721,
+      "boundary_adjustment_frames": 1,
+      "speed_multiplier": 1,
+      "max_cue_deviation_seconds": 0.033333333333196435,
+      "sha256": "762fd6c1fbb4e38768785a9a33cdb9abb8bfe977b8d820d779c9a804312ae03d"
+    },
+    {
+      "scene": "TokensERepresentacoesScene",
+      "start_frame": 3184,
+      "end_frame_exclusive": 7346,
+      "frames": 4162,
+      "source_sha256": "e70174c83f2010abeff2deac738408c4e127c56e13a108d48967007db49ca6e2",
+      "mode": "unchanged from baseline",
+      "source_frames": 4162,
+      "boundary_adjustment_frames": 0,
+      "speed_multiplier": 1,
+      "max_cue_deviation_seconds": 0.03333333333326394,
+      "sha256": "87fd72f703b7e2985b85706ba1de0bb05639742ac70386bfef3f52e0815d8877"
+    },
+    {
+      "scene": "OTextoEnsinaOModeloScene",
+      "start_frame": 7346,
+      "end_frame_exclusive": 10064,
+      "frames": 2718,
+      "source_sha256": "d779c8567b0d07a0d60d5a5714c9bb47ca875d26f66f04bce18bfb57f460dd06",
+      "mode": "unchanged from baseline",
+      "source_frames": 2717,
+      "boundary_adjustment_frames": 1,
+      "speed_multiplier": 1,
+      "max_cue_deviation_seconds": 0.03333333333326749,
+      "sha256": "c2d9893da1f87605bbaef8721d8d2fd1a06481b7ef8554a4cb8071ff656c368e"
+    },
+    {
+      "scene": "Scene2017OTransformerScene",
+      "start_frame": 10064,
+      "end_frame_exclusive": 11575,
+      "frames": 1511,
+      "source_sha256": "c318473bbc6f15697620a0564a1819ff5a8cc54fedd9af2370d71630a425bba9",
+      "mode": "unchanged from baseline",
+      "sha256": "0d7408de89455e12d931143aa55ace8eca45c3221cb8818bbbf5d8a12a9d73e4"
+    },
+    {
+      "scene": "AEscalaDosGPTsScene",
+      "start_frame": 11575,
+      "end_frame_exclusive": 14806,
+      "frames": 3231,
+      "source_sha256": "6422378e7aa37354194af4eebcdbefcdcfa8a6dd6011e86608b5b427b01605be",
+      "mode": "unchanged from baseline",
+      "source_frames": 3231,
+      "boundary_adjustment_frames": 0,
+      "speed_multiplier": 1,
+      "max_cue_deviation_seconds": 0.03333333333333144,
+      "sha256": "618b6a2e0f3246ffe4c0b26b4665e1a232d25ff33d5eb899188fb7f9ff78a6a6"
+    },
+    {
+      "scene": "ModeloBaseNaoEAssistenteScene",
+      "start_frame": 14806,
+      "end_frame_exclusive": 15971,
+      "frames": 1165,
+      "source_sha256": "de3f0d7dcbe765d5280dd985bd93a38ebfc8f9dcc404db3bdc387220a0442ed9",
+      "mode": "CASA stagger + JARVIS reference",
+      "sha256": "daf48c156e7fb000d08e6719ee8e054b7f3bb2d86b754169d0d2c98dbaf4526c"
+    },
+    {
+      "scene": "PosTreinamentoEChatGPTScene",
+      "start_frame": 15971,
+      "end_frame_exclusive": 17944,
+      "frames": 1973,
+      "source_sha256": "37b6af90f143f573bb721cb4f958754451f42fabba1e8b16ee1d6dff108d9eec",
+      "mode": "unchanged from baseline",
+      "sha256": "b498e195efc03a06598ab812173028f1cbbf363c1df19c447707b319984305a5"
+    },
+    {
+      "scene": "UmaFundacaoMuitasAplicacoesScene",
+      "start_frame": 17944,
+      "end_frame_exclusive": 19963,
+      "frames": 2019,
+      "source_sha256": "c9f6b5db5248e54a27b9ee23f206aeda1b3f6158fdc76a7f2336853ec6540ba0",
+      "mode": "unchanged from baseline",
+      "source_frames": 2018,
+      "boundary_adjustment_frames": 1,
+      "speed_multiplier": 1,
+      "max_cue_deviation_seconds": 0.03333333333308275,
+      "sha256": "80470542339c9a12e7b4c189fe6cc3bc9dbe43af73646b67fd151e10cf12ac2f"
+    },
+    {
+      "scene": "AEscadaEAPerguntaScene",
+      "start_frame": 19963,
+      "end_frame_exclusive": 21437,
+      "frames": 1474,
+      "source_sha256": "682e1f782c763e855667d3969b2a93efa465897df0326f57ffadafd5242e9edd",
+      "mode": "unchanged from baseline",
+      "sha256": "c0f3721c2cc1bf73201e1bf20ee7fdfb58743567cb30e0c188d5d09522d0cf40"
+    },
+    {
+      "scene": "ANovaFinalizacaoScene",
+      "start_frame": 21437,
+      "end_frame_exclusive": 22167,
+      "frames": 730,
+      "source_sha256": "1ba95e89147de107d4894d2c3f0b9917ba2a56df2807b4c6402b93ee8f88dc69",
+      "mode": "unchanged from baseline",
+      "sha256": "c20fc15ad79a2aac59a9d3a9a5f76d571dae6ff53406e2e478dfe9185ff8048b"
+    }
+  ]
+}

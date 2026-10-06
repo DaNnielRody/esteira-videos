@@ -1,0 +1,1129 @@
+{
+  "schema_version": "visual.direction-reference/1",
+  "profile": "visual.direction/1",
+  "approval_basis": "User explicitly identified videos/llm_fundation/master.mp4 as the validated video in this session.",
+  "master_path": "videos/llm_fundation/master.mp4",
+  "master_sha256": "7d52455e20cecb8c958bafceceb250558640e85f581b804d94bc524b8c409f33",
+  "source_hashes_match_existing_validation": true,
+  "environment_observed": {
+    "python": "3.13.9",
+    "packages": {
+      "manim": "0.21.0",
+      "numpy": "2.5.2",
+      "pillow": "12.3.0",
+      "pydantic": "2.12.4"
+    },
+    "note": "Current environment inventory; original render environment was not independently reconstructed."
+  },
+  "catalog_scope": "Scene boundaries from existing master-validation.json at 30 fps. Principle attribution comes from user case study; exact illustrative sub-beats still require temporal annotation, not re-reviewed here.",
+  "reference_scenes": [
+    {
+      "scene": "TokensERepresentacoesScene",
+      "start_seconds": 106.13333333333334,
+      "end_seconds_exclusive": 244.86666666666667,
+      "principles": [
+        "DV03",
+        "DV06",
+        "DV10",
+        "DV12",
+        "DV13",
+        "DV14"
+      ]
+    },
+    {
+      "scene": "AEscalaDosGPTsScene",
+      "start_seconds": 385.8333333333333,
+      "end_seconds_exclusive": 493.53333333333336,
+      "principles": [
+        "DV02",
+        "DV07",
+        "DV09"
+      ]
+    },
+    {
+      "scene": "PosTreinamentoEChatGPTScene",
+      "start_seconds": 532.3666666666667,
+      "end_seconds_exclusive": 598.1333333333333,
+      "principles": [
+        "DV05"
+      ]
+    },
+    {
+      "scene": "UmaFundacaoMuitasAplicacoesScene",
+      "start_seconds": 598.1333333333333,
+      "end_seconds_exclusive": 665.4333333333333,
+      "principles": [
+        "DV02",
+        "DV04",
+        "DV06"
+      ]
+    },
+    {
+      "scene": "AEscadaEAPerguntaScene",
+      "start_seconds": 665.4333333333333,
+      "end_seconds_exclusive": 714.5666666666667,
+      "principles": [
+        "DV04",
+        "DV05",
+        "DV06"
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "pyproject.toml",
+      "sha256": "4f243bff3217d73b17330fd685170fcc557e5fb5eab3ea94c5b1324b12c29136",
+      "bytes": 2057
+    },
+    {
+      "path": "uv.lock",
+      "sha256": "eafa1a81b3db7b62b3653d8a96fc3432194bb1fbf9e3994a80c86395c51fa147",
+      "bytes": 98171
+    },
+    {
+      "path": "videos/llm_fundation/master-changelog.md",
+      "sha256": "88a653abf240b6f128ab7b87d3750256d91b57fa70d825b7582840ec5b096d23",
+      "bytes": 950
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/AEscadaEAPerguntaScene/composition-audit.json",
+      "sha256": "be7e18830abf46d3cd925fb51db6020f640b094c974a489656a6034c568d4c72",
+      "bytes": 35163
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/AEscadaEAPerguntaScene/scene.py",
+      "sha256": "682e1f782c763e855667d3969b2a93efa465897df0326f57ffadafd5242e9edd",
+      "bytes": 40457
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/AEscadaEAPerguntaScene/visual-facts.json",
+      "sha256": "4cba72e1453a46ed5af2bbe668c8cba952cb28cb066e41d23a0cb4157675cf11",
+      "bytes": 512986
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/AEscalaDosGPTsScene/composition-audit.json",
+      "sha256": "0f9a59ae1389ca35a7823fc5d9efdb01277f753216eab2f6f28f1bbcc002263b",
+      "bytes": 41430
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/AEscalaDosGPTsScene/scene.py",
+      "sha256": "6422378e7aa37354194af4eebcdbefcdcfa8a6dd6011e86608b5b427b01605be",
+      "bytes": 48874
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/AEscalaDosGPTsScene/visual-facts.json",
+      "sha256": "b73b8372875aecb74620a30a07535c857d6eb164097cf5715cf89990769f77f9",
+      "bytes": 295052
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/ANovaFinalizacaoScene/scene.py",
+      "sha256": "1ba95e89147de107d4894d2c3f0b9917ba2a56df2807b4c6402b93ee8f88dc69",
+      "bytes": 37557
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/ModeloBaseNaoEAssistenteScene/scene.py",
+      "sha256": "de3f0d7dcbe765d5280dd985bd93a38ebfc8f9dcc404db3bdc387220a0442ed9",
+      "bytes": 38927
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/OLimiteDoDicionarioScene/composition-audit.json",
+      "sha256": "525f90b544cf9fdca951974a28768cbdc1f6387ce226439a75c5a09d0dcd49de",
+      "bytes": 30539
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/OLimiteDoDicionarioScene/scene.py",
+      "sha256": "776946affa21d152361c67a6ac4952dd21b50ecc6fe456484cb7fb8703f051d7",
+      "bytes": 44902
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/OLimiteDoDicionarioScene/visual-facts.json",
+      "sha256": "5fa76d5ed3e1ab6b771f24a8b89d09fa639687f8cfe191326249769c8d7d0df0",
+      "bytes": 400846
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/OQueCriouOChatGPTScene/scene.py",
+      "sha256": "933e9d53ea13cc0058a7de842c655868771ca7923493651374e941ae7909fd75",
+      "bytes": 41391
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/OTextoEnsinaOModeloScene/scene.py",
+      "sha256": "d779c8567b0d07a0d60d5a5714c9bb47ca875d26f66f04bce18bfb57f460dd06",
+      "bytes": 48396
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/PosTreinamentoEChatGPTScene/scene.py",
+      "sha256": "37b6af90f143f573bb721cb4f958754451f42fabba1e8b16ee1d6dff108d9eec",
+      "bytes": 41971
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/README.md",
+      "sha256": "4f27604f8c7a21967c58b8de1d39861486032265cff1268c88fba33276406e13",
+      "bytes": 532
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/Scene2017OTransformerScene/scene.py",
+      "sha256": "c318473bbc6f15697620a0564a1819ff5a8cc54fedd9af2370d71630a425bba9",
+      "bytes": 38564
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/TokensERepresentacoesScene/composition-audit.json",
+      "sha256": "688c1e20ec9877be38860a1724114159e99206f25c0d4a04a0c63a4ba8f1a169",
+      "bytes": 118290
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/TokensERepresentacoesScene/scene.py",
+      "sha256": "e70174c83f2010abeff2deac738408c4e127c56e13a108d48967007db49ca6e2",
+      "bytes": 47773
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/TokensERepresentacoesScene/visual-facts.json",
+      "sha256": "87b0ee17600531f77314b9d2ff0adb9d1d753e87359d01b087e47b69d67a5e18",
+      "bytes": 712692
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/UmaFundacaoMuitasAplicacoesScene/scene.py",
+      "sha256": "c9f6b5db5248e54a27b9ee23f206aeda1b3f6158fdc76a7f2336853ec6540ba0",
+      "bytes": 44922
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_assets/11265-05_RX580_Pulse_8GBGDDR5_2DP_2HDMI_DVI_PCIE_C01_10Apr17.jpg",
+      "sha256": "55647edbb3e1cd31a06d4472187ca1130b97bcb05077f64b097c699284ea4b80",
+      "bytes": 744112
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_assets/11265-05_RX580_Pulse_8GBGDDR5_2DP_2HDMI_DVI_PCIE_C02_10Apr17.jpg",
+      "sha256": "f5f5e2baf987f5694704c4d0dd271f4807e06fba9049c9f038b06f3d5fd79946",
+      "bytes": 652005
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_assets/11265-05_RX580_Pulse_8GBGDDR5_2DP_2HDMI_DVI_PCIE_C03_10Apr17.jpg",
+      "sha256": "8097fa18419955613b81171ef805f7a777ea5432899561b2d402d7415d6df46d",
+      "bytes": 496306
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_assets/11265-05_RX580_Pulse_8GBGDDR5_2DP_2HDMI_DVI_PCIE_C04_10Apr17.jpg",
+      "sha256": "0f0267bbe3070686264af671b56391f567d2c064f6be286b094e3f7fb0e950dd",
+      "bytes": 309486
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_assets/11265-05_RX580_Pulse_8GBGDDR5_2DP_2HDMI_DVI_PCIE_C05_10Apr17.jpg",
+      "sha256": "88d4866e6b2cd6a474eb6236a0f03d97bf500c3e33a8069a77af47d70a3ef783",
+      "bytes": 588830
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_assets/11265-05_RX580_Pulse_8GBGDDR5_2DP_2HDMI_DVI_PCIE_FBC_10Apr17.jpg",
+      "sha256": "869287c276a00f10209a20339495ca9547c7b59a307cfd5a4f075cf395c3faf0",
+      "bytes": 696958
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_assets/11265-05_RX580_Pulse_8GBGDDR5_2DP_2HDMI_DVI_PCIE_FB_10Apr17.jpg",
+      "sha256": "d46a54998b235717f4896de0ce0d49d0a50f7652101c66e085e72bbc3bbdbe56",
+      "bytes": 422990
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_assets/11265-05_RX580_Pulse_8GBGDDR5_2DP_2HDMI_DVI_PCIE_LBC_10Apr17.jpg",
+      "sha256": "cd53e8f94af36c7433762209761943c25902601dc1fe86dd571770916f394343",
+      "bytes": 666560
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_assets/11265-05_RX580_Pulse_8GBGDDR5_2DP_2HDMI_DVI_PCIE_LB_10Apr17.jpg",
+      "sha256": "e66e3cf3487ea62a8ddefeb3e0865cd4885a60c69a92eec7a6380e29c9ba0ce7",
+      "bytes": 410639
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_assets/chatgpt.png",
+      "sha256": "35d05e42c23ecf1b2b8dfcc4817ab8d9bfe977e4b953540d8e90e882ed96cca7",
+      "bytes": 275409
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_assets/gpu-official-high-resolution.zip",
+      "sha256": "3d3a4bfe02a9542e9c3703281e665818c41df905fdf1b5dddeca067c3460c63f",
+      "bytes": 4306059
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_assets/gpu-official.html",
+      "sha256": "4fdcca663850d06f8acbc3c334b2815b3f9ed8c8fe71db2f1c856738c8eb0524",
+      "bytes": 498776
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_assets/gpu-rx580-2.png",
+      "sha256": "b036e046a9587b3e3c0088fd5dd40d79a8462f16775b49b62faaba7f06105ed7",
+      "bytes": 426405
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_assets/gpu-rx580-3.png",
+      "sha256": "e62f8857a76e38f0b201e68da0977445afcf951775b77e9da2eecfbce48ae7c0",
+      "bytes": 334016
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_assets/gpu-rx580-4.png",
+      "sha256": "cfc2c691399205bf212583ab1cce1d8439b764ebb636b138b70dbd8cf30da87c",
+      "bytes": 225555
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_assets/gpu-rx580.png",
+      "sha256": "36af5636177a3ce5033af8d9ed7970bd8881cb4353b060d638f6347bc681b056",
+      "bytes": 377780
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_assets/gpu-source.txt",
+      "sha256": "f0c982f58213c09190fa67496c91b19170ad5e7d1579433cccea7266d3202e46",
+      "bytes": 114
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_assets/youtube-bell.svg",
+      "sha256": "98c220546213c6d8e2e198facc58f6add44d01191c5bb83e9205b6b463d4576a",
+      "bytes": 520
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_assets/youtube-comment.svg",
+      "sha256": "8c90c2b93231690ba51e0d210c366ba19c79734b1b6948ba5e075cd2bd692275",
+      "bytes": 503
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_assets/youtube-like.svg",
+      "sha256": "dbfa0411910ca261c3697fb7f78afa5d68d1e020e4653e5bace6e356ac6a9c32",
+      "bytes": 1008
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_assets/youtube-logo-dark.svg",
+      "sha256": "9f775f78c6db275a69e0dacf4f49b8bb1aa631d86bd55977ac01bbb7afc6a507",
+      "bytes": 3549
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_assets/youtube-logo.svg",
+      "sha256": "838f24c391e0e60a9df1a2a9e23d6d94fe2b8628e12bc7ce1de5fa03a20a5be3",
+      "bytes": 3114
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_assets/youtube-reference.png",
+      "sha256": "7b9536e412b0ad49cb1b222405c106e5981f8c7e978cdab1f0ba04b4029c9f43",
+      "bytes": 1278450
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_assets/youtube-rendered-icons.json",
+      "sha256": "edf8d5ddee3b58f67759a97c57b5ddca12f5aaca1fc6108534df9b3fa46e0498",
+      "bytes": 78046
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_assets/youtube-share.svg",
+      "sha256": "1a589e9721197a8f59f86e82f13b8e7578907d2a57aaee765de4547387bde671",
+      "bytes": 689
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_assets/youtube-thumb-up.svg",
+      "sha256": "8c9c35bcc55e85c70e52d8863ec61f5759ef9fb70b5a30391532d2e03d1acc8f",
+      "bytes": 316
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_assets/youtube-ui-source.txt",
+      "sha256": "0bc6ab17453715ca287811bea416abb7ee0376c435f14febad887c46e6ac21d0",
+      "bytes": 223
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_assets/youtube-ui.html",
+      "sha256": "3e3b40c8feca3b3b55031656fc2dbd4fdeb0766cce95999b99aae93d28239e4e",
+      "bytes": 1284747
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_assets/youtube-ui.js",
+      "sha256": "b7c0489e3b8493c7a99dfd595eea4e105c072639669e9d763643dea9a3e2e7f2",
+      "bytes": 10738683
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_assets/youtube.html",
+      "sha256": "9021370e66b8f2797ba3a09fd6977243f7def1bfba6b2d785a7f98049d935aaf",
+      "bytes": 60243
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_fonts/JetBrains_Mono/JetBrainsMono-Bold.ttf",
+      "sha256": "a2349098b9e45419e7bf0e2958d6c4937a049dded37387b08be725be4c7615f3",
+      "bytes": 114828
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_fonts/JetBrains_Mono/JetBrainsMono-BoldItalic.ttf",
+      "sha256": "c73bade35851b6df912fa0fef28a57edc6629467b22c9f05ec727557a6391570",
+      "bytes": 117920
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_fonts/JetBrains_Mono/JetBrainsMono-ExtraBold.ttf",
+      "sha256": "4d65f6acd792c4b2007058d05d960671be218b61136050e157aea2f95bf05193",
+      "bytes": 114800
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_fonts/JetBrains_Mono/JetBrainsMono-ExtraBoldItalic.ttf",
+      "sha256": "463b768db76e4387c2cd0c76f46c1570edfbf15c60f9c44f6262f6b356020c29",
+      "bytes": 117952
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_fonts/JetBrains_Mono/JetBrainsMono-ExtraLight.ttf",
+      "sha256": "da2c4abde6ce3b57c9e8ae39e9d6a1dfd4f91a66dc2992da414ade14a3e2c7a8",
+      "bytes": 115072
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_fonts/JetBrains_Mono/JetBrainsMono-ExtraLightItalic.ttf",
+      "sha256": "9743862f948da174b63545d52d83c47da052712d1145b675963957992c650327",
+      "bytes": 118228
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_fonts/JetBrains_Mono/JetBrainsMono-Italic.ttf",
+      "sha256": "2b1cad3ac0e0d915d7202204ba138444a62a71dc9c71a350745a151ace9ebc86",
+      "bytes": 117940
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_fonts/JetBrains_Mono/JetBrainsMono-Light.ttf",
+      "sha256": "578b63866997cf796ea6f1e865078940494079fca39f4838415ef57d235e9fec",
+      "bytes": 115020
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_fonts/JetBrains_Mono/JetBrainsMono-LightItalic.ttf",
+      "sha256": "f41d9977e66883878fbd77af5df542dae09b623641c1bb0ab7c3fca4fd78113b",
+      "bytes": 118124
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_fonts/JetBrains_Mono/JetBrainsMono-Medium.ttf",
+      "sha256": "23d57b8a635d023c3717a9c7ac1721199d0f8c6fe4b06d4d5ba3af2170fcbaa2",
+      "bytes": 114920
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_fonts/JetBrains_Mono/JetBrainsMono-MediumItalic.ttf",
+      "sha256": "c11300f0b569bf3b830230b1335d4dd82a5a936be1c1692e1e269a865ecf7ca2",
+      "bytes": 118044
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_fonts/JetBrains_Mono/JetBrainsMono-Regular.ttf",
+      "sha256": "b6b1ff4ddefe36d7f2a6174e1d001cab374e594519ee9049af028d577b64c5f5",
+      "bytes": 114904
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_fonts/JetBrains_Mono/JetBrainsMono-SemiBold.ttf",
+      "sha256": "55987f26bab41b3fc9f13ce5ca9db9d99a75e3be4bba0f7341d3c026ff6e4706",
+      "bytes": 114900
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_fonts/JetBrains_Mono/JetBrainsMono-SemiBoldItalic.ttf",
+      "sha256": "6fe62da641ac1c142ef2b1c5db95e23f598f53704d6c7b77230fdc6a75f3ee1f",
+      "bytes": 118032
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_fonts/JetBrains_Mono/JetBrainsMono-Thin.ttf",
+      "sha256": "a968566646c73d8be2354fffa3b937eefd6df0729a1a8e374797636da531797b",
+      "bytes": 114996
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_fonts/JetBrains_Mono/JetBrainsMono-ThinItalic.ttf",
+      "sha256": "66c4c206b06b6a6e0f4a007d581768f5d947b14c08e8dc798023e76f77ee2f46",
+      "bytes": 118156
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_fonts/JetBrains_Mono/OFL.txt",
+      "sha256": "4d9694c4844a13ea377458c3f98c90d2bf83d3c214612dcae2b7808406520708",
+      "bytes": 4492
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/__init__.py",
+      "sha256": "71709776596628b09c6b0b8bb2dff08a90a99e4c9e279c6237c1f386be97ce09",
+      "bytes": 1819
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/calibration.py",
+      "sha256": "8c915a05d37eea8faa922ce47598ee48c900c4fbce05ce9a80d0b07d75df2159",
+      "bytes": 18766
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/capabilities.py",
+      "sha256": "06059a4d06dc8d531bba0bc8f1af83f4dc620697de719bf3248296022ac05193",
+      "bytes": 8303
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/cli.py",
+      "sha256": "18f6a24fe9d257b471293f8a12346e1da9bf1d93490b3d36dbe0e03e8c0f754f",
+      "bytes": 8969
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/continuity.py",
+      "sha256": "3950ba93e266fa06eb28a999c5af692e1a8dcd9ed4809d359e3cd8d3aca3b4cd",
+      "bytes": 16970
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/critics.py",
+      "sha256": "c5cf588e07b1c4d991c53862024226d0567a759575ee2d0244a276875c379a28",
+      "bytes": 55006
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/expectations.py",
+      "sha256": "f91289c9f1b63b7683d70de279235f5c1e4fc77df1144e28bcd6de064a1d25a2",
+      "bytes": 8205
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/golden.py",
+      "sha256": "667de47fe673bb8f5136f5e82702702837eb81f5a508811c902c21a25a752f75",
+      "bytes": 121991
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/latex_validation.py",
+      "sha256": "cd0ca56d7e3de9d156e60aaa03537b025a5421babfca893f5c8ef1172c350c05",
+      "bytes": 12895
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/multimodal.py",
+      "sha256": "0f25a83fdc18de1c84857b13e0d1528ef6a7742403a5aa387021f8c965619065",
+      "bytes": 5135
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/observation.py",
+      "sha256": "963201f93b1449bdbe82ef9c6a169917e30409d8d43c44f05f3b898321b3019d",
+      "bytes": 20412
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/pipeline.py",
+      "sha256": "2a42225c5d2670d31f83e46d4371fc3f5a42a6ad9679aa506d6deb35d734812d",
+      "bytes": 59469
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/project.py",
+      "sha256": "7d5d22a32f20c6e4fb6742eb528f888960d299740984a622a2a9c80eab4bf910",
+      "bytes": 56170
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/prompts.py",
+      "sha256": "9a2affb25c16b8f72d3f664ef84e578826d8ce9c0b120e6bf1d5ccafa5ca4a30",
+      "bytes": 20983
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/provider.py",
+      "sha256": "13645006161a8cd32eb1f60aa475437d7c8753248a99aba6b385038b0c0b7b42",
+      "bytes": 11388
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/quality.py",
+      "sha256": "748d72edc12f87393c76f4ce6dd6e1781769b3f515069d30d7f8d59c748bbf78",
+      "bytes": 5650
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/reference_catalog.py",
+      "sha256": "77ae2377419758ab3e8f7f1c014262bbc4ba532233cc85a3f97750fceed9037a",
+      "bytes": 11039
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/rendering.py",
+      "sha256": "444ea95e3e01f7555082d6ad2d81273b49de66afc69cdff8d2da47a65c8470d7",
+      "bytes": 7486
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/revisions.py",
+      "sha256": "f8f0f772b65971f1147f93b347a45e561ab58acb537dbcdbff8cfbf6185d43ca",
+      "bytes": 34727
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/runtime.py",
+      "sha256": "910e8d59858c1ffcb3420963ebf951b74859c7ffe00ae2d662cdaffe1a95e352",
+      "bytes": 21771
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/scene_plan.py",
+      "sha256": "c28036613a0213d348519e1892a6f5ff966dd600f66457ea4a059f305bca06a4",
+      "bytes": 13621
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/sensors.py",
+      "sha256": "978f09336a93f09c25e6823b35cd94802503a026b9fbf83d2623e704ed5a7e1b",
+      "bytes": 1876
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/spec.py",
+      "sha256": "ecbef22acb5dc196ec8e4b3c75423bb97d47f57a5e0e56da82b5c54351106cde",
+      "bytes": 2554
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/temporal.py",
+      "sha256": "4aa1b5279f50523293d590a2801ff6cc392744902acba808463bdcf135ad2436",
+      "bytes": 15460
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/theme.py",
+      "sha256": "e5bc53ecc02330c1360a04127bd3ac97120dbc3da477d5efd5ddca36d350315c",
+      "bytes": 11980
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/timeline.py",
+      "sha256": "af8f243bc00c9914f97603bc5c37db236f457c7e8ac479ab68e4cebc45653e6d",
+      "bytes": 31410
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/token_box.py",
+      "sha256": "e1c59d8f81623b26c319deffd90752b05c03ccc05f85d0c7105626704b0c8c4d",
+      "bytes": 861
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/validation.py",
+      "sha256": "90c9235f9808c1cd64796103014375dd0da97f0786e49dcd5e82e0ca5a75436f",
+      "bytes": 25758
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/video.py",
+      "sha256": "0ebd8da5e773617c89000eadefd8f0e9b284f2119df73b8c8108fda48e32ba09",
+      "bytes": 93650
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/visual_assets.py",
+      "sha256": "fe091b791ebf21c6984d40ad55355a2b0dc8bde50059aeb84c010a5a58f66816",
+      "bytes": 5921
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/web/__init__.py",
+      "sha256": "7d92f2b2248c476aea5046c0dd7798a9bb3c80d2ddb45cae322fcc5e9fda0028",
+      "bytes": 530
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/web/limits.py",
+      "sha256": "33325cdb49dc98e2e431801e23c8ccb4d1ee757d42c0aacf56933d7c84040c70",
+      "bytes": 131
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/web/server.py",
+      "sha256": "89ebf396647d241c1449d41447f7211ecad547fb7384b1c2939ebc8d66131efa",
+      "bytes": 23974
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/web/service.py",
+      "sha256": "333e7bf6df680ad4209483c63075a25120f41ddf4bd972811e4895e7bc6e6904",
+      "bytes": 54743
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/web/static/app.css",
+      "sha256": "ec066d83dc2bd7c249cc0273617b1453a0f7042bac43f039b0c82434dcb69d6f",
+      "bytes": 8453
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/web/static/app.js",
+      "sha256": "1cb0ddedc9c5f46ef7e25ba0b185294012dcff76d9b6340e63bbb793a4fd6fd7",
+      "bytes": 24388
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/web/static/index.html",
+      "sha256": "24977e5b73d3dcf14a62578c3099744835d657f679bbd1151b7f9a9e9e7494c2",
+      "bytes": 7429
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/web_errors.py",
+      "sha256": "f66419b04c1bfd7f2f9a5a26da627d9ab5ebf3031c739a402fb7329049c318d5",
+      "bytes": 656
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/_support/src/video_pipeline/workspace.py",
+      "sha256": "5b6106395dc0f27a04dface540c1d45b94640429901d44bc98dd0c1918182c84",
+      "bytes": 2093
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/changelog.md",
+      "sha256": "88a653abf240b6f128ab7b87d3750256d91b57fa70d825b7582840ec5b096d23",
+      "bytes": 950
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/assistant-alignment.json",
+      "sha256": "2107c623ef246e55129ac9b6a8930aaef78c7769a45628a0b84164cbab1eeece",
+      "bytes": 193
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/casa-jarvis/ModeloBaseNaoEAssistenteScene.jpg",
+      "sha256": "27df3b2414c0954077921efa5d8e22e5d3b7e615b9e7dff52f4d7c5356352a49",
+      "bytes": 131484
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/casa-jarvis/OLimiteDoDicionarioScene.jpg",
+      "sha256": "8514ddf7c685b1d38e03b1c22d27ce82523a5ddccb24e3d05b49c5a0648432a1",
+      "bytes": 128140
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/casa-jarvis/assembled-master.jpg",
+      "sha256": "3590f4eb8eda1d17d50460db143f8738f34502bd2cc5e7f548058f6465cda6d2",
+      "bytes": 64199
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/casa-jarvis/geometry.json",
+      "sha256": "4433ccff95419719533f983e44d36345fa4af878445c2e8e76aeff9d3a23c817",
+      "bytes": 317
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/casa-jarvis/geometry.log",
+      "sha256": "24d87e26402431ecedc750f96d9c46bddb9080795987d30a425fb98eddc5c47b",
+      "bytes": 316
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/casa-jarvis/geometry.py",
+      "sha256": "97a635dd1533803b7724f61f819d336282620065c846be9e82004fced98c834e",
+      "bytes": 4444
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/casa-jarvis/hd-0.jpg",
+      "sha256": "664e7eceba11475a5443c24f806f00cc5c69d04dbf50bee4bdc9839f9d0f771d",
+      "bytes": 88760
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/casa-jarvis/hd-1.jpg",
+      "sha256": "c3a78278b1d85141378953e8b99694582417f42313571c982cbdf7b78b638802",
+      "bytes": 123102
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/casa-jarvis/hd-2.jpg",
+      "sha256": "7219cd7fa0dceb8f1680efd2d97a006eb5f48c0af9fc44842967859c1129a988",
+      "bytes": 69132
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/casa-jarvis/hd-3.jpg",
+      "sha256": "1ada89bd97d719c92f16eace9e29a7525c1fef6831d7f2abf1165965fd75cb45",
+      "bytes": 124202
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/casa-jarvis/hd-4.jpg",
+      "sha256": "a5f3227372a5981a28f34f9002dba2c248ac43aa301dd64f732b4d0dbaba8b42",
+      "bytes": 56325
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/casa-jarvis/jarvis-hd.png",
+      "sha256": "d73ca05f6c64766524a43274e39647f338087075dda873a1916612d3005b23ab",
+      "bytes": 272294
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/casa-jarvis/jarvis-reference.png",
+      "sha256": "d709c11f3c804f6ed5f99905185c3fd1efe25419c16016687e884bedaa6ab04f",
+      "bytes": 1073069
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/direction.patch",
+      "sha256": "90c480b961b5a5b0c2ce3be99485c799f67785f60b001fdb6e200c6f8d99452a",
+      "bytes": 11511
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/frames/AEscalaDosGPTsScene.jpg",
+      "sha256": "73712a12f5ef8c508014fde53ee84a6cb14a50a6f909187bedb7b3cfb1bfe21a",
+      "bytes": 115502
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/frames/ANovaFinalizacaoScene.jpg",
+      "sha256": "9a713783035091022d80c17a7a3d264e2b7fed1bb09360bc67bb0864769a16b8",
+      "bytes": 52847
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/frames/ModeloBaseNaoEAssistenteScene.jpg",
+      "sha256": "746bbae1cda6763530c2a114f9a83981dc2fcf63db637e110e9d6865b55ae919",
+      "bytes": 62019
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/frames/OLimiteDoDicionarioScene.jpg",
+      "sha256": "b18801d51027d10d6432172b96761cbdceb6b44dcc1f3bec945cccd0420b2c1e",
+      "bytes": 82590
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/frames/OQueCriouOChatGPTScene.jpg",
+      "sha256": "4da6d96bdffc1093157d29d85ef60bc1adf3b862c2b4253915f6c0adb5b12061",
+      "bytes": 81464
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/frames/OTextoEnsinaOModeloScene.jpg",
+      "sha256": "283751cffb3f8470635b9648fb021ef564607b781572a78fc48c9eb86e933c01",
+      "bytes": 95373
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/frames/PosTreinamentoEChatGPTScene.jpg",
+      "sha256": "5d11ea53339fe2a3f9ac9ddeb05b8f7aedfe155030f66dfd20783f9d08a6ba0c",
+      "bytes": 68238
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/frames/Scene2017OTransformerScene.jpg",
+      "sha256": "745d237ca5d4c5888d07d575c840f3362717f3fc62ac98a17c15cba51ed021f5",
+      "bytes": 77005
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/frames/TokensERepresentacoesScene.jpg",
+      "sha256": "585a09671f92263e8f7df9b86f9693c163a2bfad103cb8c16e56c803875ecf5c",
+      "bytes": 89849
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/frames/UmaFundacaoMuitasAplicacoesScene.jpg",
+      "sha256": "97f66ce2ebda78bcd657ef2b9bb0a4043465064ed18137e09e56ea4d360db8f0",
+      "bytes": 71260
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/frames/book-entry.jpg",
+      "sha256": "50bad8a14cd28a3f0c76b5637376032e1f924a20a7e1de3f665c44d0e4b8d139",
+      "bytes": 109501
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/frames/conclusion.jpg",
+      "sha256": "3aed2bc38bc8cfcf64ad36f5bab240f038b27350e5d3f0f9fe4964389c3f16d2",
+      "bytes": 95984
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/frames/gpt-compare.jpg",
+      "sha256": "0780aa05cf61df84c1a2e7a3d123aa0fcb96ed8ddc8643ffeb067fc29011856f",
+      "bytes": 55113
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/frames/node-mask-occlusion.png",
+      "sha256": "35ee4224d44aa5c23b63c9d7686d9aae5363a428b7cbe76c37337f609a5ab789",
+      "bytes": 50382
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/freeze-review.json",
+      "sha256": "76851adc0570cd2c424621a6ec23c842423b027f916f7db1c9064de2fce14101",
+      "bytes": 60771
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/freeze-review.md",
+      "sha256": "55963bbf120733b1d1280e036ad410bb2b7daa769bcfda8a7af251cefe2da0e2",
+      "bytes": 9822
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/hotfix-final/all-boundaries.jpg",
+      "sha256": "5921393e2c609052622d20ab94273a2689b8d028abee19eaf00026b430fc6c28",
+      "bytes": 59616
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/hotfix-final/dense-0.jpg",
+      "sha256": "98b2898122c73663b9cbf4d8f9d34f7d478f5083eea55196eee4e0d3ad5caadd",
+      "bytes": 52361
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/hotfix-final/dense-1.jpg",
+      "sha256": "c7830e9e8a08ff68190a2bd5c64ab4970a8ad62a5745bbfe3e89ce58d8c8dfe1",
+      "bytes": 55385
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/hotfix-final/dense-10.jpg",
+      "sha256": "34b70516344736646b2da692c23e4b57aa22ba8bc7b0b296916d633b1ec418cf",
+      "bytes": 97678
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/hotfix-final/dense-11.jpg",
+      "sha256": "d3f031d178e5a6655c6b94b1ff1b2737501f4e4ed514f8765ff02be397d588bf",
+      "bytes": 125486
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/hotfix-final/dense-2.jpg",
+      "sha256": "a31152cd5ce521562dc39f447b9cd476ade8efcb87275576aae79ff4df7c194d",
+      "bytes": 58329
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/hotfix-final/dense-3.jpg",
+      "sha256": "1fc6dd9f73a7f7a7bc5e23f36ddba8bdb11ff886480ba916cfb92147ea983456",
+      "bytes": 62536
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/hotfix-final/dense-4.jpg",
+      "sha256": "a541cb45a1325589f658ced62c72025e4978567a939842b85c6401eb0e3c71be",
+      "bytes": 43329
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/hotfix-final/dense-5.jpg",
+      "sha256": "a1d89691491501f965981d0c77037b773798b2b6ac31a1574e51aa9ccee5a2c6",
+      "bytes": 55244
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/hotfix-final/dense-6.jpg",
+      "sha256": "9fbd720e083992b2273019272563bc7f4aab627dfff9f797f6e37c73de34cd31",
+      "bytes": 53333
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/hotfix-final/dense-7.jpg",
+      "sha256": "18838297936ec602bbdf09252860590030a251fc59513607c0575554431377d2",
+      "bytes": 50808
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/hotfix-final/dense-8.jpg",
+      "sha256": "f151c5443bdb24253d3a79ca3bdb8d700154d08cde5744e79e608360fe2b2c12",
+      "bytes": 81109
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/hotfix-final/dense-9.jpg",
+      "sha256": "ba03acb06f8ba3a46f530477a05021ffbac1d2d8c3deaba2e082e88999a856d6",
+      "bytes": 79399
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/hotfix-final/geometry-late-book.log",
+      "sha256": "e80ae12a353cd9969c2caa9d3813bbd21d8de42a45a60c4123a2077ff1401949",
+      "bytes": 153
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/hotfix-final/geometry.json",
+      "sha256": "7caf014ad5bec9c153aea34b3a033c6b46ebe94d8bf91e7aa1607ce63bd92627",
+      "bytes": 636
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/hotfix-final/geometry.log",
+      "sha256": "279dfa128135095b699bb66eac6ced71a4d14a141a96035d22e46a7909382b0d",
+      "bytes": 624
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/hotfix-final/geometry.py",
+      "sha256": "c3f16cc64f85e7086555196a2c8575409cfc8999a2ee5bde61bcd78c0346e779",
+      "bytes": 3980
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/hotfix-final/late-word.jpg",
+      "sha256": "b3104c91d2d8e6abf19014e733ce8bbd1a02adb66b147392b6145dda8595db2c",
+      "bytes": 60089
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/hotfix-final/lifecycle.md",
+      "sha256": "a3c2a21846ef6b65e15d1be0c3cf321481c5fd78498abf8da1e779ad5e882e69",
+      "bytes": 2382
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/hotfix-final/master-cachorro-computador.png",
+      "sha256": "937ce9ae3371fd8cc02860288ff5337166634e39545286dbbdd5371280fbeea9",
+      "bytes": 92405
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/hotfix-final/master-seam-1462.jpg",
+      "sha256": "efee5a3e4d6792bce9f5e8e2d468bf06f52bba794c8ef184a258cffc7e31f377",
+      "bytes": 33849
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/hotfix-final/master-seam-21437.jpg",
+      "sha256": "ed9c4d61e0a2740decd4271f7547663a4946a45106b34e3f7218d8b131c378f7",
+      "bytes": 26839
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/hotfix-final/repro-after.log",
+      "sha256": "a3ef29500787abfe05252dc7df9e7d68e6555c9c169410d4471ce22ed31b8d77",
+      "bytes": 30
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/hotfix-final/repro-before.log",
+      "sha256": "6c0710b87aad191a2cf8010b3773aeb9e72074433a116d402d8dfe26e3c7ffac",
+      "bytes": 1343
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/hotfix-final/repro.py",
+      "sha256": "07d18a1f20cc638e38e6574e2113b7c101898de0787b09242b18e776bc464aba",
+      "bytes": 1188
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/hotfix-final/sheet-0.jpg",
+      "sha256": "433190bf5dbb1920c4fa7ec2f34dea1e43ffe7e7b91b28814e9dad515bb8369a",
+      "bytes": 79533
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/hotfix-final/sheet-1.jpg",
+      "sha256": "5c1a7ea6050b658e87c5dfe6936f4472683dc72b06e251474380eee8279bef42",
+      "bytes": 144120
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/hotfix-final/sheet-2.jpg",
+      "sha256": "210a3a47b9cfee7cc3c811bfabcff43bff8e66a003f74a728e6d9da5440e5049",
+      "bytes": 120820
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/hotfix-final/sheet-3.jpg",
+      "sha256": "689d496191d24dec11e7f685b67c943f0bbc8d8079b323b44c246fe3bdc9f605",
+      "bytes": 112021
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/hotfix-final/sheet-4.jpg",
+      "sha256": "902a26f2bb54fdd4dc9a95205d1f7cf84c09a60cb2a2bf15fd661cf359e5d26e",
+      "bytes": 109168
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/hotfix-final/sheet-5.jpg",
+      "sha256": "d22214982e6b41fa7a87c9a6a8693b0201c278118d63e97c2c0cc210a5a5fe22",
+      "bytes": 100957
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/node-pixel-measurements.json",
+      "sha256": "5392843d8b29cb3d7c269e302eeeb9057e6e33da9c2407177d97734e3358ce44",
+      "bytes": 45787
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/preservation-checks.json",
+      "sha256": "5709c11b2c5f1a6b1cfdf1c8cf4324d8d21f43f29627f502f08638d7db37352c",
+      "bytes": 1216
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/qa-summary.json",
+      "sha256": "37ef8eb252624c5944d218c055f8a64aa37f9f2327268e3c666f805783a43267",
+      "bytes": 1610
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/source-scope.json",
+      "sha256": "ef8be6bc0aab28b616cd125edfca37c08dc2f7eeb4708e079b646ad2f6c12830",
+      "bytes": 1776
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/temporal/assistant-00.jpg",
+      "sha256": "9cae5f7501750497a4c53c35f5eadae8781b5fe5b58081adae9306f33c4c03e0",
+      "bytes": 141837
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/temporal/assistant-01.jpg",
+      "sha256": "caa9b506f75c94212ab6e5bd3173cc71e3bcd646c4e3f51fa401c1a362583ba3",
+      "bytes": 159386
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/temporal/book-open-00.jpg",
+      "sha256": "49498a962f6dee6fb2e0d7aefe2977552d9cd51f7093a6c447e83a9ed4559022",
+      "bytes": 114145
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/temporal/book-open-01.jpg",
+      "sha256": "812b4678c3a8bfb72b3ed708c8e66e1b36ebf83a85c2e12b9396d51ce01c6fb5",
+      "bytes": 152521
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/temporal/callbacks-00.jpg",
+      "sha256": "cc3abdf5122581cc51959a86842f7e1afa5bf5596fb2e13084c39341fd203356",
+      "bytes": 194775
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/temporal/callbacks-01.jpg",
+      "sha256": "445c6dd4ee2bf09c4b86b3d7b115f597848c639996e41aeed7c1d53b368909db",
+      "bytes": 190485
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/temporal/callbacks-02.jpg",
+      "sha256": "1e33ef06f2729c461626d7eed2920a5a26238f394947cb86e7f823b90df09e21",
+      "bytes": 116028
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/temporal/callbacks-03.jpg",
+      "sha256": "447344157ea5de350f5105f042c24b0e428bdc72decb324c478f5e7e0bb2e154",
+      "bytes": 144204
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/temporal/callbacks-04.jpg",
+      "sha256": "6d31fbe07d5b87e9972ef25bc103b60c5078e591b9a396e1852dc8e25e6b147e",
+      "bytes": 182032
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/temporal/callbacks-05.jpg",
+      "sha256": "7c5ff0fff7c0c5bd41ace1c3383fd5c20e15bab9c3d077a674a9b7d37c1f6577",
+      "bytes": 192529
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/temporal/callbacks-06.jpg",
+      "sha256": "c177b4fb76980f7573209ce424b2ab2bbeabea48eaba1898803f9c2cebdafada",
+      "bytes": 203922
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/temporal/callbacks-07.jpg",
+      "sha256": "ae6b106daaada4277720b5b2e93852f670dec509cac7974f12283e8affb0c5fd",
+      "bytes": 136440
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/temporal/callbacks-08.jpg",
+      "sha256": "f6ea2b435d6bfdc75eb4c05fa7d743f13b81d6d62798921f168f912417048f26",
+      "bytes": 158536
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/temporal/callbacks-09.jpg",
+      "sha256": "a308acc2671880e3b2191b4bef726ff99e7f1350e231d63a06620f39ae178c09",
+      "bytes": 147569
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/temporal/conclusion-00.jpg",
+      "sha256": "061745b44628bebb7ab9dcf40e29dcd24d9def32c40cc3581b3122a5db9dd375",
+      "bytes": 130634
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/temporal/conclusion-01.jpg",
+      "sha256": "cac31a274f61ed0f5ce352ba041cbee7a7e21fbcf0fd02df42b02ebcfc67866b",
+      "bytes": 208151
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/temporal/conclusion-02.jpg",
+      "sha256": "0d6c8a36802228ccd17e77095fdb28c3f1a9539d1ab73d6ff086b96e3c0c300d",
+      "bytes": 153121
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/temporal/conclusion-03.jpg",
+      "sha256": "800c5fdcc532cb8979a163121870e4d16d45193bde1afd850741bbec2e0c4901",
+      "bytes": 108732
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/temporal/conclusion-04.jpg",
+      "sha256": "67026d4be23ca71c22644c6d77acdddd246ab95809918211cd0e391ebe3725f3",
+      "bytes": 112515
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/temporal/conclusion-05.jpg",
+      "sha256": "601c9243d2e4602151b60a1f2c7aacf0aa18ba0ab91b6a8b23a6b56b7826fe31",
+      "bytes": 41272
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/temporal/first-word-00.jpg",
+      "sha256": "19fa785de32ade7ba4ed072285fd03df1f8bbb4146d479c4b8356807a79c8cb2",
+      "bytes": 206086
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/temporal/first-word-01.jpg",
+      "sha256": "3dd92f2dca0ac1e11b8c614ff439862ea270499c99f1a3d27c02f9a61e6dd964",
+      "bytes": 55695
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/temporal/manifest.json",
+      "sha256": "9a24acdb82e91a0cb5d4d80094d933b72acc6ecbf4a26de9ca6d32f679fcc777",
+      "bytes": 4775
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/temporal/model-left-summary-00.jpg",
+      "sha256": "ff925b0b00d2b995f50cd5c4b681c04c33e2df59392354543f4ebc373c68d810",
+      "bytes": 205389
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/temporal/model-left-summary-01.jpg",
+      "sha256": "b778ca1da6d94ab1eec96818f0e06ce02391526af6904f6c1809a78578888db6",
+      "bytes": 207388
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/temporal/model-left-summary-02.jpg",
+      "sha256": "b3cc821ea4598e00dd0a7594280edd0c3092abedf7820b8db42f0747b70eda85",
+      "bytes": 91873
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/temporal/payoff-00.jpg",
+      "sha256": "a4ed30c481d571f7597c71222311a93d01382586b343c96596d80d4818ff0a57",
+      "bytes": 168869
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/temporal/payoff-01.jpg",
+      "sha256": "a0e1b1ee17604eec92a4859fb396c6971a8732e912b1ea60f5cc528e155417b9",
+      "bytes": 240303
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/temporal/payoff-02.jpg",
+      "sha256": "7c8ba222932437271c62629c79520ebca0b9a5a24888361de7cd289555d96515",
+      "bytes": 212939
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/temporal/persona-00.jpg",
+      "sha256": "1e1ee652a9f893659a996dd38def4584cce9cf144c6965b56ec3df5d3e979ad6",
+      "bytes": 171871
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/temporal/persona-01.jpg",
+      "sha256": "92850f33b74b86fa6f9cbc6ae97b059f0e7026771adad144873fa8cc593ba681",
+      "bytes": 183948
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/qa/temporal/persona-02.jpg",
+      "sha256": "e9abbd3dc7290420f7758fd08303703183f1ac2a1a38e1402fe8c39dd97a3f0c",
+      "bytes": 191928
+    },
+    {
+      "path": "videos/llm_fundation/master-scenes/source-manifest.json",
+      "sha256": "5b6a9666b4cdd17a0d4a633263fc8664232b100da9e03ae758d116de613e6b34",
+      "bytes": 4997
+    },
+    {
+      "path": "videos/llm_fundation/master-validation.json",
+      "sha256": "3c3385176560c57ee933e9ac0429602b66bbf190a03c4240846517eb2d3d5498",
+      "bytes": 6648
+    },
+    {
+      "path": "videos/llm_fundation/master.mp4",
+      "sha256": "7d52455e20cecb8c958bafceceb250558640e85f581b804d94bc524b8c409f33",
+      "bytes": 59863231
+    }
+  ]
+}

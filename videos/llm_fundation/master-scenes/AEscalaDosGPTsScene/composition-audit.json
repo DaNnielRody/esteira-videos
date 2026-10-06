@@ -1,0 +1,1655 @@
+{
+  "method": "Clipped visible root envelopes in camera coordinates; estimate, not ink area or semantic identification. Thin hero typography, first GPT, spatial distance and empty question hold require narrative review.",
+  "beats": [
+    {
+      "beat": "beat-3.8",
+      "seconds": 3.767,
+      "camera_width": 10.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.263,
+          "height_fraction": 0.4148,
+          "envelope_area_fraction": 0.1091
+        },
+        {
+          "type": "Text",
+          "text": "GPT-1",
+          "width_fraction": 0.2212,
+          "height_fraction": 0.1062,
+          "envelope_area_fraction": 0.0235
+        },
+        {
+          "type": "Text",
+          "text": "0M",
+          "width_fraction": 0.0634,
+          "height_fraction": 0.0788,
+          "envelope_area_fraction": 0.005
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-3.8",
+      "seconds": 5.267,
+      "camera_width": 10.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.263,
+          "height_fraction": 0.4148,
+          "envelope_area_fraction": 0.1091
+        },
+        {
+          "type": "Text",
+          "text": "GPT-1",
+          "width_fraction": 0.2212,
+          "height_fraction": 0.1062,
+          "envelope_area_fraction": 0.0235
+        },
+        {
+          "type": "Text",
+          "text": "0M",
+          "width_fraction": 0.1368,
+          "height_fraction": 0.0768,
+          "envelope_area_fraction": 0.0105
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-9.8",
+      "seconds": 9.8,
+      "camera_width": 10.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.263,
+          "height_fraction": 0.4148,
+          "envelope_area_fraction": 0.1091
+        },
+        {
+          "type": "Text",
+          "text": "GPT-1",
+          "width_fraction": 0.2212,
+          "height_fraction": 0.1062,
+          "envelope_area_fraction": 0.0235
+        },
+        {
+          "type": "Text",
+          "text": "0M",
+          "width_fraction": 0.1368,
+          "height_fraction": 0.0768,
+          "envelope_area_fraction": 0.0105
+        },
+        {
+          "type": "Text",
+          "text": "texto",
+          "width_fraction": 0.0818,
+          "height_fraction": 0.0426,
+          "envelope_area_fraction": 0.0035
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-9.8",
+      "seconds": 11.3,
+      "camera_width": 10.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.263,
+          "height_fraction": 0.4148,
+          "envelope_area_fraction": 0.1091
+        },
+        {
+          "type": "Text",
+          "text": "GPT-1",
+          "width_fraction": 0.2212,
+          "height_fraction": 0.1062,
+          "envelope_area_fraction": 0.0235
+        },
+        {
+          "type": "Text",
+          "text": "0M",
+          "width_fraction": 0.1368,
+          "height_fraction": 0.0768,
+          "envelope_area_fraction": 0.0105
+        },
+        {
+          "type": "Text",
+          "text": "texto",
+          "width_fraction": 0.0072,
+          "height_fraction": 0.0034,
+          "envelope_area_fraction": 0.0
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-13.1",
+      "seconds": 13.1,
+      "camera_width": 10.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.263,
+          "height_fraction": 0.4148,
+          "envelope_area_fraction": 0.1091
+        },
+        {
+          "type": "Text",
+          "text": "GPT-1",
+          "width_fraction": 0.2212,
+          "height_fraction": 0.1062,
+          "envelope_area_fraction": 0.0235
+        },
+        {
+          "type": "Text",
+          "text": "0M",
+          "width_fraction": 0.1368,
+          "height_fraction": 0.0768,
+          "envelope_area_fraction": 0.0105
+        },
+        {
+          "type": "Text",
+          "text": "texto",
+          "width_fraction": 0.0818,
+          "height_fraction": 0.0426,
+          "envelope_area_fraction": 0.0035
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-13.1",
+      "seconds": 14.6,
+      "camera_width": 10.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.263,
+          "height_fraction": 0.4148,
+          "envelope_area_fraction": 0.1091
+        },
+        {
+          "type": "Text",
+          "text": "GPT-1",
+          "width_fraction": 0.2212,
+          "height_fraction": 0.1062,
+          "envelope_area_fraction": 0.0235
+        },
+        {
+          "type": "Text",
+          "text": "0M",
+          "width_fraction": 0.1368,
+          "height_fraction": 0.0768,
+          "envelope_area_fraction": 0.0105
+        },
+        {
+          "type": "Text",
+          "text": "texto",
+          "width_fraction": 0.0072,
+          "height_fraction": 0.0034,
+          "envelope_area_fraction": 0.0
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-17",
+      "seconds": 17.0,
+      "camera_width": 10.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.263,
+          "height_fraction": 0.4148,
+          "envelope_area_fraction": 0.1091
+        },
+        {
+          "type": "Text",
+          "text": "GPT-1",
+          "width_fraction": 0.2212,
+          "height_fraction": 0.1062,
+          "envelope_area_fraction": 0.0235
+        },
+        {
+          "type": "Text",
+          "text": "0M",
+          "width_fraction": 0.1368,
+          "height_fraction": 0.0768,
+          "envelope_area_fraction": 0.0105
+        },
+        {
+          "type": "Text",
+          "text": "texto",
+          "width_fraction": 0.0818,
+          "height_fraction": 0.0426,
+          "envelope_area_fraction": 0.0035
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-17",
+      "seconds": 18.5,
+      "camera_width": 10.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.263,
+          "height_fraction": 0.4148,
+          "envelope_area_fraction": 0.1091
+        },
+        {
+          "type": "Text",
+          "text": "GPT-1",
+          "width_fraction": 0.2212,
+          "height_fraction": 0.1062,
+          "envelope_area_fraction": 0.0235
+        },
+        {
+          "type": "Text",
+          "text": "0M",
+          "width_fraction": 0.1368,
+          "height_fraction": 0.0768,
+          "envelope_area_fraction": 0.0105
+        },
+        {
+          "type": "Text",
+          "text": "texto",
+          "width_fraction": 0.0072,
+          "height_fraction": 0.0034,
+          "envelope_area_fraction": 0.0
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-22.4",
+      "seconds": 22.367,
+      "camera_width": 10.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.263,
+          "height_fraction": 0.4148,
+          "envelope_area_fraction": 0.1091
+        },
+        {
+          "type": "Text",
+          "text": "GPT-1",
+          "width_fraction": 0.2212,
+          "height_fraction": 0.1062,
+          "envelope_area_fraction": 0.0235
+        },
+        {
+          "type": "Text",
+          "text": "0M",
+          "width_fraction": 0.1368,
+          "height_fraction": 0.0768,
+          "envelope_area_fraction": 0.0105
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-22.4",
+      "seconds": 22.767,
+      "camera_width": 10.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.263,
+          "height_fraction": 0.4148,
+          "envelope_area_fraction": 0.1091
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-23",
+      "seconds": 23.0,
+      "camera_width": 10.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.263,
+          "height_fraction": 0.4148,
+          "envelope_area_fraction": 0.1091
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-23",
+      "seconds": 26.0,
+      "camera_width": 24.0,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.4628,
+          "height_fraction": 0.7259,
+          "envelope_area_fraction": 0.3359
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1183,
+          "height_fraction": 0.1867,
+          "envelope_area_fraction": 0.0221
+        },
+        {
+          "type": "Text",
+          "text": "GPT-2",
+          "width_fraction": 0.1177,
+          "height_fraction": 0.054,
+          "envelope_area_fraction": 0.0064
+        },
+        {
+          "type": "Text",
+          "text": "0.117B",
+          "width_fraction": 0.0999,
+          "height_fraction": 0.04,
+          "envelope_area_fraction": 0.004
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-26.7",
+      "seconds": 26.667,
+      "camera_width": 24.0,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.4628,
+          "height_fraction": 0.7259,
+          "envelope_area_fraction": 0.3359
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1183,
+          "height_fraction": 0.1867,
+          "envelope_area_fraction": 0.0221
+        },
+        {
+          "type": "Text",
+          "text": "GPT-2",
+          "width_fraction": 0.1177,
+          "height_fraction": 0.054,
+          "envelope_area_fraction": 0.0064
+        },
+        {
+          "type": "Text",
+          "text": "0.117B",
+          "width_fraction": 0.0705,
+          "height_fraction": 0.0427,
+          "envelope_area_fraction": 0.003
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-26.7",
+      "seconds": 26.667,
+      "camera_width": 24.0,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.4628,
+          "height_fraction": 0.7259,
+          "envelope_area_fraction": 0.3359
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1183,
+          "height_fraction": 0.1867,
+          "envelope_area_fraction": 0.0221
+        },
+        {
+          "type": "Text",
+          "text": "GPT-2",
+          "width_fraction": 0.1177,
+          "height_fraction": 0.054,
+          "envelope_area_fraction": 0.0064
+        },
+        {
+          "type": "Text",
+          "text": "0.117B",
+          "width_fraction": 0.0705,
+          "height_fraction": 0.0427,
+          "envelope_area_fraction": 0.003
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-33",
+      "seconds": 33.0,
+      "camera_width": 24.0,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.4628,
+          "height_fraction": 0.7259,
+          "envelope_area_fraction": 0.3359
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1183,
+          "height_fraction": 0.1867,
+          "envelope_area_fraction": 0.0221
+        },
+        {
+          "type": "Text",
+          "text": "GPT-2",
+          "width_fraction": 0.1177,
+          "height_fraction": 0.054,
+          "envelope_area_fraction": 0.0064
+        },
+        {
+          "type": "Text",
+          "text": "0.117B",
+          "width_fraction": 0.0705,
+          "height_fraction": 0.0427,
+          "envelope_area_fraction": 0.003
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-33",
+      "seconds": 35.3,
+      "camera_width": 24.0,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.4628,
+          "height_fraction": 0.7259,
+          "envelope_area_fraction": 0.3359
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1183,
+          "height_fraction": 0.1867,
+          "envelope_area_fraction": 0.0221
+        },
+        {
+          "type": "Text",
+          "text": "GPT-2",
+          "width_fraction": 0.1177,
+          "height_fraction": 0.054,
+          "envelope_area_fraction": 0.0064
+        },
+        {
+          "type": "Text",
+          "text": "0.117B",
+          "width_fraction": 0.0705,
+          "height_fraction": 0.0427,
+          "envelope_area_fraction": 0.003
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-36.5",
+      "seconds": 36.5,
+      "camera_width": 24.0,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.4628,
+          "height_fraction": 0.7259,
+          "envelope_area_fraction": 0.3359
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1183,
+          "height_fraction": 0.1867,
+          "envelope_area_fraction": 0.0221
+        },
+        {
+          "type": "Text",
+          "text": "GPT-2",
+          "width_fraction": 0.1177,
+          "height_fraction": 0.054,
+          "envelope_area_fraction": 0.0064
+        },
+        {
+          "type": "Text",
+          "text": "0.117B",
+          "width_fraction": 0.0705,
+          "height_fraction": 0.0427,
+          "envelope_area_fraction": 0.003
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-36.5",
+      "seconds": 38.8,
+      "camera_width": 24.0,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.4628,
+          "height_fraction": 0.7259,
+          "envelope_area_fraction": 0.3359
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1183,
+          "height_fraction": 0.1867,
+          "envelope_area_fraction": 0.0221
+        },
+        {
+          "type": "Text",
+          "text": "GPT-2",
+          "width_fraction": 0.1177,
+          "height_fraction": 0.054,
+          "envelope_area_fraction": 0.0064
+        },
+        {
+          "type": "Text",
+          "text": "0.117B",
+          "width_fraction": 0.0705,
+          "height_fraction": 0.0427,
+          "envelope_area_fraction": 0.003
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-40",
+      "seconds": 40.0,
+      "camera_width": 24.0,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.4628,
+          "height_fraction": 0.7259,
+          "envelope_area_fraction": 0.3359
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1183,
+          "height_fraction": 0.1867,
+          "envelope_area_fraction": 0.0221
+        },
+        {
+          "type": "Text",
+          "text": "GPT-2",
+          "width_fraction": 0.1177,
+          "height_fraction": 0.054,
+          "envelope_area_fraction": 0.0064
+        },
+        {
+          "type": "Text",
+          "text": "0.117B",
+          "width_fraction": 0.0705,
+          "height_fraction": 0.0427,
+          "envelope_area_fraction": 0.003
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-40",
+      "seconds": 42.3,
+      "camera_width": 24.0,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.4628,
+          "height_fraction": 0.7259,
+          "envelope_area_fraction": 0.3359
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1183,
+          "height_fraction": 0.1867,
+          "envelope_area_fraction": 0.0221
+        },
+        {
+          "type": "Text",
+          "text": "GPT-2",
+          "width_fraction": 0.1177,
+          "height_fraction": 0.054,
+          "envelope_area_fraction": 0.0064
+        },
+        {
+          "type": "Text",
+          "text": "0.117B",
+          "width_fraction": 0.0705,
+          "height_fraction": 0.0427,
+          "envelope_area_fraction": 0.003
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-43.4",
+      "seconds": 43.4,
+      "camera_width": 24.0,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.4628,
+          "height_fraction": 0.7259,
+          "envelope_area_fraction": 0.3359
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.4628,
+          "height_fraction": 0.7259,
+          "envelope_area_fraction": 0.3359
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1183,
+          "height_fraction": 0.1867,
+          "envelope_area_fraction": 0.0221
+        },
+        {
+          "type": "Text",
+          "text": "GPT-2",
+          "width_fraction": 0.1177,
+          "height_fraction": 0.054,
+          "envelope_area_fraction": 0.0064
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-43.4",
+      "seconds": 45.1,
+      "camera_width": 24.0,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.4628,
+          "height_fraction": 0.7259,
+          "envelope_area_fraction": 0.3359
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-45.75",
+      "seconds": 45.767,
+      "camera_width": 24.0,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.4628,
+          "height_fraction": 0.7259,
+          "envelope_area_fraction": 0.3359
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-45.75",
+      "seconds": 46.633,
+      "camera_width": 24.0,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.6513,
+          "height_fraction": 1.0,
+          "envelope_area_fraction": 0.6513
+        },
+        {
+          "type": "Text",
+          "text": "1.5B",
+          "width_fraction": 0.0947,
+          "height_fraction": 0.045,
+          "envelope_area_fraction": 0.0043
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-46.65",
+      "seconds": 46.667,
+      "camera_width": 24.0,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.6513,
+          "height_fraction": 1.0,
+          "envelope_area_fraction": 0.6513
+        },
+        {
+          "type": "Text",
+          "text": "1.5B",
+          "width_fraction": 0.0947,
+          "height_fraction": 0.045,
+          "envelope_area_fraction": 0.0043
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-46.65",
+      "seconds": 47.567,
+      "camera_width": 46.0,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.6224,
+          "height_fraction": 1.0,
+          "envelope_area_fraction": 0.6224
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1572,
+          "height_fraction": 0.4251,
+          "envelope_area_fraction": 0.0668
+        },
+        {
+          "type": "Text",
+          "text": "GPT-2·1.5B",
+          "width_fraction": 0.1217,
+          "height_fraction": 0.0477,
+          "envelope_area_fraction": 0.0058
+        },
+        {
+          "type": "Text",
+          "text": "1.5B",
+          "width_fraction": 0.0946,
+          "height_fraction": 0.045,
+          "envelope_area_fraction": 0.0043
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-47.6",
+      "seconds": 47.6,
+      "camera_width": 46.0,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.6224,
+          "height_fraction": 1.0,
+          "envelope_area_fraction": 0.6224
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1572,
+          "height_fraction": 0.4251,
+          "envelope_area_fraction": 0.0668
+        },
+        {
+          "type": "Text",
+          "text": "GPT-2·1.5B",
+          "width_fraction": 0.1217,
+          "height_fraction": 0.0477,
+          "envelope_area_fraction": 0.0058
+        },
+        {
+          "type": "Text",
+          "text": "1.5B",
+          "width_fraction": 0.0946,
+          "height_fraction": 0.045,
+          "envelope_area_fraction": 0.0043
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-47.6",
+      "seconds": 48.367,
+      "camera_width": 46.0,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.7609,
+          "height_fraction": 1.0,
+          "envelope_area_fraction": 0.7609
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1572,
+          "height_fraction": 0.4251,
+          "envelope_area_fraction": 0.0668
+        },
+        {
+          "type": "Text",
+          "text": "GPT-2·1.5B",
+          "width_fraction": 0.1217,
+          "height_fraction": 0.0477,
+          "envelope_area_fraction": 0.0058
+        },
+        {
+          "type": "Text",
+          "text": "1.5B",
+          "width_fraction": 0.1142,
+          "height_fraction": 0.045,
+          "envelope_area_fraction": 0.0051
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-48.45",
+      "seconds": 48.433,
+      "camera_width": 46.0,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.7609,
+          "height_fraction": 1.0,
+          "envelope_area_fraction": 0.7609
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1572,
+          "height_fraction": 0.4251,
+          "envelope_area_fraction": 0.0668
+        },
+        {
+          "type": "Text",
+          "text": "GPT-2·1.5B",
+          "width_fraction": 0.1217,
+          "height_fraction": 0.0477,
+          "envelope_area_fraction": 0.0058
+        },
+        {
+          "type": "Text",
+          "text": "1.5B",
+          "width_fraction": 0.1142,
+          "height_fraction": 0.045,
+          "envelope_area_fraction": 0.0051
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-48.45",
+      "seconds": 49.8,
+      "camera_width": 88.0,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5,
+          "height_fraction": 0.7677,
+          "envelope_area_fraction": 0.3838
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1417,
+          "height_fraction": 0.2222,
+          "envelope_area_fraction": 0.0315
+        },
+        {
+          "type": "Text",
+          "text": "GPT-3",
+          "width_fraction": 0.1083,
+          "height_fraction": 0.0505,
+          "envelope_area_fraction": 0.0055
+        },
+        {
+          "type": "Text",
+          "text": "1.5B",
+          "width_fraction": 0.1142,
+          "height_fraction": 0.045,
+          "envelope_area_fraction": 0.0051
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-50.0",
+      "seconds": 50.0,
+      "camera_width": 88.0,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5,
+          "height_fraction": 0.7677,
+          "envelope_area_fraction": 0.3838
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1417,
+          "height_fraction": 0.2222,
+          "envelope_area_fraction": 0.0315
+        },
+        {
+          "type": "Text",
+          "text": "GPT-3",
+          "width_fraction": 0.1083,
+          "height_fraction": 0.0505,
+          "envelope_area_fraction": 0.0055
+        },
+        {
+          "type": "Text",
+          "text": "1.5B",
+          "width_fraction": 0.1142,
+          "height_fraction": 0.045,
+          "envelope_area_fraction": 0.0051
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-50.0",
+      "seconds": 50.0,
+      "camera_width": 88.0,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5,
+          "height_fraction": 0.7677,
+          "envelope_area_fraction": 0.3838
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1417,
+          "height_fraction": 0.2222,
+          "envelope_area_fraction": 0.0315
+        },
+        {
+          "type": "Text",
+          "text": "GPT-3",
+          "width_fraction": 0.1083,
+          "height_fraction": 0.0505,
+          "envelope_area_fraction": 0.0055
+        },
+        {
+          "type": "Text",
+          "text": "1.5B",
+          "width_fraction": 0.1142,
+          "height_fraction": 0.045,
+          "envelope_area_fraction": 0.0051
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-52",
+      "seconds": 52.0,
+      "camera_width": 88.0,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5,
+          "height_fraction": 0.7677,
+          "envelope_area_fraction": 0.3838
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.1417,
+          "height_fraction": 0.2222,
+          "envelope_area_fraction": 0.0315
+        },
+        {
+          "type": "Text",
+          "text": "GPT-3",
+          "width_fraction": 0.1083,
+          "height_fraction": 0.0505,
+          "envelope_area_fraction": 0.0055
+        },
+        {
+          "type": "Text",
+          "text": "1.5B",
+          "width_fraction": 0.1142,
+          "height_fraction": 0.045,
+          "envelope_area_fraction": 0.0051
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "after-52",
+      "seconds": 54.5,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.2672,
+          "height_fraction": 0.4113,
+          "envelope_area_fraction": 0.1099
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-55.2",
+      "seconds": 55.2,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.2672,
+          "height_fraction": 0.4113,
+          "envelope_area_fraction": 0.1099
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-55.2",
+      "seconds": 55.8,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.2672,
+          "height_fraction": 0.4113,
+          "envelope_area_fraction": 0.1099
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-61.0",
+      "seconds": 61.0,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.2672,
+          "height_fraction": 0.4113,
+          "envelope_area_fraction": 0.1099
+        },
+        {
+          "type": "Text",
+          "text": "dog",
+          "width_fraction": 0.057,
+          "height_fraction": 0.0568,
+          "envelope_area_fraction": 0.0032
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-61.0",
+      "seconds": 61.567,
+      "camera_width": 10.6,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.5324,
+          "height_fraction": 0.6219,
+          "envelope_area_fraction": 0.3311
+        }
+      ],
+      "below_30_percent": false
+    },
+    {
+      "beat": "beat-66.1",
+      "seconds": 66.1,
+      "camera_width": 12.4,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.4552,
+          "height_fraction": 0.5316,
+          "envelope_area_fraction": 0.242
+        },
+        {
+          "type": "Text",
+          "text": "POSITIVO",
+          "width_fraction": 0.2903,
+          "height_fraction": 0.0838,
+          "envelope_area_fraction": 0.0243
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-66.1",
+      "seconds": 67.1,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.3969,
+          "height_fraction": 0.4635,
+          "envelope_area_fraction": 0.184
+        },
+        {
+          "type": "Text",
+          "text": "POSITIVO",
+          "width_fraction": 0.2532,
+          "height_fraction": 0.0731,
+          "envelope_area_fraction": 0.0185
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-69.1",
+      "seconds": 69.1,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.3969,
+          "height_fraction": 0.4635,
+          "envelope_area_fraction": 0.184
+        },
+        {
+          "type": "Text",
+          "text": "POSITIVO",
+          "width_fraction": 0.2532,
+          "height_fraction": 0.0731,
+          "envelope_area_fraction": 0.0185
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-69.1",
+      "seconds": 69.633,
+      "camera_width": 11.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.322,
+          "height_fraction": 0.4957,
+          "envelope_area_fraction": 0.1596
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-75.5",
+      "seconds": 75.5,
+      "camera_width": 11.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.322,
+          "height_fraction": 0.4957,
+          "envelope_area_fraction": 0.1596
+        },
+        {
+          "type": "Text",
+          "text": "Ocachorrobuscouabola.",
+          "width_fraction": 0.339,
+          "height_fraction": 0.1035,
+          "envelope_area_fraction": 0.0351
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-75.5",
+      "seconds": 76.033,
+      "camera_width": 16.5,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.2303,
+          "height_fraction": 0.3545,
+          "envelope_area_fraction": 0.0816
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-82.5",
+      "seconds": 82.5,
+      "camera_width": 16.5,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.2303,
+          "height_fraction": 0.3545,
+          "envelope_area_fraction": 0.0816
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.3939,
+          "height_fraction": 0.0739,
+          "envelope_area_fraction": 0.0291
+        },
+        {
+          "type": "Text",
+          "text": "somar(a,b)",
+          "width_fraction": 0.1735,
+          "height_fraction": 0.0539,
+          "envelope_area_fraction": 0.0093
+        },
+        {
+          "type": "Text",
+          "text": "PERSONA",
+          "width_fraction": 0.1025,
+          "height_fraction": 0.0337,
+          "envelope_area_fraction": 0.0034
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-82.5",
+      "seconds": 82.933,
+      "camera_width": 10.6,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.3585,
+          "height_fraction": 0.5518,
+          "envelope_area_fraction": 0.1978
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-89.0",
+      "seconds": 89.0,
+      "camera_width": 12.4,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.3065,
+          "height_fraction": 0.4717,
+          "envelope_area_fraction": 0.1446
+        },
+        {
+          "type": "Text",
+          "text": "POSITIVO",
+          "width_fraction": 0.2903,
+          "height_fraction": 0.0838,
+          "envelope_area_fraction": 0.0243
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-89.0",
+      "seconds": 89.4,
+      "camera_width": 16.5,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.2303,
+          "height_fraction": 0.3545,
+          "envelope_area_fraction": 0.0816
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-95.2",
+      "seconds": 95.2,
+      "camera_width": 16.5,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.2303,
+          "height_fraction": 0.3545,
+          "envelope_area_fraction": 0.0816
+        },
+        {
+          "type": "Text",
+          "text": "Chuvacausoualagamento.",
+          "width_fraction": 0.2134,
+          "height_fraction": 0.1021,
+          "envelope_area_fraction": 0.0218
+        },
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.2667,
+          "height_fraction": 0.0733,
+          "envelope_area_fraction": 0.0195
+        },
+        {
+          "type": "Line",
+          "text": null,
+          "width_fraction": 0.1636,
+          "height_fraction": 0.0382,
+          "envelope_area_fraction": 0.0063
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-95.2",
+      "seconds": 95.567,
+      "camera_width": 11.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.322,
+          "height_fraction": 0.4957,
+          "envelope_area_fraction": 0.1596
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-98.0",
+      "seconds": 98.0,
+      "camera_width": 11.8,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.322,
+          "height_fraction": 0.4957,
+          "envelope_area_fraction": 0.1596
+        },
+        {
+          "type": "Text",
+          "text": "4",
+          "width_fraction": 0.0178,
+          "height_fraction": 0.055,
+          "envelope_area_fraction": 0.001
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-98.0",
+      "seconds": 98.567,
+      "camera_width": 15.5,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.2452,
+          "height_fraction": 0.3774,
+          "envelope_area_fraction": 0.0925
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-98.55",
+      "seconds": 98.567,
+      "camera_width": 15.5,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.2452,
+          "height_fraction": 0.3774,
+          "envelope_area_fraction": 0.0925
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-98.55",
+      "seconds": 98.833,
+      "camera_width": 15.5,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.2452,
+          "height_fraction": 0.3774,
+          "envelope_area_fraction": 0.0925
+        },
+        {
+          "type": "Text",
+          "text": "MESMOMODELO",
+          "width_fraction": 0.4129,
+          "height_fraction": 0.0784,
+          "envelope_area_fraction": 0.0324
+        },
+        {
+          "type": "Text",
+          "text": "somar(a,b)",
+          "width_fraction": 0.2323,
+          "height_fraction": 0.0721,
+          "envelope_area_fraction": 0.0168
+        },
+        {
+          "type": "Text",
+          "text": "POSITIVO",
+          "width_fraction": 0.2323,
+          "height_fraction": 0.067,
+          "envelope_area_fraction": 0.0156
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-101.4",
+      "seconds": 101.4,
+      "camera_width": 15.5,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.2452,
+          "height_fraction": 0.3774,
+          "envelope_area_fraction": 0.0925
+        },
+        {
+          "type": "Text",
+          "text": "MESMOMODELO",
+          "width_fraction": 0.4129,
+          "height_fraction": 0.0784,
+          "envelope_area_fraction": 0.0324
+        },
+        {
+          "type": "Text",
+          "text": "somar(a,b)",
+          "width_fraction": 0.2323,
+          "height_fraction": 0.0721,
+          "envelope_area_fraction": 0.0168
+        },
+        {
+          "type": "Text",
+          "text": "POSITIVO",
+          "width_fraction": 0.2323,
+          "height_fraction": 0.067,
+          "envelope_area_fraction": 0.0156
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-101.4",
+      "seconds": 102.0,
+      "camera_width": 15.5,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.2452,
+          "height_fraction": 0.3774,
+          "envelope_area_fraction": 0.0925
+        },
+        {
+          "type": "Text",
+          "text": "MESMOMODELO",
+          "width_fraction": 0.4129,
+          "height_fraction": 0.0784,
+          "envelope_area_fraction": 0.0324
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-102",
+      "seconds": 102.0,
+      "camera_width": 15.5,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.2452,
+          "height_fraction": 0.3774,
+          "envelope_area_fraction": 0.0925
+        },
+        {
+          "type": "Text",
+          "text": "MESMOMODELO",
+          "width_fraction": 0.4129,
+          "height_fraction": 0.0784,
+          "envelope_area_fraction": 0.0324
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-102",
+      "seconds": 104.0,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.4641,
+          "height_fraction": 0.535,
+          "envelope_area_fraction": 0.2483
+        },
+        {
+          "type": "Text",
+          "text": "modelo-base",
+          "width_fraction": 0.3788,
+          "height_fraction": 0.0796,
+          "envelope_area_fraction": 0.0302
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "beat-104.4",
+      "seconds": 104.4,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.4641,
+          "height_fraction": 0.535,
+          "envelope_area_fraction": 0.2483
+        },
+        {
+          "type": "Text",
+          "text": "modelo-base",
+          "width_fraction": 0.3788,
+          "height_fraction": 0.0796,
+          "envelope_area_fraction": 0.0302
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "after-104.4",
+      "seconds": 106.7,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.3376,
+          "height_fraction": 0.5196,
+          "envelope_area_fraction": 0.1754
+        },
+        {
+          "type": "Text",
+          "text": "modelo-base",
+          "width_fraction": 0.3788,
+          "height_fraction": 0.0796,
+          "envelope_area_fraction": 0.0302
+        }
+      ],
+      "below_30_percent": true
+    },
+    {
+      "beat": "final",
+      "seconds": 107.7,
+      "camera_width": 14.22,
+      "largest_subjects": [
+        {
+          "type": "VGroup",
+          "text": null,
+          "width_fraction": 0.3376,
+          "height_fraction": 0.5196,
+          "envelope_area_fraction": 0.1754
+        },
+        {
+          "type": "Text",
+          "text": "modelo-base",
+          "width_fraction": 0.3788,
+          "height_fraction": 0.0796,
+          "envelope_area_fraction": 0.0302
+        }
+      ],
+      "below_30_percent": true
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+[
+  {
+    "scene": "AEscadaEAPerguntaScene",
+    "typography_only": false,
+    "sha256": "65f1b940d4e99cd0eafd83f879bb0df221ed1726c253294c60a727eff5548938"
+  },
+  {
+    "scene": "AEscalaDosGPTsScene",
+    "typography_only": false,
+    "sha256": "5cc0a278adfdcde81bada81b62a6d1d02fc720021c3a401282c5c18d4f52793f"
+  },
+  {
+    "scene": "ANovaFinalizacaoScene",
+    "typography_only": false,
+    "sha256": "1ba95e89147de107d4894d2c3f0b9917ba2a56df2807b4c6402b93ee8f88dc69"
+  },
+  {
+    "scene": "ModeloBaseNaoEAssistenteScene",
+    "typography_only": true,
+    "sha256": "cee0501f23f14ee2c9c41624ccd5859db0373cec213167a676e415f4ed545041"
+  },
+  {
+    "scene": "OLimiteDoDicionarioScene",
+    "typography_only": false,
+    "sha256": "abbf7daab71e0a4092e4554bb2f9a971794a5c558190c6240457746f8ec6fc5f"
+  },
+  {
+    "scene": "OQueCriouOChatGPTScene",
+    "typography_only": false,
+    "sha256": "22a9d65bcbe77c2082ec426fcf701443dcfaf81fbe3bfce4fdaa23810c51bba6"
+  },
+  {
+    "scene": "OTextoEnsinaOModeloScene",
+    "typography_only": true,
+    "sha256": "d779c8567b0d07a0d60d5a5714c9bb47ca875d26f66f04bce18bfb57f460dd06"
+  },
+  {
+    "scene": "PosTreinamentoEChatGPTScene",
+    "typography_only": false,
+    "sha256": "193bd1b8db9fe93835773fd99889d4a7173063c7da940705f5d55419e9fe0ba1"
+  },
+  {
+    "scene": "Scene2017OTransformerScene",
+    "typography_only": true,
+    "sha256": "c318473bbc6f15697620a0564a1819ff5a8cc54fedd9af2370d71630a425bba9"
+  },
+  {
+    "scene": "TokensERepresentacoesScene",
+    "typography_only": true,
+    "sha256": "105cda34577befa318d3711b25caa18ee5bb5304d31d5e6931c900a7fa902a64"
+  },
+  {
+    "scene": "UmaFundacaoMuitasAplicacoesScene",
+    "typography_only": true,
+    "sha256": "c9f6b5db5248e54a27b9ee23f206aeda1b3f6158fdc76a7f2336853ec6540ba0"
+  }
+]

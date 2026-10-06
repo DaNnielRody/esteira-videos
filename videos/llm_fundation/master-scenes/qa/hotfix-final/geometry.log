@@ -1,0 +1,4 @@
+TokensERepresentacoesScene {'scene': 'TokensERepresentacoesScene', 'frames_checked': 865, 'token_frames_checked': 925, 'min_token_padding': 0.0414206283712093, 'errors': []}
+OQueCriouOChatGPTScene {'scene': 'OQueCriouOChatGPTScene', 'frames_checked': 68, 'token_frames_checked': 0, 'min_token_padding': 100, 'errors': []}
+OLimiteDoDicionarioScene {'scene': 'OLimiteDoDicionarioScene', 'frames_checked': 332, 'token_frames_checked': 0, 'min_token_padding': 100, 'errors': []}
+AEscadaEAPerguntaScene {'scene': 'AEscadaEAPerguntaScene', 'frames_checked': 160, 'token_frames_checked': 0, 'min_token_padding': 100, 'errors': []}
