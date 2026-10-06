@@ -83,6 +83,10 @@ def main(
             )
         if options.command == "web":
             return _serve_web(options)
+        if options.command == "narration":
+            from video_pipeline.narration import run_narration_command
+
+            return run_narration_command(options)
     except (OSError, ValueError) as exc:
         print(f"ERROR: {exc}")
         return 1
@@ -243,6 +247,34 @@ def _build_parser() -> argparse.ArgumentParser:
     web.add_argument("--port", type=int, default=8000)
     web.add_argument("--projects-root", type=Path, default=Path("projects"))
     web.add_argument("--audio-root", type=Path, default=Path("audio"))
+
+    narration = subparsers.add_parser("narration", help="prepare and improve narration")
+    narration_commands = narration.add_subparsers(dest="narration_command", required=True)
+    plan = narration_commands.add_parser("plan", help="inspect speech and pauses offline")
+    plan.add_argument("source", type=Path)
+    plan_context = plan.add_mutually_exclusive_group()
+    plan_context.add_argument("--timeline", type=Path)
+    plan_context.add_argument("--project", type=Path)
+    enhance = narration_commands.add_parser("enhance", help="convert phrases preserving pauses")
+    enhance.add_argument("source", type=Path)
+    enhance.add_argument("output", type=Path, help="new candidate directory")
+    enhance_context = enhance.add_mutually_exclusive_group()
+    enhance_context.add_argument("--timeline", type=Path)
+    enhance_context.add_argument("--project", type=Path)
+    voice = enhance.add_mutually_exclusive_group()
+    voice.add_argument("--voice-id")
+    voice.add_argument("--voice-file", type=Path)
+    enhance.add_argument("--env-file", type=Path)
+    enhance.add_argument("--stability", type=float, default=0.3)
+    enhance.add_argument("--similarity", type=float, default=0.85)
+    enhance.add_argument("--style", type=float, default=0.5)
+    clone = narration_commands.add_parser("clone", help="explicitly clone an owned narration voice")
+    clone.add_argument("source", type=Path)
+    clone.add_argument("--name", required=True)
+    clone.add_argument("--output", type=Path, required=True)
+    clone.add_argument("--start", type=float, default=0.0)
+    clone.add_argument("--duration", type=float, default=60.0)
+    clone.add_argument("--env-file", type=Path)
     return parser
 
 

@@ -4,6 +4,10 @@ Pipeline local para transformar um projeto audiovisual editável em cenas Manim
 aceitas e em um MP4 final. O projeto é a fonte de identidade; cada execução
 preserva seus candidatos, fatos e decisões para revisão.
 
+O serviço de [narração com ElevenLabs](docs/narration-elevenlabs.md) oferece
+planejamento offline, clonagem explícita e Voice Changer com preservação de pausas
+e controles de expressividade ligados aos beats canônicos.
+
 ## Fluxo canônico
 
 Inicialize um diretório de projeto com roteiro e narração:
